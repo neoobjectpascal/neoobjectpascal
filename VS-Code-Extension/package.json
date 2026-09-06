@@ -2,7 +2,7 @@
   "name": "neoobjectpascal",
   "displayName": "NeoObjectPascal",
   "description": "Complete IDE support for NeoObjectPascal: syntax highlighting, debugging, testing, and cloud execution",
-  "version": "2.16.1",
+  "version": "2.16.2",
   "publisher": "alvarobrito",
   "author": "Álvaro Brito",
   "license": "MIT",
