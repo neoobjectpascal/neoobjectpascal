@@ -1,0 +1,34 @@
+// Cálculo de ITBI (Imposto sobre Transmissão de Bens Imóveis) usando o tipo
+// Currency (BigDecimal) para valores monetários exatos, e Date para o vencimento.
+// Currency não sofre erro de ponto flutuante: 0.1 + 0.2 = 0.3 exatamente.
+
+var valorVenal: Currency;
+var valorTransacao: Currency;
+var baseCalculo: Currency;
+var aliquota: Real;
+var itbi: Currency;
+var vencimento: Date;
+
+begin
+    valorVenal := currency(450000.00);
+    valorTransacao := currency(520000.00);
+
+    // Base de cálculo: o maior entre o valor venal e o valor da transação
+    if valorTransacao > valorVenal then
+        baseCalculo := valorTransacao
+    else
+        baseCalculo := valorVenal;
+
+    aliquota := 0.02;   // 2%
+    itbi := baseCalculo * currency(aliquota);
+
+    WriteLn("Valor venal:      ", formatCurrency(valorVenal, "R$"));
+    WriteLn("Valor transação:  ", formatCurrency(valorTransacao, "R$"));
+    WriteLn("Base de cálculo:  ", formatCurrency(baseCalculo, "R$"));
+    WriteLn("Alíquota:         2%");
+    WriteLn("ITBI devido:      ", formatCurrency(itbi, "R$"));
+
+    // Vencimento em 30 dias
+    vencimento := addDays(today(), 30);
+    WriteLn("Vencimento:       ", format(vencimento, "dd/MM/yyyy"));
+end.

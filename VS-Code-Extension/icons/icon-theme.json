@@ -1,0 +1,20 @@
+{
+  "iconDefinitions": {
+    "npas": {
+      "iconPath": "./npas-icon.svg"
+    },
+    "test-npas": {
+      "iconPath": "./test-npas-icon.svg"
+    }
+  },
+  "fileExtensions": {
+    "npas": "npas"
+  },
+  "fileNames": {
+    "*.test.npas": "test-npas"
+  },
+  "file": "npas",
+  "languageIds": {
+    "neoobjectpascal": "npas"
+  }
+}

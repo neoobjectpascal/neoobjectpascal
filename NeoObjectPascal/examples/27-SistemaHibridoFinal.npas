@@ -1,0 +1,59 @@
+uses internal.datetime;
+
+function calcularIdade(anoNascimento): Integer
+begin
+    return java:(anoNascimento) {
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        int anoAtual = hoje.getYear();
+        return anoAtual - (Integer)param0;
+    };
+end;
+
+function formatarMensagem(nome, idade): String
+begin
+    return java:(nome, idade) {
+        return String.format("Olá %s! Você tem %d anos.", (String)param0, (Integer)param1);
+    };
+end;
+
+function obterDataFormatada(): String
+begin
+    return java:() {
+        java.time.LocalDateTime agora = java.time.LocalDateTime.now();
+        java.time.format.DateTimeFormatter formatter = 
+            java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        return agora.format(formatter);
+    };
+end;
+
+begin
+    WriteLn("=== Sistema Híbrido NeoObjectPascal-Java ===");
+    WriteLn();
+    
+    WriteLn("--- Demonstração de Funções Híbridas ---");
+    WriteLn("Data/hora atual: ", obterDataFormatada());
+    WriteLn("Idade calculada (nascido em 1990): ", calcularIdade(1990));
+    WriteLn("Mensagem formatada: ", formatarMensagem("João", 25));
+    WriteLn();
+    
+    WriteLn("--- Bibliotecas Internas Híbridas ---");
+    WriteLn("Ano atual: ", getCurrentYear());
+    WriteLn("Data atual: ", getCurrentDate());
+    WriteLn("Hora atual: ", getCurrentTime());
+    WriteLn("2024 é bissexto? ", isLeapYear(2024));
+    WriteLn("Dias em fevereiro de 2024: ", getDaysInMonth(2024, 2));
+    WriteLn("Idade de quem nasceu em 1990-05-15: ", getAge(1990, 5, 15));
+    WriteLn("Adicionar 30 dias a 2024-01-01: ", addDays(2024, 1, 1, 30));
+    WriteLn();
+    
+    WriteLn("--- Cálculos Matemáticos com Java ---");
+    WriteLn("Cálculo direto: ", java:(10, 20) {
+        Integer a = (Integer)param0;
+        Integer b = (Integer)param1;
+        return a * a + b * b;
+    });
+    WriteLn();
+    
+    WriteLn("=== Sistema Híbrido Funcionando Perfeitamente! ===");
+    WriteLn("NeoObjectPascal + Java = Poder Ilimitado!");
+end.

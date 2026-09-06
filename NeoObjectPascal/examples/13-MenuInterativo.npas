@@ -1,0 +1,11 @@
+begin
+  WriteLn("=== Demonstracao de Menu Interativo ===");
+  
+  showMenu("Primeira opcao", "Segunda opcao", "Terceira opcao", "Quarta opcao", "Sair");
+  
+  WriteLn("Menu exibido com sucesso!");
+  WriteLn("Este exemplo demonstra o uso da funcao showMenu");
+  WriteLn("que cria um menu numerado automaticamente.");
+  
+  WriteLn("=== Exemplo concluido! ===");
+end.

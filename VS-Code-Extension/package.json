@@ -1,0 +1,311 @@
+{
+  "name": "neoobjectpascal",
+  "displayName": "NeoObjectPascal",
+  "description": "Complete IDE support for NeoObjectPascal: syntax highlighting, debugging, testing, and cloud execution",
+  "version": "2.16.0",
+  "publisher": "alvarobrito",
+  "author": "Álvaro Brito",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alvarobrito/neoobjectpascal"
+  },
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Debuggers",
+    "Testing"
+  ],
+  "activationEvents": [
+    "onLanguage:neoobjectpascal",
+    "workspaceContains:**/*.npas",
+    "onCommand:neoobjectpascal.run",
+    "onCommand:neoobjectpascal.debug",
+    "onCommand:neoobjectpascal.runTest",
+    "onCommand:neoobjectpascal.runAllTests",
+    "onCommand:neoobjectpascal.build",
+    "onCommand:neoobjectpascal.newUi",
+    "onCustomEditor:neoobjectpascal.uiBuilder",
+    "onDebug"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "neoobjectpascal",
+        "aliases": [
+          "NeoObjectPascal",
+          "neoobjectpascal"
+        ],
+        "extensions": [
+          ".npas"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./icons/npas-icon.svg",
+          "dark": "./icons/npas-icon.svg"
+        }
+      },
+      {
+        "id": "neoobjectpascal-ui",
+        "aliases": [
+          "NeoObjectPascal UI"
+        ],
+        "extensions": [
+          ".xnpas"
+        ]
+      }
+    ],
+    "customEditors": [
+      {
+        "viewType": "neoobjectpascal.uiBuilder",
+        "displayName": "NeoObjectPascal UI Builder",
+        "selector": [
+          {
+            "filenamePattern": "*.xnpas"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "iconThemes": [
+      {
+        "id": "neoobjectpascal-icons",
+        "label": "NeoObjectPascal Icons",
+        "path": "./icons/neoobjectpascal-icon-theme.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "neoobjectpascal",
+        "scopeName": "source.neoobjectpascal",
+        "path": "./syntaxes/neoobjectpascal.tmLanguage.json",
+        "embeddedLanguages": {
+          "meta.embedded.asm": "source.asm"
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "neoobjectpascal",
+        "path": "./snippets/neoobjectpascal.json"
+      }
+    ],
+    "configuration": {
+      "title": "NeoObjectPascal",
+      "properties": {
+        "neoobjectpascal.jarPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the directory containing neoobjectpascal.jar (leave empty to use bundled JAR)"
+        },
+        "neoobjectpascal.cloudUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "Base URL for NeoObjectPascal Cloud"
+        },
+        "neoobjectpascal.cloudUsername": {
+          "type": "string",
+          "default": "",
+          "description": "Username for NeoObjectPascal Cloud (optional, will prompt if not set)"
+        },
+        "neoobjectpascal.cloudPassword": {
+          "type": "string",
+          "default": "",
+          "description": "Password for NeoObjectPascal Cloud (optional, will prompt if not set - NOT RECOMMENDED to store here)"
+        },
+        "neoobjectpascal.uiBuilder.language": {
+          "type": "string",
+          "enum": ["auto", "pt", "en", "de", "fr", "it"],
+          "enumDescriptions": [
+            "Follow the VS Code display language (falls back to Portuguese)",
+            "Português",
+            "English",
+            "Deutsch",
+            "Français",
+            "Italiano"
+          ],
+          "default": "auto",
+          "description": "Language of the .xnpas visual UI Builder editor (properties, palette, events). 'auto' follows the VS Code display language."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "neoobjectpascal.run",
+        "title": "Run NeoObjectPascal",
+        "icon": "$(play)"
+      },
+      {
+        "command": "neoobjectpascal.debug",
+        "title": "Debug NeoObjectPascal",
+        "icon": "$(debug-alt)"
+      },
+      {
+        "command": "neoobjectpascal.runTest",
+        "title": "Execute Unit Test",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "neoobjectpascal.runAllTests",
+        "title": "Execute All Unit Tests",
+        "icon": "$(testing-run-all-icon)"
+      },
+      {
+        "command": "neoobjectpascal.build",
+        "title": "Build Native Executable",
+        "icon": "$(package)"
+      },
+      {
+        "command": "neoobjectpascal.newUi",
+        "title": "New UI Builder File (.xnpas)",
+        "category": "NeoObjectPascal",
+        "icon": "$(add)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "when": "(resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || (explorerResourceIsFolder && neoobjectpascal:hasNpas)",
+          "command": "neoobjectpascal.run",
+          "group": "neoobjectpascal@1"
+        },
+        {
+          "when": "(resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || (explorerResourceIsFolder && neoobjectpascal:hasNpas)",
+          "command": "neoobjectpascal.debug",
+          "group": "neoobjectpascal@2"
+        },
+        {
+          "when": "(resourceExtname == .npas || (explorerResourceIsFolder && neoobjectpascal:hasNpas)) && neoobjectpascal:hasTests",
+          "command": "neoobjectpascal.runAllTests",
+          "group": "neoobjectpascal@3"
+        },
+        {
+          "when": "resourceFilename =~ /\\.test\\.npas$/",
+          "command": "neoobjectpascal.runTest",
+          "group": "neoobjectpascal@1"
+        },
+        {
+          "when": "(resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || (explorerResourceIsFolder && neoobjectpascal:hasNpas)",
+          "command": "neoobjectpascal.build",
+          "group": "neoobjectpascal@5"
+        }
+      ],
+      "editor/context": [
+        {
+          "when": "resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)",
+          "command": "neoobjectpascal.run",
+          "group": "neoobjectpascal@1"
+        },
+        {
+          "when": "resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)",
+          "command": "neoobjectpascal.debug",
+          "group": "neoobjectpascal@2"
+        },
+        {
+          "when": "resourceExtname == .npas && neoobjectpascal:hasTests",
+          "command": "neoobjectpascal.runAllTests",
+          "group": "neoobjectpascal@3"
+        },
+        {
+          "when": "resourceFilename =~ /\\.test\\.npas$/",
+          "command": "neoobjectpascal.runTest",
+          "group": "neoobjectpascal@1"
+        },
+        {
+          "when": "resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)",
+          "command": "neoobjectpascal.build",
+          "group": "neoobjectpascal@5"
+        }
+      ],
+      "editor/title/run": [
+        {
+          "when": "resourceExtname == .npas",
+          "command": "neoobjectpascal.run",
+          "group": "navigation@1"
+        },
+        {
+          "when": "resourceExtname == .npas",
+          "command": "neoobjectpascal.debug",
+          "group": "navigation@2"
+        }
+      ]
+    },
+    "breakpoints": [
+      {
+        "language": "neoobjectpascal"
+      }
+    ],
+    "debuggers": [
+      {
+        "type": "neoobjectpascal",
+        "label": "NeoObjectPascal Debug",
+        "program": "./debugAdapter.js",
+        "runtime": "node",
+        "configurationAttributes": {
+          "launch": {
+            "required": [
+              "program"
+            ],
+            "properties": {
+              "program": {
+                "type": "string",
+                "description": "Absolute path to a .npas file.",
+                "default": "${file}"
+              },
+              "jarPath": {
+                "type": "string",
+                "description": "Path to neoobjectpascal JAR file",
+                "default": ""
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "description": "Automatically stop after launch.",
+                "default": true
+              }
+            }
+          }
+        },
+        "initialConfigurations": [
+          {
+            "type": "neoobjectpascal",
+            "request": "launch",
+            "name": "Debug NeoObjectPascal File",
+            "program": "${file}",
+            "stopOnEntry": true
+          }
+        ],
+        "configurationSnippets": [
+          {
+            "label": "NeoObjectPascal: Debug File",
+            "description": "A new configuration for debugging a NeoObjectPascal file",
+            "body": {
+              "type": "neoobjectpascal",
+              "request": "launch",
+              "name": "Debug NeoObjectPascal File",
+              "program": "^\"\\${file}\"",
+              "stopOnEntry": true
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "prepare": "js-yaml syntaxes/neoobjectpascal.tmLanguage.yaml > syntaxes/neoobjectpascal.tmLanguage.json",
+    "clean": "rm -f syntaxes/neoobjectpascal.tmLanguage.json",
+    "test": "node test/run-tests.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "js-yaml": "^3.13.1",
+    "vsce": "^2.7.0"
+  },
+  "dependencies": {
+    "vscode-debugadapter": "^1.51.0",
+    "vscode-debugprotocol": "^1.51.0"
+  }
+}

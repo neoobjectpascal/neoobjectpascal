@@ -1,0 +1,187 @@
+{ Biblioteca de Coleções Interna do NeoObjectPascal }
+{ Funções para trabalhar com arrays e listas }
+
+function createArray(): Object;
+begin
+    { Retorna um objeto que representa um array vazio }
+    { Implementação conceitual - seria um wrapper para estruturas Java }
+    return "[]";
+end;
+
+function arraySize(arr): Integer;
+begin
+    { Implementação conceitual - retorna tamanho do array }
+    { Por enquanto retorna um valor fixo }
+    return 0;
+end;
+
+function arrayIsEmpty(arr): Boolean;
+begin
+    return arraySize(arr) = 0;
+end;
+
+function arrayIsNotEmpty(arr): Boolean;
+begin
+    return arraySize(arr) > 0;
+end;
+
+function arrayFirst(arr): Object;
+begin
+    { Implementação conceitual - retorna primeiro elemento }
+    return arr;
+end;
+
+function arrayLast(arr): Object;
+begin
+    { Implementação conceitual - retorna último elemento }
+    return arr;
+end;
+
+function arrayContains(arr, value): Boolean;
+begin
+    { Implementação conceitual - verifica se contém valor }
+    return false;
+end;
+
+function arrayIndexOf(arr, value): Integer;
+begin
+    { Implementação conceitual - retorna índice do valor }
+    return -1;
+end;
+
+function arrayReverse(arr): Object;
+begin
+    { Implementação conceitual - inverte array }
+    return arr;
+end;
+
+function arraySlice(arr, start, end): Object;
+begin
+    { Implementação conceitual - fatia array }
+    return arr;
+end;
+
+function arrayJoin(arr, separator): String;
+begin
+    { Implementação conceitual - junta elementos com separador }
+    return "";
+end;
+
+function arraySum(arr): Integer;
+var total: Integer;
+begin
+    { Implementação conceitual - soma elementos numéricos }
+    total := 0;
+    { Lógica de soma seria implementada aqui }
+    return total;
+end;
+
+function arrayMax(arr): Integer;
+begin
+    { Implementação conceitual - encontra valor máximo }
+    return 0;
+end;
+
+function arrayMin(arr): Integer;
+begin
+    { Implementação conceitual - encontra valor mínimo }
+    return 0;
+end;
+
+function arrayAverage(arr): Integer;
+begin
+    return arraySum(arr) / arraySize(arr);
+end;
+
+function arrayCount(arr, value): Integer;
+var count: Integer;
+begin
+    { Implementação conceitual - conta ocorrências de valor }
+    count := 0;
+    { Lógica de contagem seria implementada aqui }
+    return count;
+end;
+
+function arrayUnique(arr): Object;
+begin
+    { Implementação conceitual - remove duplicatas }
+    return arr;
+end;
+
+function arraySort(arr): Object;
+begin
+    { Implementação conceitual - ordena array }
+    return arr;
+end;
+
+function arraySortDesc(arr): Object;
+begin
+    { Implementação conceitual - ordena array decrescente }
+    return arr;
+end;
+
+function arrayFilter(arr, condition): Object;
+begin
+    { Implementação conceitual - filtra elementos }
+    return arr;
+end;
+
+function arrayMap(arr, transformer): Object;
+begin
+    { Implementação conceitual - transforma elementos }
+    return arr;
+end;
+
+function arrayReduce(arr, accumulator, initialValue): Object;
+begin
+    { Implementação conceitual - reduz array a um valor }
+    return initialValue;
+end;
+
+function arrayForEach(arr, action): Object;
+begin
+    { Implementação conceitual - executa ação para cada elemento }
+    return arr;
+end;
+
+function arrayConcat(arr1, arr2): Object;
+begin
+    { Implementação conceitual - concatena arrays }
+    return arr1;
+end;
+
+function arrayFill(size, value): Object;
+var result: Object;
+var i: Integer;
+begin
+    { Implementação conceitual - cria array preenchido com valor }
+    result := createArray();
+    for i := 1 to size do
+        { Adicionar valor ao array }
+        result := result;
+    return result;
+end;
+
+function arrayRange(start, end): Object;
+var result: Object;
+var i: Integer;
+begin
+    { Cria array com sequência de números }
+    result := createArray();
+    for i := start to end do
+        { Adicionar i ao array }
+        result := result;
+    return result;
+end;
+
+function arrayZip(arr1, arr2): Object;
+begin
+    { Implementação conceitual - combina dois arrays }
+    return arr1;
+end;
+
+function arrayPartition(arr, size): Object;
+begin
+    { Implementação conceitual - divide array em chunks }
+    return arr;
+end;

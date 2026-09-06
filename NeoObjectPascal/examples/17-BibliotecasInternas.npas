@@ -1,0 +1,92 @@
+uses internal.math, internal.string, internal.datetime;
+
+var numero: Integer;
+var resultado: Integer;
+var texto: String;
+var data: String;
+
+begin
+    WriteLn("=== Demonstração das Bibliotecas Internas ===");
+    WriteLn();
+    
+    { Testando biblioteca matemática }
+    WriteLn("--- Biblioteca Matemática (internal.math) ---");
+    numero := 15;
+    WriteLn("Número: ", numero);
+    WriteLn("Valor absoluto: ", abs(numero));
+    WriteLn("Quadrado: ", square(numero));
+    WriteLn("Cubo: ", cube(numero));
+    WriteLn("Fatorial: ", factorial(5));
+    WriteLn("Fibonacci(8): ", fibonacci(8));
+    WriteLn("É par? ", isEven(numero));
+    WriteLn("É ímpar? ", isOdd(numero));
+    WriteLn("Máximo entre 10 e 20: ", max(10, 20));
+    WriteLn("Mínimo entre 10 e 20: ", min(10, 20));
+    WriteLn("MDC(12, 18): ", gcd(12, 18));
+    WriteLn("MMC(4, 6): ", lcm(4, 6));
+    WriteLn("Sinal de -5: ", sign(0 - 5));
+    WriteLn("Clamp(25, 10, 20): ", clamp(25, 10, 20));
+    WriteLn();
+    
+    { Testando biblioteca de strings }
+    WriteLn("--- Biblioteca de Strings (internal.string) ---");
+    texto := "NeoObjectPascal";
+    WriteLn("Texto: ", texto);
+    WriteLn("Está vazio? ", isEmpty(texto));
+    WriteLn("Não está vazio? ", isNotEmpty(texto));
+    WriteLn("Repetir 3 vezes: ", repeat("*", 3));
+    WriteLn("Entre aspas: ", quote(texto));
+    WriteLn("Entre aspas simples: ", singleQuote(texto));
+    WriteLn("Entre colchetes: ", bracket(texto));
+    WriteLn("Entre parênteses: ", parenthesize(texto));
+    WriteLn("Juntar com hífen: ", join("-", "Neo", "Object"));
+    WriteLn("Juntar 3 palavras: ", join3(" ", "Olá", "mundo", "programação"));
+    WriteLn("Posição de 'Object': ", inStr(texto, "Object"));
+    WriteLn("Posição do caractere 'P': ", inStrChar(texto, "P"));
+    WriteLn("Contém 'Pascal'? ", contains(texto, "Pascal"));
+    WriteLn("Começa com 'Neo'? ", startsWith(texto, "Neo"));
+    WriteLn("Termina com 'Pascal'? ", endsWith(texto, "Pascal"));
+    WriteLn();
+    
+    { Testando biblioteca de data/hora }
+    WriteLn("--- Biblioteca de Data/Hora (internal.datetime) ---");
+    WriteLn("Ano atual: ", getCurrentYear());
+    WriteLn("Mês atual: ", getCurrentMonth());
+    WriteLn("Dia atual: ", getCurrentDay());
+    WriteLn("Data atual: ", getCurrentDate());
+    WriteLn("Hora atual: ", getCurrentTime());
+    WriteLn("Data e hora: ", getCurrentDateTime());
+    WriteLn("2024 é ano bissexto? ", isLeapYear(2024));
+    WriteLn("2023 é ano bissexto? ", isLeapYear(2023));
+    WriteLn("Dias em fevereiro de 2024: ", getDaysInMonth(2024, 2));
+    WriteLn("Nome do mês 10: ", getMonthName(10));
+    WriteLn("Nome do mês 10 (inglês): ", getMonthNameEn(10));
+    WriteLn("Nome do dia da semana 1: ", getDayOfWeekName(1));
+    WriteLn("Nome do dia da semana 1 (inglês): ", getDayOfWeekNameEn(1));
+    WriteLn("Data formatada: ", formatDate(2024, 10, 1));
+    WriteLn("Hora formatada: ", formatTime(14, 30, 45));
+    WriteLn("Data válida (2024-02-29)? ", isValidDate(2024, 2, 29));
+    WriteLn("Data válida (2023-02-29)? ", isValidDate(2023, 2, 29));
+    WriteLn("Hora válida (14:30:45)? ", isValidTime(14, 30, 45));
+    WriteLn("Hora válida (25:30:45)? ", isValidTime(25, 30, 45));
+    WriteLn("Idade de quem nasceu em 1990: ", getAge(1990, 5, 15));
+    WriteLn("Adicionar 30 dias a 2024-01-01: ", addDays(2024, 1, 1, 30));
+    WriteLn("Adicionar 6 meses a 2024-06-15: ", addMonths(2024, 6, 15, 6));
+    WriteLn("Adicionar 5 anos a 2024-01-01: ", addYears(2024, 1, 1, 5));
+    WriteLn();
+    
+    { Demonstração de pipeline com funções internas }
+    WriteLn("--- Pipeline com Funções Internas ---");
+    WriteLn("Pipeline: 7 |> square |> abs = ", 7 |> square |> abs);
+    WriteLn("Pipeline: -10 |> abs |> square = ", (0 - 10) |> abs |> square);
+    WriteLn();
+    
+    WriteLn("=== Demonstração Concluída! ===");
+    WriteLn("As bibliotecas internas estão funcionando corretamente.");
+    WriteLn("Use 'uses internal.[nome]' para importar bibliotecas:");
+    WriteLn("- internal.math: Funções matemáticas");
+    WriteLn("- internal.string: Manipulação de strings");
+    WriteLn("- internal.datetime: Data e hora");
+    WriteLn("- internal.collections: Trabalhar com arrays");
+    WriteLn("- internal.file: Operações com arquivos");
+end.

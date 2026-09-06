@@ -1,0 +1,17 @@
+{
+  "name": "neoobjectpascal-docs",
+  "version": "1.0.0",
+  "description": "Official multilingual documentation for the NeoObjectPascal language (pt, en, de, fr, it)",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3",
+    "@playwright/test": "^1.49.1"
+  }
+}

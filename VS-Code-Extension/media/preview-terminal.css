@@ -1,0 +1,21 @@
+/* preview-terminal.css — TerminalInk canvas look (dark monospace terminal). */
+.device-term { background: #0d1220; color: #c8ccd4;
+  font-family: var(--vscode-editor-font-family, "SF Mono", Menlo, monospace); font-size: 13.5px; line-height: 1.5; }
+.tk-root { padding: 8px; }
+.tk-box:empty { min-width: 60px; min-height: 16px; outline: 1px dashed #2e3b4e; border-radius: 4px; }
+.tk-text { white-space: pre-wrap; }
+.tk-badge { color: #0d1220; font-weight: 700; padding: 0 6px; border-radius: 3px; letter-spacing: .3px; }
+.tk-spacer { flex: 1 1 auto; min-width: 24px; min-height: 8px; }
+.tk-input { display: inline-flex; align-items: center; border: 1px solid #2e3b4e; border-radius: 4px;
+  padding: 2px 8px; min-width: 180px; background: #0f1626; }
+.tk-input .dim, .dim { opacity: .5; }
+.tk-cur { display: inline-block; width: 7px; height: 15px; background: #4ec9d4; margin-left: 3px; }
+.tk-select { display: flex; flex-direction: column; }
+.tk-opt { padding: 1px 0; }
+.tk-opt.on { color: #ffffff; }
+.tk-opt .ptr { color: #4ec9d4; }
+.tk-opt .chk { color: #23d18b; }
+.tk-progress .fill { color: #c586c0; letter-spacing: -1px; }
+.tk-progress .empty { color: #3a4658; letter-spacing: -1px; }
+.tk-alert { border: 1px solid; border-radius: 8px; padding: 6px 12px; display: inline-block; }
+.tk-list > div { padding: 1px 0; }

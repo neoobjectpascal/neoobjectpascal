@@ -1,0 +1,34 @@
+// Tipos de data e hora: Date, Time e DateTime (baseados em java.time).
+// Funções embutidas (sem uses): today, now, date, time, dateTime, format,
+// year/month/day/hour/minute, addDays/addMonths, daysBetween, dayOfWeek.
+
+var hoje: Date;
+var agora: DateTime;
+var nascimento: Date;
+var vencimento: Date;
+
+begin
+    hoje := today();
+    agora := now();
+    nascimento := date(1990, 5, 20);
+    vencimento := date(2026, 12, 31);
+
+    WriteLn("Hoje: ", format(hoje, "dd/MM/yyyy"));
+    WriteLn("Agora: ", format(agora, "dd/MM/yyyy HH:mm:ss"));
+    WriteLn("Idade em dias: ", daysBetween(nascimento, hoje));
+
+    // Datas se comparam com os operadores < > = <>
+    if hoje > vencimento then
+        WriteLn("Prazo vencido!")
+    else
+        WriteLn("Faltam ", daysBetween(hoje, vencimento), " dias para o vencimento");
+
+    WriteLn("Daqui a 30 dias: ", format(addDays(hoje, 30), "dd/MM/yyyy"));
+    WriteLn("No ano que vem: ", format(addYears(hoje, 1), "dd/MM/yyyy"));
+    WriteLn("Dia da semana (1=segunda): ", dayOfWeek(hoje));
+
+    // Coerção de String para Date (formato ISO yyyy-MM-dd)
+    var feriado: Date;
+    feriado := "2026-12-25";
+    WriteLn("Natal cai em: ", format(feriado, "dd/MM/yyyy"));
+end.

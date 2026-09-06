@@ -1,0 +1,21 @@
+// TerminalInk: interface estática com layout flexbox, borda e badge.
+// Rode em um terminal real: java -jar neoobjectpascal.jar examples/45-TuiOlaMundo.npas
+// (pressione q ou Esc para sair)
+
+uses terminalink;
+
+function ui(): Object
+begin
+    return VBox(#{ padding: 1, gap: 1, border: "round", borderColor: "cyan" }, [
+        Text(#{ bold: true, color: "cyan" }, "TerminalInk"),
+        Text(#{}, "Interfaces de terminal em NeoObjectPascal"),
+        HBox(#{ gap: 2 }, [
+            Badge(#{ color: "green" }, "OK"),
+            Text(#{ dim: true }, "pressione q para sair")
+        ])
+    ]);
+end;
+
+begin
+    render(ui);
+end.

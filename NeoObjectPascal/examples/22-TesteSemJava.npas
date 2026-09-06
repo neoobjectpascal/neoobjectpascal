@@ -1,0 +1,8 @@
+function testeSimples(): String
+begin
+    return "Olá sem Java!";
+end;
+
+begin
+    WriteLn("Teste: ", testeSimples());
+end.

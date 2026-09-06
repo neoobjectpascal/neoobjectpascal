@@ -1,0 +1,13 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0d0f13"/>
+  <rect width="1200" height="630" fill="url(#g)" opacity="0.18"/>
+  <defs>
+    <radialGradient id="g" cx="30%" cy="25%" r="70%">
+      <stop offset="0%" stop-color="#f0b429"/>
+      <stop offset="100%" stop-color="#0d0f13"/>
+    </radialGradient>
+  </defs>
+  <text x="90" y="300" font-family="monospace" font-size="72" font-weight="700" fill="#f0b429">NeoObjectPascal</text>
+  <text x="92" y="370" font-family="sans-serif" font-size="34" fill="#c9ccd3">Pascal, reimagined — OO, native testing, Java interop</text>
+  <text x="90" y="470" font-family="monospace" font-size="28" fill="#8b9099">begin  WriteLn("Hello, NeoObjectPascal!");  end.</text>
+</svg>

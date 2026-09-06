@@ -1,0 +1,418 @@
+function getFileExtension(filename): String
+begin
+    return java:(filename) {
+        String fname = (String) param0;
+        int lastDot = fname.lastIndexOf('.');
+        if (lastDot == -1 || lastDot == fname.length() - 1) {
+            return "";
+        }
+        return fname.substring(lastDot);
+    };
+end;
+
+function getFileName(filepath): String
+begin
+    return java:(filepath) {
+        String path = (String) param0;
+        java.io.File file = new java.io.File(path);
+        return file.getName();
+    };
+end;
+
+function getFileNameWithoutExtension(filepath): String
+begin
+    return java:(filepath) {
+        String path = (String) param0;
+        java.io.File file = new java.io.File(path);
+        String name = file.getName();
+        int lastDot = name.lastIndexOf('.');
+        if (lastDot == -1) {
+            return name;
+        }
+        return name.substring(0, lastDot);
+    };
+end;
+
+function joinPath(path1, path2): String
+begin
+    return java:(path1, path2) {
+        String p1 = (String) param0;
+        String p2 = (String) param1;
+        java.io.File file = new java.io.File(p1, p2);
+        return file.getPath();
+    };
+end;
+
+function joinPath3(path1, path2, path3): String
+begin
+    return java:(path1, path2, path3) {
+        String p1 = (String) param0;
+        String p2 = (String) param1;
+        String p3 = (String) param2;
+        java.io.File file = new java.io.File(new java.io.File(p1, p2), p3);
+        return file.getPath();
+    };
+end;
+
+function isAbsolutePath(path): Boolean
+begin
+    return java:(path) {
+        String p = (String) param0;
+        java.io.File file = new java.io.File(p);
+        return file.isAbsolute();
+    };
+end;
+
+function isRelativePath(path): Boolean
+begin
+    return java:(path) {
+        String p = (String) param0;
+        java.io.File file = new java.io.File(p);
+        return !file.isAbsolute();
+    };
+end;
+
+function normalizePath(path): String
+begin
+    return java:(path) {
+        String p = (String) param0;
+        try {
+            java.io.File file = new java.io.File(p);
+            return file.getCanonicalPath();
+        } catch (java.io.IOException e) {
+            return file.getAbsolutePath();
+        }
+    };
+end;
+
+function getParentDirectory(path): String
+begin
+    return java:(path) {
+        String p = (String) param0;
+        java.io.File file = new java.io.File(p);
+        String parent = file.getParent();
+        return parent != null ? parent : "";
+    };
+end;
+
+function isValidFilename(filename): Boolean
+begin
+    return java:(filename) {
+        String fname = (String) param0;
+        if (fname == null || fname.trim().isEmpty()) {
+            return false;
+        }
+        
+        String invalidChars = "<>:\"/\\|?*";
+        for (int i = 0; i < invalidChars.length(); i++) {
+            if (fname.indexOf(invalidChars.charAt(i)) != -1) {
+                return false;
+            }
+        }
+        
+        String[] reservedNames = {"CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"};
+        String upperName = fname.toUpperCase();
+        for (String reserved : reservedNames) {
+            if (upperName.equals(reserved) || upperName.startsWith(reserved + ".")) {
+                return false;
+            }
+        }
+        
+        return true;
+    };
+end;
+
+function sanitizeFilename(filename): String
+begin
+    return java:(filename) {
+        String fname = (String) param0;
+        if (fname == null) return "";
+        
+        String invalidChars = "<>:\"/\\|?*";
+        String result = fname;
+        for (int i = 0; i < invalidChars.length(); i++) {
+            result = result.replace(String.valueOf(invalidChars.charAt(i)), "_");
+        }
+        
+        result = result.trim();
+        
+        if (result.isEmpty()) {
+            result = "unnamed_file";
+        }
+        
+        return result;
+    };
+end;
+
+function getFileSize(filepath): Integer
+begin
+    return java:(filepath) {
+        String path = (String) param0;
+        try {
+            java.io.File file = new java.io.File(path);
+            if (file.exists() && file.isFile()) {
+                return (int) file.length();
+            }
+            return -1;
+        } catch (Exception e) {
+            return -1;
+        }
+    };
+end;
+
+function fileExists(filepath): Boolean
+begin
+    return java:(filepath) {
+        String path = (String) param0;
+        java.io.File file = new java.io.File(path);
+        return file.exists() && file.isFile();
+    };
+end;
+
+function directoryExists(dirpath): Boolean
+begin
+    return java:(dirpath) {
+        String path = (String) param0;
+        java.io.File dir = new java.io.File(path);
+        return dir.exists() && dir.isDirectory();
+    };
+end;
+
+function isFile(path): Boolean
+begin
+    return java:(path) {
+        String p = (String) param0;
+        java.io.File file = new java.io.File(p);
+        return file.isFile();
+    };
+end;
+
+function isDirectory(path): Boolean
+begin
+    return java:(path) {
+        String p = (String) param0;
+        java.io.File file = new java.io.File(p);
+        return file.isDirectory();
+    };
+end;
+
+function createTempFilename(prefix, extension): String
+begin
+    return java:(prefix, extension) {
+        String pref = (String) param0;
+        String ext = (String) param1;
+        long timestamp = System.currentTimeMillis();
+        return pref + "_temp_" + timestamp + ext;
+    };
+end;
+
+function getCommonFileExtensions(): String
+begin
+    return ".txt,.csv,.json,.xml,.html,.css,.js,.java,.pas,.npas,.pdf,.doc,.docx,.xls,.xlsx,.zip,.rar,.jpg,.jpeg,.png,.gif,.bmp,.mp3,.mp4,.avi,.mov";
+end;
+
+function isTextFile(filename): Boolean
+begin
+    return java:(filename) {
+        String fname = (String) param0;
+        String ext = "";
+        int lastDot = fname.lastIndexOf('.');
+        if (lastDot != -1) {
+            ext = fname.substring(lastDot).toLowerCase();
+        }
+        
+        String[] textExtensions = {".txt", ".csv", ".json", ".xml", ".html", ".htm", ".css", ".js", ".java", ".pas", ".npas", ".c", ".cpp", ".h", ".py", ".rb", ".php", ".sql", ".md", ".yml", ".yaml", ".ini", ".cfg", ".conf", ".log"};
+        
+        for (String textExt : textExtensions) {
+            if (ext.equals(textExt)) {
+                return true;
+            }
+        }
+        return false;
+    };
+end;
+
+function isBinaryFile(filename): Boolean
+begin
+    return java:(filename) {
+        String fname = (String) param0;
+        String ext = "";
+        int lastDot = fname.lastIndexOf('.');
+        if (lastDot != -1) {
+            ext = fname.substring(lastDot).toLowerCase();
+        }
+        
+        String[] textExtensions = {".txt", ".csv", ".json", ".xml", ".html", ".htm", ".css", ".js", ".java", ".pas", ".npas", ".c", ".cpp", ".h", ".py", ".rb", ".php", ".sql", ".md", ".yml", ".yaml", ".ini", ".cfg", ".conf", ".log"};
+        
+        for (String textExt : textExtensions) {
+            if (ext.equals(textExt)) {
+                return false;
+            }
+        }
+        return true;
+    };
+end;
+
+function getFileTypeDescription(filename): String
+begin
+    return java:(filename) {
+        String fname = (String) param0;
+        String ext = "";
+        int lastDot = fname.lastIndexOf('.');
+        if (lastDot != -1) {
+            ext = fname.substring(lastDot).toLowerCase();
+        }
+        
+        switch (ext) {
+            case ".txt": return "Arquivo de Texto";
+            case ".csv": return "Arquivo CSV";
+            case ".json": return "Arquivo JSON";
+            case ".xml": return "Arquivo XML";
+            case ".html":
+            case ".htm": return "Arquivo HTML";
+            case ".css": return "Arquivo CSS";
+            case ".js": return "Arquivo JavaScript";
+            case ".java": return "Arquivo Java";
+            case ".pas": return "Arquivo Pascal";
+            case ".npas": return "Arquivo NeoObjectPascal";
+            case ".pdf": return "Arquivo PDF";
+            case ".doc":
+            case ".docx": return "Documento Word";
+            case ".xls":
+            case ".xlsx": return "Planilha Excel";
+            case ".zip":
+            case ".rar":
+            case ".7z": return "Arquivo Compactado";
+            case ".jpg":
+            case ".jpeg": return "Imagem JPEG";
+            case ".png": return "Imagem PNG";
+            case ".gif": return "Imagem GIF";
+            case ".bmp": return "Imagem Bitmap";
+            case ".svg": return "Imagem SVG";
+            case ".mp3":
+            case ".wav":
+            case ".flac": return "Arquivo de Audio";
+            case ".mp4":
+            case ".avi":
+            case ".mov":
+            case ".mkv": return "Arquivo de Video";
+            case ".py": return "Arquivo Python";
+            case ".c": return "Arquivo C";
+            case ".cpp": return "Arquivo C++";
+            case ".h": return "Arquivo Header";
+            case ".php": return "Arquivo PHP";
+            case ".rb": return "Arquivo Ruby";
+            case ".sql": return "Arquivo SQL";
+            case ".md": return "Arquivo Markdown";
+            default: return "Arquivo Desconhecido";
+        }
+    };
+end;
+
+function formatFileSize(sizeInBytes): String
+begin
+    return java:(sizeInBytes) {
+        long size = ((Number) param0).longValue();
+        
+        if (size < 1024) {
+            return size + " bytes";
+        } else if (size < 1024 * 1024) {
+            return String.format("%.2f KB", size / 1024.0);
+        } else if (size < 1024 * 1024 * 1024) {
+            return String.format("%.2f MB", size / (1024.0 * 1024.0));
+        } else {
+            return String.format("%.2f GB", size / (1024.0 * 1024.0 * 1024.0));
+        }
+    };
+end;
+
+function generateBackupFilename(originalFilename): String
+begin
+    return java:(originalFilename) {
+        String original = (String) param0;
+        long timestamp = System.currentTimeMillis();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd_HHmmss");
+        String timeStr = sdf.format(new java.util.Date(timestamp));
+        return original + ".backup." + timeStr;
+    };
+end;
+
+function isHiddenFile(filename): Boolean
+begin
+    return java:(filename) {
+        String fname = (String) param0;
+        java.io.File file = new java.io.File(fname);
+        try {
+            return file.isHidden();
+        } catch (SecurityException e) {
+            return false;
+        }
+    };
+end;
+
+function getFilePermissions(filepath): String
+begin
+    return java:(filepath) {
+        String path = (String) param0;
+        java.io.File file = new java.io.File(path);
+        
+        if (!file.exists()) {
+            return "---";
+        }
+        
+        StringBuilder permissions = new StringBuilder();
+        permissions.append(file.canRead() ? "r" : "-");
+        permissions.append(file.canWrite() ? "w" : "-");
+        permissions.append(file.canExecute() ? "x" : "-");
+        
+        return permissions.toString();
+    };
+end;
+
+function isReadable(filepath): Boolean
+begin
+    return java:(filepath) {
+        String path = (String) param0;
+        java.io.File file = new java.io.File(path);
+        return file.canRead();
+    };
+end;
+
+function isWritable(filepath): Boolean
+begin
+    return java:(filepath) {
+        String path = (String) param0;
+        java.io.File file = new java.io.File(path);
+        return file.canWrite();
+    };
+end;
+
+function isExecutable(filepath): Boolean
+begin
+    return java:(filepath) {
+        String path = (String) param0;
+        java.io.File file = new java.io.File(path);
+        return file.canExecute();
+    };
+end;
+
+function getCurrentWorkingDirectory(): String
+begin
+    return java:() {
+        return System.getProperty("user.dir");
+    };
+end;
+
+function getUserHomeDirectory(): String
+begin
+    return java:() {
+        return System.getProperty("user.home");
+    };
+end;
+
+function getTempDirectory(): String
+begin
+    return java:() {
+        return System.getProperty("java.io.tmpdir");
+    };
+end;

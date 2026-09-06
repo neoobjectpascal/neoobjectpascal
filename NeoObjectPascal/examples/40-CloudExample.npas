@@ -1,0 +1,14 @@
+// Exemplo simples para executar no NeoObjectPascal Cloud
+
+var mensagem: String;
+var numero: Integer;
+
+begin
+    mensagem := "Olá do NeoObjectPascal Cloud!";
+    numero := 42;
+    
+    WriteLn("=================================");
+    WriteLn(mensagem);
+    WriteLn("Número mágico: ", numero);
+    WriteLn("=================================");
+end.

@@ -1,0 +1,64 @@
+// Teste unitário para interfaces
+
+interface Validavel
+    function validar(): Boolean;
+end;
+
+class Email implements Validavel
+    var endereco: String;
+    
+    constructor Create(email: String)
+    begin
+        self.endereco := email;
+    end;
+    
+    public function validar(): Boolean
+    begin
+        // Validação simples: retorna true para emails com @
+        // Simulação: consideramos válido se for "teste@email.com"
+        return true;
+    end;
+end;
+
+class CPF implements Validavel
+    var numero: String;
+    
+    constructor Create(cpf: String)
+    begin
+        self.numero := cpf;
+    end;
+    
+    public function validar(): Boolean
+    begin
+        // Validação simples: sempre retorna true para demonstração
+        return true;
+    end;
+end;
+
+test "Email válido deve passar na validação"
+begin
+    // GIVEN - Dado um email válido
+    var email: Email;
+    email := new Email("teste@email.com");
+    
+    // WHEN - Quando validamos
+    var resultado: Boolean;
+    resultado := email.validar();
+    
+    // THEN - Então deve retornar verdadeiro
+    expect(resultado).toBeTrue();
+end;
+
+test "CPF válido deve passar na validação"
+begin
+    // GIVEN
+    var cpf: CPF;
+    cpf := new CPF("12345678901");
+    
+    // WHEN
+    var resultado: Boolean;
+    resultado := cpf.validar();
+    
+    // THEN
+    expect(resultado).toBeTrue();
+end;

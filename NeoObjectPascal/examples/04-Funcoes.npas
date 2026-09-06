@@ -1,0 +1,11 @@
+function somar(a, b): Integer;
+begin
+  return a + b;
+end;
+
+var resultado: Integer;
+
+begin
+  resultado := somar(20, 22);
+  WriteLn("O resultado da soma é: ", resultado);
+end.

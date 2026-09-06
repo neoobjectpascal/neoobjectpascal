@@ -1,0 +1,209 @@
+function getCurrentYear(): Integer
+begin
+    return java:() {
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        return hoje.getYear();
+    };
+end;
+
+function getCurrentMonth(): Integer
+begin
+    return java:() {
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        return hoje.getMonthValue();
+    };
+end;
+
+function getCurrentDay(): Integer
+begin
+    return java:() {
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        return hoje.getDayOfMonth();
+    };
+end;
+
+function getCurrentHour(): Integer
+begin
+    return java:() {
+        java.time.LocalTime agora = java.time.LocalTime.now();
+        return agora.getHour();
+    };
+end;
+
+function getCurrentMinute(): Integer
+begin
+    return java:() {
+        java.time.LocalTime agora = java.time.LocalTime.now();
+        return agora.getMinute();
+    };
+end;
+
+function getCurrentSecond(): Integer
+begin
+    return java:() {
+        java.time.LocalTime agora = java.time.LocalTime.now();
+        return agora.getSecond();
+    };
+end;
+
+function formatDate(year, month, day): String
+begin
+    return java:(year, month, day) {
+        return String.format("%04d-%02d-%02d", (Integer)param0, (Integer)param1, (Integer)param2);
+    };
+end;
+
+function formatTime(hour, minute, second): String
+begin
+    return java:(hour, minute, second) {
+        return String.format("%02d:%02d:%02d", (Integer)param0, (Integer)param1, (Integer)param2);
+    };
+end;
+
+function getCurrentDate(): String
+begin
+    return java:() {
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        return String.format("%04d-%02d-%02d", hoje.getYear(), hoje.getMonthValue(), hoje.getDayOfMonth());
+    };
+end;
+
+function getCurrentTime(): String
+begin
+    return java:() {
+        java.time.LocalTime agora = java.time.LocalTime.now();
+        return String.format("%02d:%02d:%02d", agora.getHour(), agora.getMinute(), agora.getSecond());
+    };
+end;
+
+function getCurrentDateTime(): String
+begin
+    return java:() {
+        java.time.LocalDateTime agora = java.time.LocalDateTime.now();
+        return String.format("%04d-%02d-%02d %02d:%02d:%02d",
+            agora.getYear(), agora.getMonthValue(), agora.getDayOfMonth(),
+            agora.getHour(), agora.getMinute(), agora.getSecond());
+    };
+end;
+
+function isLeapYear(year): Boolean
+begin
+    return java:(year) {
+        return java.time.Year.of((Integer)param0).isLeap();
+    };
+end;
+
+function getDaysInMonth(year, month): Integer
+begin
+    return java:(year, month) {
+        java.time.YearMonth ym = java.time.YearMonth.of((Integer)param0, (Integer)param1);
+        return ym.lengthOfMonth();
+    };
+end;
+
+function getMonthName(month): String
+begin
+    return java:(month) {
+        String[] meses = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
+        int m = (Integer)param0;
+        if (m >= 1 && m <= 12) {
+            return meses[m-1];
+        } else {
+            return "Mês Inválido";
+        }
+    };
+end;
+
+function getMonthNameEn(month): String
+begin
+    return java:(month) {
+        java.time.Month m = java.time.Month.of((Integer)param0);
+        return m.name().substring(0, 1) + m.name().substring(1).toLowerCase();
+    };
+end;
+
+function getDayOfWeekName(dayOfWeek): String
+begin
+    return java:(dayOfWeek) {
+        String[] dias = {"Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"};
+        int d = (Integer)param0;
+        if (d >= 0 && d <= 6) {
+            return dias[d];
+        } else {
+            return "Dia Inválido";
+        }
+    };
+end;
+
+function getDayOfWeekNameEn(dayOfWeek): String
+begin
+    return java:(dayOfWeek) {
+        String[] days = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        int d = (Integer)param0;
+        if (d >= 0 && d <= 6) {
+            return days[d];
+        } else {
+            return "Invalid Day";
+        }
+    };
+end;
+
+function addDays(year, month, day, daysToAdd): String
+begin
+    return java:(year, month, day, daysToAdd) {
+        java.time.LocalDate data = java.time.LocalDate.of((Integer)param0, (Integer)param1, (Integer)param2);
+        java.time.LocalDate novaData = data.plusDays((Integer)param3);
+        return String.format("%04d-%02d-%02d", novaData.getYear(), novaData.getMonthValue(), novaData.getDayOfMonth());
+    };
+end;
+
+function addMonths(year, month, day, monthsToAdd): String
+begin
+    return java:(year, month, day, monthsToAdd) {
+        java.time.LocalDate data = java.time.LocalDate.of((Integer)param0, (Integer)param1, (Integer)param2);
+        java.time.LocalDate novaData = data.plusMonths((Integer)param3);
+        return String.format("%04d-%02d-%02d", novaData.getYear(), novaData.getMonthValue(), novaData.getDayOfMonth());
+    };
+end;
+
+function addYears(year, month, day, yearsToAdd): String
+begin
+    return java:(year, month, day, yearsToAdd) {
+        java.time.LocalDate data = java.time.LocalDate.of((Integer)param0, (Integer)param1, (Integer)param2);
+        java.time.LocalDate novaData = data.plusYears((Integer)param3);
+        return String.format("%04d-%02d-%02d", novaData.getYear(), novaData.getMonthValue(), novaData.getDayOfMonth());
+    };
+end;
+
+function isValidDate(year, month, day): Boolean
+begin
+    return java:(year, month, day) {
+        try {
+            java.time.LocalDate.of((Integer)param0, (Integer)param1, (Integer)param2);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    };
+end;
+
+function isValidTime(hour, minute, second): Boolean
+begin
+    return java:(hour, minute, second) {
+        try {
+            java.time.LocalTime.of((Integer)param0, (Integer)param1, (Integer)param2);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    };
+end;
+
+function getAge(birthYear, birthMonth, birthDay): Integer
+begin
+    return java:(birthYear, birthMonth, birthDay) {
+        java.time.LocalDate nascimento = java.time.LocalDate.of((Integer)param0, (Integer)param1, (Integer)param2);
+        java.time.LocalDate hoje = java.time.LocalDate.now();
+        return java.time.Period.between(nascimento, hoje).getYears();
+    };
+end;

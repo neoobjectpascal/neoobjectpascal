@@ -1,0 +1,107 @@
+uses internal.file;
+
+var
+    testFile: String;
+    result: String;
+    boolResult: Boolean;
+    intResult: Integer;
+
+begin
+    writeln("=== Teste da Biblioteca File com Java Híbrido ===");
+    writeln("");
+    
+    testFile := "exemplo.txt";
+    writeln("Arquivo de teste: " + testFile);
+    writeln("Extensão: " + getFileExtension(testFile));
+    writeln("Nome: " + getFileName("/caminho/para/" + testFile));
+    writeln("Nome sem extensão: " + getFileNameWithoutExtension(testFile));
+    writeln("");
+    
+    writeln("=== Teste de Caminhos ===");
+    writeln("joinPath('pasta', 'arquivo.txt'): " + joinPath("pasta", "arquivo.txt"));
+    writeln("joinPath3('raiz', 'pasta', 'arquivo.txt'): " + joinPath3("raiz", "pasta", "arquivo.txt"));
+    writeln("");
+    
+    writeln("=== Verificação de Caminhos ===");
+    boolResult := isAbsolutePath("/usr/local/bin");
+    if boolResult then
+        writeln("/usr/local/bin é caminho absoluto")
+    else
+        writeln("/usr/local/bin não é caminho absoluto");
+        
+    boolResult := isRelativePath("./arquivo.txt");
+    if boolResult then
+        writeln("./arquivo.txt é caminho relativo")
+    else
+        writeln("./arquivo.txt não é caminho relativo");
+    writeln("");
+    
+    writeln("=== Normalização ===");
+    writeln("Caminho normalizado: " + normalizePath("./pasta/../arquivo.txt"));
+    writeln("Diretório pai: " + getParentDirectory("/caminho/para/arquivo.txt"));
+    writeln("");
+    
+    writeln("=== Validação de Nomes ===");
+    boolResult := isValidFilename("arquivo_valido.txt");
+    if boolResult then
+        writeln("'arquivo_valido.txt' é válido")
+    else
+        writeln("'arquivo_valido.txt' é inválido");
+        
+    writeln("Nome sanitizado: " + sanitizeFilename("arquivo<>:|?.txt"));
+    writeln("");
+    
+    writeln("=== Verificação de Existência ===");
+    testFile := "pom.xml";
+    boolResult := fileExists(testFile);
+    if boolResult then
+        writeln("Arquivo " + testFile + " existe")
+    else
+        writeln("Arquivo " + testFile + " não existe");
+        
+    intResult := getFileSize(testFile);
+    if intResult > 0 then
+        writeln("Tamanho do arquivo: " + formatFileSize(intResult))
+    else
+        writeln("Não foi possível obter o tamanho do arquivo");
+    writeln("");
+    
+    writeln("=== Tipos de Arquivo ===");
+    writeln("Extensões comuns: " + getCommonFileExtensions());
+    writeln("");
+    
+    testFile := "exemplo.java";
+    boolResult := isTextFile(testFile);
+    if boolResult then
+        writeln(testFile + " é arquivo de texto")
+    else
+        writeln(testFile + " não é arquivo de texto");
+        
+    boolResult := isBinaryFile("imagem.jpg");
+    if boolResult then
+        writeln("imagem.jpg é arquivo binário")
+    else
+        writeln("imagem.jpg não é arquivo binário");
+        
+    writeln("Descrição do tipo: " + getFileTypeDescription("documento.pdf"));
+    writeln("");
+    
+    writeln("=== Formatação ===");
+    writeln("1024 bytes = " + formatFileSize(1024));
+    writeln("1048576 bytes = " + formatFileSize(1048576));
+    writeln("1073741824 bytes = " + formatFileSize(1073741824));
+    writeln("");
+    
+    writeln("=== Nomes Temporários e Backup ===");
+    writeln("Nome temporário: " + createTempFilename("temp", ".txt"));
+    writeln("Nome de backup: " + generateBackupFilename("documento.txt"));
+    writeln("");
+    
+    writeln("=== Informações do Sistema ===");
+    writeln("Diretório atual: " + getCurrentWorkingDirectory());
+    writeln("Diretório home: " + getUserHomeDirectory());
+    writeln("Diretório temporário: " + getTempDirectory());
+    writeln("");
+    
+    writeln("=== Teste Concluído ===");
+end.

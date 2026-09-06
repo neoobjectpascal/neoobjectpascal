@@ -1,0 +1,71 @@
+/* preview.css — faithful WebInk widget look for the canvas (light, Tailwind-like). */
+.wk-root { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #1e293b; }
+.wk-page { background: #f1f5f9; min-height: 320px; border-radius: 10px; overflow: hidden; }
+.wk-container { max-width: 100%; margin: 0 auto; padding: 24px 22px; }
+.wk-section { padding: 24px 0; }
+.wk-row { display: flex; flex-wrap: wrap; gap: 16px; }
+.wk-grid { display: grid; gap: 16px; }
+.wk-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.wk-divider { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+.wk-spacer { height: 16px; }
+
+.wk-h { font-weight: 800; color: #0f172a; letter-spacing: -.3px; margin: 6px 0; }
+.wk-h1 { font-size: 28px; } .wk-h2 { font-size: 24px; } .wk-h3 { font-size: 20px; }
+.wk-h4 { font-size: 17px; } .wk-h5 { font-size: 15px; } .wk-h6 { font-size: 13px; }
+.wk-text { color: #475569; line-height: 1.6; margin: 4px 0; }
+
+.wk-badge { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.wk-badge-slate { background: #f1f5f9; color: #334155; } .wk-badge-red { background: #fee2e2; color: #b91c1c; }
+.wk-badge-green { background: #dcfce7; color: #15803d; } .wk-badge-blue { background: #dbeafe; color: #1d4ed8; }
+.wk-badge-amber { background: #fef3c7; color: #b45309; } .wk-badge-indigo { background: #e0e7ff; color: #4338ca; }
+.wk-badge-emerald { background: #d1fae5; color: #047857; } .wk-badge-rose { background: #ffe4e6; color: #be123c; }
+
+.wk-stat { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.wk-stat .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: #64748b; }
+.wk-stat .val { font-size: 26px; font-weight: 800; color: #0f172a; margin-top: 4px; }
+.wk-stat .delta { font-size: 12px; font-weight: 600; color: #059669; margin-top: 3px; }
+
+.wk-nav { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 12px 22px; display: flex; align-items: center; gap: 16px; }
+.wk-link { color: #4f46e5; font-weight: 600; text-decoration: none; }
+
+.wk-btn { display: inline-flex; align-items: center; justify-content: center; border: none; border-radius: 9px; padding: 9px 18px; font-size: 14px; font-weight: 600; cursor: default; }
+.wk-btn-primary { background: #4f46e5; color: #fff; }
+.wk-btn-secondary { background: #f1f5f9; color: #334155; }
+.wk-btn-danger { background: #dc2626; color: #fff; }
+
+/* layout / nav extras */
+.wk-col { flex: 1; min-width: 0; }
+.wk-sidebar { width: 220px; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.wk-tabs { display: flex; gap: 4px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
+
+/* forms */
+.wk-input { background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 9px 12px; font-size: 14px; color: #1e293b; }
+.wk-textarea { white-space: pre-wrap; }
+.wk-input .ph { color: #94a3b8; }
+.wk-select { display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 9px 12px; font-size: 14px; color: #334155; }
+.wk-select .chev { color: #94a3b8; margin-left: 10px; }
+.wk-checkbox { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #334155; }
+.wk-checkbox .cbox { width: 16px; height: 16px; border: 1.5px solid #94a3b8; border-radius: 4px; display: inline-block; }
+.wk-checkbox .cbox.on { background: #4f46e5; border-color: #4f46e5; }
+.wk-form { display: flex; flex-direction: column; gap: 12px; }
+
+/* data */
+.wk-tablewrap { overflow-x: auto; }
+.wk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.wk-table th { text-align: left; text-transform: uppercase; font-size: 11px; letter-spacing: .4px; color: #64748b; padding: 8px 12px; border-bottom: 1px solid #e2e8f0; }
+.wk-table td { padding: 8px 12px; color: #334155; border-bottom: 1px solid #f1f5f9; }
+.wk-list { padding-left: 22px; color: #334155; line-height: 1.7; }
+.wk-list li { margin: 2px 0; }
+.wk-chart { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; }
+.wk-chart .cbars { display: flex; align-items: flex-end; gap: 14px; height: 130px; }
+.wk-chart .cbar { flex: 1; background: #6366f1; border-radius: 5px 5px 0 0; min-height: 4px; position: relative; }
+.wk-chart .cbar span { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 10px; color: #64748b; }
+.wk-chart .ph { color: #94a3b8; }
+.wk-alert { border-radius: 10px; padding: 12px 14px; font-size: 14px; border: 1px solid; }
+.wk-alert-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+.wk-alert-success { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+.wk-alert-warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+.wk-alert-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.wk-progress { width: 100%; height: 10px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+.wk-progress .fill { height: 100%; background: #4f46e5; border-radius: 999px; }
+.wk-spinner { width: 26px; height: 26px; border: 3px solid #e2e8f0; border-top-color: #4f46e5; border-radius: 50%; }

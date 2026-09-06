@@ -1,0 +1,8 @@
+var dados: Object;
+var jsonString: String;
+
+begin
+  jsonString := '{"nome": "Carmen Sandiego", "idade": 30, "cidade": "São Paulo"}';
+  JSON.parse(jsonString) into dados;
+  WriteLn("Dados JSON processados com sucesso!");
+end.

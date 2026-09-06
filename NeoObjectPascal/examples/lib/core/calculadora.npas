@@ -1,0 +1,14 @@
+function adicionar(a: Integer, b: Integer): Integer;
+begin
+  return a + b;
+end;
+
+function subtrair(a: Integer, b: Integer): Integer;
+begin
+  return a - b;
+end;
+
+function elevarAoQuadrado(n: Integer): Integer;
+begin
+  return n * n;
+end;

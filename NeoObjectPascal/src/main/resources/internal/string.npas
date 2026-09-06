@@ -1,0 +1,158 @@
+function isEmpty(s): Boolean
+begin
+    return s = "";
+end;
+
+function isNotEmpty(s): Boolean
+begin
+    return s <> "";
+end;
+
+function strLength(s): Integer
+begin
+    return java:(s) {
+        return ((String)param0).length();
+    };
+end;
+
+function toUpperCase(s): String
+begin
+    return java:(s) {
+        return ((String)param0).toUpperCase();
+    };
+end;
+
+function toLowerCase(s): String
+begin
+    return java:(s) {
+        return ((String)param0).toLowerCase();
+    };
+end;
+
+function trim(s): String
+begin
+    return java:(s) {
+        return ((String)param0).trim();
+    };
+end;
+
+function repeat(s, count): String
+var result: String;
+var i: Integer;
+begin
+    result := "";
+    for i := 1 to count do
+        result := result + s;
+    return result;
+end;
+
+function join(separator, s1, s2): String
+begin
+    return s1 + separator + s2;
+end;
+
+function join3(separator, s1, s2, s3): String
+begin
+    return s1 + separator + s2 + separator + s3;
+end;
+
+function join4(separator, s1, s2, s3, s4): String
+begin
+    return s1 + separator + s2 + separator + s3 + separator + s4;
+end;
+
+function quote(s): String
+begin
+    return '"' + s + '"';
+end;
+
+function singleQuote(s): String
+begin
+    return "'" + s + "'";
+end;
+
+function bracket(s): String
+begin
+    return "[" + s + "]";
+end;
+
+function parenthesize(s): String
+begin
+    return "(" + s + ")";
+end;
+
+function inStr(haystack, needle): Integer
+begin
+    return java:(haystack, needle) {
+        String h = (String)param0;
+        String n = (String)param1;
+        return h.indexOf(n) + 1;
+    };
+end;
+
+function contains(haystack, needle): Boolean
+begin
+    return java:(haystack, needle) {
+        String h = (String)param0;
+        String n = (String)param1;
+        return h.contains(n);
+    };
+end;
+
+function startsWith(s, prefix): Boolean
+begin
+    return java:(s, prefix) {
+        String str = (String)param0;
+        String pre = (String)param1;
+        return str.startsWith(pre);
+    };
+end;
+
+function endsWith(s, suffix): Boolean
+begin
+    return java:(s, suffix) {
+        String str = (String)param0;
+        String suf = (String)param1;
+        return str.endsWith(suf);
+    };
+end;
+
+function subString(s, from, len): String
+begin
+    return java:(s, from, len) {
+        String str = (String)param0;
+        int f = (Integer)param1 - 1;
+        int l = (Integer)param2;
+        int end = Math.min(f + l, str.length());
+        if (f < 0 || f >= str.length()) return "";
+        return str.substring(f, end);
+    };
+end;
+
+function replaceStr(s, from, to): String
+begin
+    return java:(s, from, to) {
+        String str = (String)param0;
+        String f = (String)param1;
+        String t = (String)param2;
+        return str.replace(f, t);
+    };
+end;
+
+function intToStr(n): String
+begin
+    return java:(n) {
+        return String.valueOf(param0);
+    };
+end;
+
+function strToInt(s): Integer
+begin
+    return java:(s) {
+        try {
+            return Integer.parseInt(((String)param0).trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    };
+end;

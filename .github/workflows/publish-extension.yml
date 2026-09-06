@@ -1,0 +1,67 @@
+name: Publish VS Code Extension
+
+# Publishes a new version of the VS Code extension whenever the interpreter or the extension
+# changes: build the interpreter jar, bundle it, bump the patch version, and publish to the
+# VS Code Marketplace. The version bump is committed back with GITHUB_TOKEN (which does not
+# re-trigger workflows) plus [skip ci] as a belt-and-suspenders guard.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'NeoObjectPascal/**'
+      - 'VS-Code-Extension/**'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+# Never run two publishes at once (avoids version races).
+concurrency:
+  group: publish-extension
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build interpreter (fat jar)
+        working-directory: NeoObjectPascal
+        run: mvn -B -DskipTests package
+
+      - name: Bundle jar into the extension
+        run: cp NeoObjectPascal/target/neoobjectpascal-1.0-SNAPSHOT-jar-with-dependencies.jar VS-Code-Extension/bin/neoobjectpascal.jar
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install extension deps
+        working-directory: VS-Code-Extension
+        run: npm install
+
+      - name: Bump patch version
+        working-directory: VS-Code-Extension
+        run: npm version patch --no-git-tag-version
+
+      - name: Publish to the VS Code Marketplace
+        working-directory: VS-Code-Extension
+        run: npx @vscode/vsce publish -p "$VSCE_PAT"
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+
+      - name: Commit the version bump
+        run: |
+          VERSION=$(node -p "require('./VS-Code-Extension/package.json').version")
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add VS-Code-Extension/package.json
+          git commit -m "chore(release): extension v$VERSION [skip ci]" || echo "nada a commitar"
+          git push

@@ -1,0 +1,125 @@
+// Teste unitário para polimorfismo
+
+class FiguraGeometrica
+    public virtual function calcularPerimetro(): Integer
+    begin
+        return 0;
+    end;
+    
+    public virtual function calcularArea(): Integer
+    begin
+        return 0;
+    end;
+end;
+
+class Circulo extends FiguraGeometrica
+    var raio: Integer;
+    
+    constructor Create(r: Integer)
+    begin
+        self.raio := r;
+    end;
+    
+    public override function calcularPerimetro(): Integer
+    begin
+        // 2 * PI * raio (aproximando PI = 3)
+        return 2 * 3 * self.raio;
+    end;
+    
+    public override function calcularArea(): Integer
+    begin
+        // PI * raio^2 (aproximando PI = 3)
+        return 3 * self.raio * self.raio;
+    end;
+end;
+
+class RetanguloTeste extends FiguraGeometrica
+    var largura: Integer;
+    var altura: Integer;
+    
+    constructor Create(l: Integer, a: Integer)
+    begin
+        self.largura := l;
+        self.altura := a;
+    end;
+    
+    public override function calcularPerimetro(): Integer
+    begin
+        return 2 * (self.largura + self.altura);
+    end;
+    
+    public override function calcularArea(): Integer
+    begin
+        return self.largura * self.altura;
+    end;
+end;
+
+test "Círculo deve calcular perímetro corretamente"
+begin
+    // GIVEN - Dado um círculo com raio 5
+    var circulo: Circulo;
+    circulo := new Circulo(5);
+    
+    // WHEN - Quando calculamos o perímetro
+    var perimetro: Integer;
+    perimetro := circulo.calcularPerimetro();
+    
+    // THEN - Então deve ser 2 * 3 * 5 = 30
+    expect(perimetro).toBe(30);
+end;
+
+test "Círculo deve calcular área corretamente"
+begin
+    // GIVEN
+    var circulo: Circulo;
+    circulo := new Circulo(4);
+    
+    // WHEN
+    var area: Integer;
+    area := circulo.calcularArea();
+    
+    // THEN - 3 * 4 * 4 = 48
+    expect(area).toBe(48);
+end;
+
+test "Retângulo deve calcular perímetro corretamente"
+begin
+    // GIVEN - Dado um retângulo 5x3
+    var retangulo: RetanguloTeste;
+    retangulo := new RetanguloTeste(5, 3);
+    
+    // WHEN
+    var perimetro: Integer;
+    perimetro := retangulo.calcularPerimetro();
+    
+    // THEN - 2 * (5 + 3) = 16
+    expect(perimetro).toBe(16);
+end;
+
+test "Retângulo deve calcular área corretamente"
+begin
+    // GIVEN
+    var retangulo: RetanguloTeste;
+    retangulo := new RetanguloTeste(6, 4);
+    
+    // WHEN
+    var area: Integer;
+    area := retangulo.calcularArea();
+    
+    // THEN - 6 * 4 = 24
+    expect(area).toBe(24);
+end;
+
+test "Polimorfismo permite usar método virtual da classe base"
+begin
+    // GIVEN - Dado uma figura genérica
+    var figura: FiguraGeometrica;
+    figura := new FiguraGeometrica();
+    
+    // WHEN - Quando calculamos área
+    var area: Integer;
+    area := figura.calcularArea();
+    
+    // THEN - Então deve retornar 0 (implementação padrão)
+    expect(area).toBe(0);
+end;

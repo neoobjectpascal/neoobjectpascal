@@ -1,0 +1,9 @@
+var nome: String;
+var nomeCompleto: String;
+begin
+    WriteLn("Olá tudo bem?");
+    WriteLn("Qual o seu nome:");
+    ReadLn(nome);
+    nomeCompleto := nome + " OK!";
+    WriteLn("Maravilha ", nomeCompleto, "!");
+end.

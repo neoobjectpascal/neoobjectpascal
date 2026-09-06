@@ -1,0 +1,708 @@
+{
+  "Program skeleton": {
+    "prefix": "program",
+    "body": [
+      "uses ${1:internal.string};",
+      "",
+      "begin",
+      "\t$0",
+      "end."
+    ],
+    "description": "NeoObjectPascal program skeleton (uses + begin ... end.)"
+  },
+  "Main block": {
+    "prefix": "main",
+    "body": [
+      "begin",
+      "\tWriteLn(\"${1:Hello, NeoObjectPascal!}\");$0",
+      "end."
+    ],
+    "description": "Minimal main block (begin ... end.)"
+  },
+  "Uses clause": {
+    "prefix": "uses",
+    "body": [
+      "uses ${1:internal.string};$0"
+    ],
+    "description": "Import modules with a uses clause"
+  },
+  "Uses internal library": {
+    "prefix": "uses-internal",
+    "body": [
+      "uses internal.${1|string,math,datetime,file,collections|};$0"
+    ],
+    "description": "Import a built-in internal library"
+  },
+  "Variable declaration": {
+    "prefix": "var",
+    "body": [
+      "var ${1:name}: ${2|Integer,String,Boolean,Real,Object,Array|};$0"
+    ],
+    "description": "Declare a variable"
+  },
+  "Function": {
+    "prefix": "function",
+    "body": [
+      "function ${1:name}(${2:a: Integer}): ${3|Integer,String,Boolean,Real,Object|}",
+      "begin",
+      "\t$0",
+      "\treturn ${4:0};",
+      "end;"
+    ],
+    "description": "Top-level function with a return value"
+  },
+  "Return": {
+    "prefix": "return",
+    "body": [
+      "return ${1:value};$0"
+    ],
+    "description": "Return a value from a function"
+  },
+  "If statement": {
+    "prefix": "if",
+    "body": [
+      "if ${1:condition} then",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "If statement"
+  },
+  "If / else statement": {
+    "prefix": "ifelse",
+    "body": [
+      "if ${1:condition} then",
+      "begin",
+      "\t$2",
+      "end",
+      "else",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "If / else statement"
+  },
+  "While loop": {
+    "prefix": "while",
+    "body": [
+      "while ${1:condition} do",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "While loop"
+  },
+  "For loop": {
+    "prefix": "for",
+    "body": [
+      "for ${1:i} := ${2:1} to ${3:10} do",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "For loop (inclusive, counts up)"
+  },
+  "For..in loop": {
+    "prefix": "forin",
+    "body": [
+      "for ${1:item} in ${2:items} do",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "For..in loop over an array"
+  },
+  "WriteLn": {
+    "prefix": "writeln",
+    "body": [
+      "WriteLn(${1:\"text\"});$0"
+    ],
+    "description": "Print a line to output"
+  },
+  "ReadLn": {
+    "prefix": "readln",
+    "body": [
+      "ReadLn(${1:variable});$0"
+    ],
+    "description": "Read a line into a variable"
+  },
+  "showMenu": {
+    "prefix": "showmenu",
+    "body": [
+      "showMenu(${1:\"Option 1\"}, ${2:\"Option 2\"});$0"
+    ],
+    "description": "Display a numbered menu"
+  },
+  "Record literal": {
+    "prefix": "record",
+    "body": [
+      "#{ ${1:key}: ${2:value} }$0"
+    ],
+    "description": "Record literal #{ key: value }"
+  },
+  "Array literal": {
+    "prefix": "array",
+    "body": [
+      "[${1:1, 2, 3}]$0"
+    ],
+    "description": "Array literal [ ... ]"
+  },
+  "Class": {
+    "prefix": "class",
+    "body": [
+      "class ${1:Person}",
+      "\tvar ${2:name}: ${3|String,Integer,Boolean,Real,Object,Array|};",
+      "",
+      "\tconstructor Create(${2:name}: ${3|String,Integer,Boolean,Real,Object,Array|})",
+      "\tbegin",
+      "\t\tself.${2:name} := ${2:name};",
+      "\tend;",
+      "",
+      "\tpublic function ${4:greet}(): ${5|String,Integer,Boolean,Real,Object|}",
+      "\tbegin",
+      "\t\treturn $0;",
+      "\tend;",
+      "end;"
+    ],
+    "description": "NeoObjectPascal class with field, constructor and method (inline bodies)"
+  },
+  "Class extends (inheritance)": {
+    "prefix": "class-extends",
+    "body": [
+      "class ${1:Circle} extends ${2:Shape}",
+      "\tvar ${3:radius}: ${4|Real,Integer,String|};",
+      "",
+      "\tconstructor Create(${3:radius}: ${4|Real,Integer,String|})",
+      "\tbegin",
+      "\t\tself.${3:radius} := ${3:radius};",
+      "\tend;",
+      "",
+      "\tpublic override function ${5:area}(): Real",
+      "\tbegin",
+      "\t\treturn $0;",
+      "\tend;",
+      "end;"
+    ],
+    "description": "Class extending a parent, with an override method"
+  },
+  "Class implements (interface)": {
+    "prefix": "class-implements",
+    "body": [
+      "class ${1:Circle} implements ${2:IShape}",
+      "\tpublic function ${3:area}(): ${4|Real,Integer,String|}",
+      "\tbegin",
+      "\t\treturn $0;",
+      "\tend;",
+      "end;"
+    ],
+    "description": "Class implementing an interface"
+  },
+  "Interface": {
+    "prefix": "interface",
+    "body": [
+      "interface ${1:IShape}",
+      "\tfunction ${2:area}(): ${3|Real,Integer,String,Boolean|};",
+      "end;$0"
+    ],
+    "description": "Interface with method signatures"
+  },
+  "Constructor": {
+    "prefix": "constructor",
+    "body": [
+      "constructor Create(${1:params})",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "Class constructor (inline body)"
+  },
+  "Method (class function)": {
+    "prefix": "method",
+    "body": [
+      "${1|public,private,protected|} function ${2:name}(${3:params}): ${4|Integer,String,Boolean,Real,Object|}",
+      "begin",
+      "\t$0",
+      "\treturn ${5:0};",
+      "end;"
+    ],
+    "description": "Class method (function member) with visibility"
+  },
+  "Procedure (class member)": {
+    "prefix": "procedure",
+    "body": [
+      "${1|public,private,protected|} procedure ${2:name}(${3:params})",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "Class procedure member (no return value)"
+  },
+  "New instance": {
+    "prefix": "new",
+    "body": [
+      "${1:obj} := new ${2:ClassName}(${3:args});$0"
+    ],
+    "description": "Instantiate a class with new"
+  },
+  "Try / catch": {
+    "prefix": "try",
+    "body": [
+      "try",
+      "begin",
+      "\t$1",
+      "end",
+      "catch (${2:e})",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "Try / catch block (with begin ... end)"
+  },
+  "Try / catch / finally": {
+    "prefix": "tryfinally",
+    "body": [
+      "try",
+      "begin",
+      "\t$1",
+      "end",
+      "catch (${2:e})",
+      "begin",
+      "\t$3",
+      "end",
+      "finally",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "Try / catch / finally block"
+  },
+  "Raise": {
+    "prefix": "raise",
+    "body": [
+      "raise ${1:\"Error message\"};$0"
+    ],
+    "description": "Raise an error"
+  },
+  "Pipe operator": {
+    "prefix": "pipe",
+    "body": [
+      "${1:value} |> ${2:func}$0"
+    ],
+    "description": "Functional pipe: value |> func"
+  },
+  "Java block (by name)": {
+    "prefix": "java",
+    "body": [
+      "java:(${1:value}) {",
+      "\treturn ${2:value};",
+      "}"
+    ],
+    "description": "Embedded Java block — arguments are available by name and as param0, param1, ..."
+  },
+  "Unit test": {
+    "prefix": "test",
+    "body": [
+      "test \"${1:should do something}\"",
+      "begin",
+      "\t$0",
+      "end;"
+    ],
+    "description": "Unit test block: test \"...\" begin ... end;"
+  },
+  "Expect (value matcher)": {
+    "prefix": "expect",
+    "body": [
+      "expect(${1:actual}).${2|toBe,toEqual|}(${3:expected});$0"
+    ],
+    "description": "Assertion with a value matcher (toBe / toEqual)"
+  },
+  "Expect (state matcher)": {
+    "prefix": "expect-state",
+    "body": [
+      "expect(${1:value}).${2|toBeTrue,toBeFalse,toBeNull|}();$0"
+    ],
+    "description": "Assertion with a state matcher (toBeTrue / toBeFalse / toBeNull)"
+  },
+  "Mock": {
+    "prefix": "mock",
+    "body": [
+      "mock ${1:ClassName}.${2:method} thenReturn ${3:value};$0"
+    ],
+    "description": "Mock a method to return a value"
+  },
+  "Verify": {
+    "prefix": "verify",
+    "body": [
+      "verify ${1:ClassName}.${2:method};$0"
+    ],
+    "description": "Verify a mocked method was called"
+  },
+  "TerminalInk app": {
+    "prefix": "tink-app",
+    "body": [
+      "uses terminalink;",
+      "",
+      "function ui(): Object",
+      "begin",
+      "\treturn VBox(#{ gap: 1, padding: 1 }, [",
+      "\t\tText(#{ bold: true }, \"${1:Hello, TerminalInk!}\")",
+      "\t]);",
+      "end;",
+      "",
+      "begin",
+      "\trender(ui);",
+      "end.$0"
+    ],
+    "description": "TerminalInk app skeleton (build function returning VBox + render)"
+  },
+  "TerminalInk Text": {
+    "prefix": "tink-text",
+    "body": [
+      "Text(#{ ${1:color: \"cyan\"} }, \"${2:text}\")$0"
+    ],
+    "description": "TerminalInk Text node"
+  },
+  "TerminalInk VBox": {
+    "prefix": "tink-vbox",
+    "body": [
+      "VBox(#{ gap: 1 }, [",
+      "\t$0",
+      "])"
+    ],
+    "description": "TerminalInk vertical box (children array)"
+  },
+  "TerminalInk TextInput": {
+    "prefix": "tink-textinput",
+    "body": [
+      "TextInput(#{ placeholder: \"${1:Enter text}\", onChange: ${2:onChange} })$0"
+    ],
+    "description": "TerminalInk TextInput (onChange is a function name)"
+  },
+  "TerminalInk Select": {
+    "prefix": "tink-select",
+    "body": [
+      "Select(#{ options: [",
+      "\t#{ label: \"${1:Option 1}\", value: \"${2:opt1}\" },",
+      "\t#{ label: \"${3:Option 2}\", value: \"${4:opt2}\" }",
+      "], onChange: ${5:onSelect} })$0"
+    ],
+    "description": "TerminalInk Select with options (onChange is a function name)"
+  },
+  "TerminalInk Spinner": {
+    "prefix": "tink-spinner",
+    "body": [
+      "Spinner(#{ label: \"${1:Loading...}\" })$0"
+    ],
+    "description": "TerminalInk Spinner (animated)"
+  },
+  "TerminalInk ProgressBar": {
+    "prefix": "tink-progressbar",
+    "body": [
+      "ProgressBar(#{ value: ${1:50} })$0"
+    ],
+    "description": "TerminalInk ProgressBar (value 0-100)"
+  },
+  "TerminalInk Badge": {
+    "prefix": "tink-badge",
+    "body": [
+      "Badge(#{ color: \"${1:magenta}\" }, \"${2:new}\")$0"
+    ],
+    "description": "TerminalInk Badge"
+  },
+  "TerminalInk StatusMessage": {
+    "prefix": "tink-status",
+    "body": [
+      "StatusMessage(#{ variant: \"${1|info,success,error,warning|}\" }, \"${2:Done!}\")$0"
+    ],
+    "description": "TerminalInk StatusMessage (variant + text)"
+  },
+  "TerminalInk Alert": {
+    "prefix": "tink-alert",
+    "body": [
+      "Alert(#{ variant: \"${1|info,success,error,warning|}\", title: \"${2:Notice}\" }, [",
+      "\tText(#{}, \"${3:message}\")",
+      "])$0"
+    ],
+    "description": "TerminalInk Alert (variant + title + body children)"
+  },
+  "TerminalInk form": {
+    "prefix": "tink-form",
+    "body": [
+      "uses terminalink;",
+      "",
+      "var ${1:nome}: String;",
+      "",
+      "function onNome(v): Boolean",
+      "begin",
+      "\t${1:nome} := v;",
+      "\treturn true;",
+      "end;",
+      "",
+      "function ui(): Object",
+      "begin",
+      "\treturn VBox(#{ gap: 1, padding: 1 }, [",
+      "\t\tText(#{}, \"${2:Nome:}\"),",
+      "\t\tTextInput(#{ placeholder: \"${3:Digite...}\", onChange: onNome }),",
+      "\t\tText(#{}, \"Olá, \" + ${1:nome})",
+      "\t]);",
+      "end;",
+      "",
+      "begin",
+      "\t${1:nome} := \"\";",
+      "\trender(ui);",
+      "end.$0"
+    ],
+    "description": "TerminalInk form (state variable + callback function + TextInput + render)"
+  },
+  "TerminalInk theme": {
+    "prefix": "tink-theme",
+    "body": [
+      "var theme: Object;",
+      "theme := extendTheme(defaultTheme(), #{",
+      "\tSpinner: #{ color: \"${1:magenta}\" },",
+      "\tBadge: #{ color: \"${2:cyan}\" }",
+      "});",
+      "setTheme(theme);$0"
+    ],
+    "description": "TerminalInk theme (extendTheme by component + setTheme)"
+  },
+  "HTTP GET": {
+    "prefix": "http-get",
+    "body": [
+      "uses http;",
+      "",
+      "var resp: Object;",
+      "resp := httpGet(\"${1:https://api.example.com/users/1}\");",
+      "if resp.ok then",
+      "begin",
+      "\tWriteLn(resp.json${2:.name});$0",
+      "end",
+      "else",
+      "\tWriteLn(\"HTTP \", resp.status);"
+    ],
+    "description": "HTTP GET that checks resp.ok and reads resp.json"
+  },
+  "HTTP POST": {
+    "prefix": "http-post",
+    "body": [
+      "var resp: Object;",
+      "resp := httpPost(\"${1:https://api.example.com/users}\", #{ ${2:name}: ${3:\"value\"} });",
+      "WriteLn(resp.status);$0"
+    ],
+    "description": "HTTP POST with a record body (auto-JSON)"
+  },
+  "HTTP request (full)": {
+    "prefix": "http-request",
+    "body": [
+      "var resp: Object;",
+      "resp := httpRequest(#{",
+      "\tmethod: \"${1|GET,POST,PUT,PATCH,DELETE|}\",",
+      "\turl: \"${2:https://api.example.com/resource}\",",
+      "\theaders: #{ Accept: \"application/json\" },",
+      "\tquery: #{ ${3:page}: ${4:1} },",
+      "\ttimeout: ${5:30}",
+      "});",
+      "WriteLn(resp.status);$0"
+    ],
+    "description": "Full httpRequest(#{ method, url, headers, query, timeout }) — timeout in seconds"
+  },
+  "HTTP with bearer auth": {
+    "prefix": "http-auth",
+    "body": [
+      "var resp: Object;",
+      "resp := httpGet(\"${1:https://api.example.com/me}\", httpBearer(${2:token}));",
+      "if resp.ok then",
+      "\tWriteLn(resp.json);$0"
+    ],
+    "description": "HTTP GET using httpBearer(token) as the headers argument"
+  },
+  "HTTP form POST": {
+    "prefix": "http-form",
+    "body": [
+      "var resp: Object;",
+      "resp := httpPost(\"${1:https://api.example.com/login}\", httpForm(#{ ${2:user}: ${3:\"alice\"} }));",
+      "WriteLn(resp.status);$0"
+    ],
+    "description": "HTTP POST using httpForm(#{ ... }) as a url-encoded body"
+  },
+  "Date value": {
+    "prefix": "date",
+    "body": [
+      "var ${1:d}: Date;",
+      "${1:d} := date(${2:2026}, ${3:1}, ${4:15});$0"
+    ],
+    "description": "Declare a Date and build it with date(year, month, day)"
+  },
+  "DateTime now + format": {
+    "prefix": "datetime",
+    "body": [
+      "var ${1:dt}: DateTime;",
+      "${1:dt} := now();",
+      "WriteLn(format(${1:dt}, \"${2:dd/MM/yyyy HH:mm}\"));$0"
+    ],
+    "description": "Get the current DateTime with now() and format it"
+  },
+  "Currency value": {
+    "prefix": "currency",
+    "body": [
+      "var ${1:preco}: Currency;",
+      "${1:preco} := currency(${2:199.90});",
+      "WriteLn(formatCurrency(${1:preco}, \"${3:R\\$}\"));$0"
+    ],
+    "description": "Declare a Currency, build it with currency(...) and format it with a symbol"
+  },
+  "WebInk app": {
+    "prefix": "wink-app",
+    "description": "WebInk app skeleton (routes + render)",
+    "body": [
+      "uses webink;",
+      "",
+      "function home(): Object",
+      "begin",
+      "\treturn Page(#{}, [",
+      "\t\tNavbar(#{}, [",
+      "\t\t\tHeading(#{ level: 3 }, \"${1:My App}\"),",
+      "\t\t\tLink(#{ href: \"/dashboard\" }, \"Dashboard\")",
+      "\t\t]),",
+      "\t\tContainer(#{ className: \"py-8\" }, [",
+      "\t\t\tHeading(#{ level: 1 }, \"${2:Welcome}\")",
+      "\t\t])",
+      "\t]);",
+      "end;",
+      "",
+      "function dashboard(): Object",
+      "begin",
+      "\treturn Page(#{}, [ Container(#{ className: \"py-8\" }, [ Heading(#{ level: 1 }, \"Dashboard\") ]) ]);",
+      "end;",
+      "",
+      "begin",
+      "\trender(#{ \"/\": home, \"/dashboard\": dashboard });",
+      "end.$0"
+    ]
+  },
+  "WebInk Page": {
+    "prefix": "wink-page",
+    "description": "WebInk Page shell",
+    "body": [
+      "Page(#{}, [",
+      "\t${1:Container(#{ className: \"py-8\" }, [ Heading(#{ level: 1 }, \"Title\") ])}",
+      "])$0"
+    ]
+  },
+  "WebInk Card": {
+    "prefix": "wink-card",
+    "description": "WebInk Card",
+    "body": [
+      "Card(#{ className: \"${1:}\" }, [",
+      "\tHeading(#{ level: 4 }, \"${2:Title}\"),",
+      "\tText(#{}, \"${3:content}\")",
+      "])$0"
+    ]
+  },
+  "WebInk Grid": {
+    "prefix": "wink-grid",
+    "description": "WebInk responsive Grid",
+    "body": [
+      "Grid(#{ cols: ${1:3} }, [",
+      "\t${2:StatCard(#{ label: \"Revenue\", value: \"$ 12,400\" })}",
+      "])$0"
+    ]
+  },
+  "WebInk Chart": {
+    "prefix": "wink-chart",
+    "description": "WebInk Chart.js chart",
+    "body": [
+      "Chart(#{",
+      "\ttype: \"${1|bar,line,pie,doughnut,radar|}\",",
+      "\tdata: #{",
+      "\t\tlabels: [\"${2:Jan}\", \"${3:Feb}\", \"${4:Mar}\"],",
+      "\t\tdatasets: [ #{ label: \"${5:Sales}\", data: [${6:10, 20, 15}] } ]",
+      "\t}",
+      "})$0"
+    ]
+  },
+  "WebInk Navbar": {
+    "prefix": "wink-navbar",
+    "description": "WebInk Navbar with links",
+    "body": [
+      "Navbar(#{}, [",
+      "\tHeading(#{ level: 3 }, \"${1:Brand}\"),",
+      "\tLink(#{ href: \"/${2:page}\" }, \"${3:Page}\")",
+      "])$0"
+    ]
+  },
+  "WebInk StatCard": {
+    "prefix": "wink-statcard",
+    "description": "WebInk KPI StatCard",
+    "body": [
+      "StatCard(#{ label: \"${1:Revenue}\", value: \"${2:$ 12,400}\", delta: \"${3:+8%}\" })$0"
+    ]
+  },
+  "WebInk Button": {
+    "prefix": "wink-button",
+    "description": "WebInk Button with onClick",
+    "body": [
+      "Button(#{ variant: \"${1|primary,secondary,danger|}\", onClick: ${2:handler} }, \"${3:Click me}\")$0"
+    ]
+  },
+  "WebInk Link": {
+    "prefix": "wink-link",
+    "description": "WebInk navigation Link",
+    "body": [
+      "Link(#{ href: \"/${1:route}\" }, \"${2:label}\")$0"
+    ]
+  },
+  "WebInk TextInput": {
+    "prefix": "wink-input",
+    "description": "WebInk TextInput with onChange",
+    "body": [
+      "TextInput(#{ placeholder: \"${1:Type...}\", value: ${2:value}, onChange: ${3:onChange} })$0"
+    ]
+  },
+  "WebInk Table": {
+    "prefix": "wink-table",
+    "description": "WebInk Table",
+    "body": [
+      "Table(#{",
+      "\tcolumns: [\"${1:Name}\", \"${2:Value}\"],",
+      "\trows: [ [\"${3:Alice}\", \"${4:10}\"], [\"${5:Bob}\", \"${6:20}\"] ]",
+      "})$0"
+    ]
+  },
+  "WebInk callback": {
+    "prefix": "wink-callback",
+    "description": "WebInk event callback + navigate",
+    "body": [
+      "function ${1:onAction}(): Boolean",
+      "begin",
+      "\t${2:// mutate state}",
+      "\tnavigate(\"/${3:route}\");",
+      "\treturn true;",
+      "end;$0"
+    ]
+  },
+  "TerminalInk screens (navigation)": {
+    "prefix": "tink-nav",
+    "description": "TerminalInk multi-screen app with navigate()",
+    "body": [
+      "uses terminalink;",
+      "",
+      "function home(): Object",
+      "begin",
+      "\treturn VBox(#{ padding: 1, gap: 1 }, [",
+      "\t\tText(#{ bold: true }, \"${1:Home}\"),",
+      "\t\tText(#{ dim: true }, \"Esc to quit\")",
+      "\t]);",
+      "end;",
+      "",
+      "function about(): Object",
+      "begin",
+      "\treturn VBox(#{ padding: 1 }, [ Text(#{ bold: true }, \"${2:About}\") ]);",
+      "end;",
+      "",
+      "begin",
+      "\trender(#{ \"home\": home, \"about\": about });",
+      "end.$0"
+    ]
+  }
+}

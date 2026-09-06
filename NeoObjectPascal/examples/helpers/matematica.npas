@@ -1,0 +1,14 @@
+function somar(a, b): Integer;
+begin
+  return a + b;
+end;
+
+function multiplicar(x, y): Integer;
+begin
+  return x * y;
+end;
+
+function potencia(base, exp): Integer;
+begin
+  return base * base;
+end;

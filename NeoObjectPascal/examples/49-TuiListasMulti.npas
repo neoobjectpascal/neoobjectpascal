@@ -1,0 +1,46 @@
+// TerminalInk (Fase 2): MultiSelect + listas (OrderedList / UnorderedList).
+// No MultiSelect: ↑↓ navega, Espaço marca/desmarca, Enter confirma. Esc sai.
+
+uses terminalink;
+
+var marcadas: Object;
+
+function onMarcar(vs): Boolean
+begin
+    marcadas := vs;
+    return true;
+end;
+
+function ui(): Object
+begin
+    return VBox(#{ padding: 1, gap: 1, border: "round", borderColor: "cyan" }, [
+        Text(#{ bold: true, color: "cyan" }, "Preferências"),
+        Text(#{}, "Linguagens (Espaço marca, Enter confirma):"),
+        MultiSelect(#{ options: [
+            #{ label: "TypeScript", value: "ts" },
+            #{ label: "Rust", value: "rs" },
+            #{ label: "Go", value: "go" },
+            #{ label: "Python", value: "py" }
+        ], onChange: onMarcar }),
+        Text(#{}, "Marcadas: " + marcadas),
+
+        Text(#{ bold: true }, "Passos de instalação:"),
+        OrderedList(#{}, [
+            Item(#{}, "Instalar Java 11 ou superior"),
+            Item(#{}, "Compilar com Maven"),
+            Item(#{}, "Executar o exemplo")
+        ]),
+
+        Text(#{ bold: true }, "Recursos:"),
+        UnorderedList(#{}, [
+            Item(#{}, "Layout flexbox"),
+            Item(#{}, "Estado reativo"),
+            Item(#{}, "Temas personalizáveis")
+        ])
+    ]);
+end;
+
+begin
+    marcadas := "(nenhuma)";
+    render(ui);
+end.

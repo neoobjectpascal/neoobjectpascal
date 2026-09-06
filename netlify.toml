@@ -1,0 +1,12 @@
+# Netlify configuration for the NeoObjectPascal docs (VitePress) inside this monorepo.
+# Netlify builds and deploys only when files under NeoObjectPascal-Docs/ change.
+[build]
+  base = "NeoObjectPascal-Docs"
+  command = "npm run docs:build"
+  publish = ".vitepress/dist"
+  # Skip the build unless the base directory (the docs) changed in this push.
+  # (exit 0 = "ignore this build")
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."
+
+[build.environment]
+  NODE_VERSION = "20"

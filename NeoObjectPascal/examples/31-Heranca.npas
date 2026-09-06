@@ -1,0 +1,57 @@
+// Exemplo de herança em NeoObjectPascal
+
+class Animal
+    var nome: String;
+    
+    constructor Create(n: String)
+    begin
+        self.nome := n;
+    end;
+    
+    public virtual function emitirSom(): String
+    begin
+        return "Som genérico";
+    end;
+end;
+
+class Cachorro extends Animal
+    var raca: String;
+    
+    constructor Create(n: String, r: String)
+    begin
+        self.nome := n;
+        self.raca := r;
+    end;
+    
+    public override function emitirSom(): String
+    begin
+        return "Au au! Meu nome é " + self.nome;
+    end;
+end;
+
+class Gato extends Animal
+    constructor Create(n: String)
+    begin
+        self.nome := n;
+    end;
+    
+    public override function emitirSom(): String
+    begin
+        return "Miau! Eu sou " + self.nome;
+    end;
+end;
+
+var animal: Animal;
+var cachorro: Cachorro;
+var gato: Gato;
+
+begin
+    animal := new Animal("Animal Genérico");
+    WriteLn(animal.emitirSom());
+    
+    cachorro := new Cachorro("Rex", "Labrador");
+    WriteLn(cachorro.emitirSom());
+    
+    gato := new Gato("Mimi");
+    WriteLn(gato.emitirSom());
+end.

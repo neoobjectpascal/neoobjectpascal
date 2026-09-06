@@ -1,0 +1,10 @@
+var nome: String;
+var idade: Integer;
+
+begin
+  nome := "Carmen Sandiego";
+  idade := 30;
+
+  WriteLn("Nome: ", nome);
+  WriteLn("Idade: ", idade);
+end.

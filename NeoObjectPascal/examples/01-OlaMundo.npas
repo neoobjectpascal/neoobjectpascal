@@ -1,0 +1,4 @@
+begin
+  WriteLn("Olá, Mundo!");
+end.
+

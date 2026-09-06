@@ -1,0 +1,8 @@
+var dados: Object;
+var csvString: String;
+
+begin
+  csvString := "nome,idade,cidade\nCarla,30,São Paulo\nBrito,25,Rio de Janeiro";
+  CSV.parse(csvString) into dados;
+  WriteLn("Dados CSV processados com sucesso!");
+end.

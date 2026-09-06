@@ -1,0 +1,43 @@
+// Exemplo: arrays nativos e for..in
+
+var numeros: Array;
+var nomes: Array;
+var item: Integer;
+var nome: String;
+var soma: Integer;
+var i: Integer;
+
+begin
+    // Criar array com literal
+    numeros := [10, 20, 30, 40, 50];
+    nomes := ["Alice", "Bob", "Carlos", "Diana"];
+
+    // Acessar por indice (base 0)
+    WriteLn("Primeiro numero: ", numeros[0]);
+    WriteLn("Ultimo nome: ", nomes[3]);
+
+    // Modificar elemento
+    numeros[2] := 99;
+    WriteLn("Terceiro apos modificacao: ", numeros[2]);
+
+    // Iterar com for..in
+    WriteLn("--- Numeros ---");
+    soma := 0;
+    for item in numeros do
+    begin
+        WriteLn("  ", item);
+        soma := soma + item;
+    end;
+    WriteLn("Soma: ", soma);
+
+    WriteLn("--- Nomes ---");
+    for nome in nomes do
+        WriteLn("  Ola, ", nome, "!");
+
+    // Array de resultados calculados
+    var quadrados: Array;
+    quadrados := [1, 4, 9, 16, 25];
+    WriteLn("Quadrados:");
+    for item in quadrados do
+        WriteLn("  ", item);
+end.

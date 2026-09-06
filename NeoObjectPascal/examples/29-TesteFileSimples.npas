@@ -1,0 +1,36 @@
+uses internal.file;
+
+begin
+    WriteLn("=== Teste Simples da Biblioteca File ===");
+    WriteLn("");
+    
+    WriteLn("Extensão de 'exemplo.txt': " + getFileExtension("exemplo.txt"));
+    WriteLn("Nome de '/caminho/exemplo.txt': " + getFileName("/caminho/exemplo.txt"));
+    WriteLn("Nome sem extensão: " + getFileNameWithoutExtension("exemplo.txt"));
+    WriteLn("");
+    
+    WriteLn("Junção de caminhos: " + joinPath("pasta", "arquivo.txt"));
+    WriteLn("Junção de 3 caminhos: " + joinPath3("raiz", "pasta", "arquivo.txt"));
+    WriteLn("");
+    
+    WriteLn("Nome sanitizado: " + sanitizeFilename("arquivo<>:|?.txt"));
+    WriteLn("Nome temporário: " + createTempFilename("temp", ".txt"));
+    WriteLn("");
+    
+    WriteLn("Extensões comuns: " + getCommonFileExtensions());
+    WriteLn("Tipo de arquivo PDF: " + getFileTypeDescription("documento.pdf"));
+    WriteLn("");
+    
+    WriteLn("Formatação de tamanhos:");
+    WriteLn("1024 bytes = " + formatFileSize(1024));
+    WriteLn("1048576 bytes = " + formatFileSize(1048576));
+    WriteLn("");
+    
+    WriteLn("Diretórios do sistema:");
+    WriteLn("Atual: " + getCurrentWorkingDirectory());
+    WriteLn("Home: " + getUserHomeDirectory());
+    WriteLn("Temp: " + getTempDirectory());
+    WriteLn("");
+    
+    WriteLn("=== Teste Concluído ===");
+end.

@@ -1,0 +1,40 @@
+// TerminalInk: painel com Spinner (animado), ProgressBar, StatusMessage, Badge e Select.
+// Use as setas ↑↓ para navegar no Select e Enter para escolher. q/Esc para sair.
+
+uses terminalink;
+
+var progresso: Integer;
+var cor: String;
+
+function escolher(v): Boolean
+begin
+    cor := v;
+    return true;
+end;
+
+function ui(): Object
+begin
+    return VBox(#{ padding: 1, gap: 1, border: "round", borderColor: "magenta" }, [
+        HBox(#{ gap: 1 }, [
+            Text(#{ bold: true, color: "magenta" }, "Dashboard"),
+            Badge(#{ color: "yellow" }, "beta")
+        ]),
+        Spinner(#{ label: "Carregando dados..." }),
+        Text(#{ dim: true }, "Progresso:"),
+        ProgressBar(#{ value: progresso }),
+        StatusMessage(#{ variant: "success" }, "Conexão estabelecida"),
+        Text(#{}, "Escolha uma cor:"),
+        Select(#{ options: [
+            #{ label: "Vermelho", value: "red" },
+            #{ label: "Verde", value: "green" },
+            #{ label: "Azul", value: "blue" }
+        ], onChange: escolher }),
+        Text(#{}, "Cor escolhida: " + cor)
+    ]);
+end;
+
+begin
+    progresso := 66;
+    cor := "(nenhuma)";
+    render(ui);
+end.

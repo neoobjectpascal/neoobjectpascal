@@ -1,0 +1,72 @@
+// Exemplo de teste com mocking profissional
+
+// Serviço externo que queremos mockar
+class EmailService
+    public function enviarEmail(destinatario: String, mensagem: String): Boolean
+    begin
+        // Em produção, enviaria email real
+        WriteLn("Enviando email para ", destinatario);
+        return true;
+    end;
+end;
+
+// Classe que usa o serviço
+class NotificadorUsuario
+    var emailService: EmailService;
+    
+    constructor Create(service: EmailService)
+    begin
+        self.emailService := service;
+    end;
+    
+    public function notificar(usuario: String): Boolean
+    begin
+        return self.emailService.enviarEmail(usuario, "Você tem uma nova notificação!");
+    end;
+end;
+
+test "NotificadorUsuario deve chamar EmailService ao notificar"
+begin
+    // GIVEN - Dado um serviço de email mockado
+    var emailService: EmailService;
+    emailService := new EmailService();
+    
+    // Mock o método enviarEmail para retornar true sem enviar email real
+    mock EmailService enviarEmail thenReturn true;
+    
+    var notificador: NotificadorUsuario;
+    notificador := new NotificadorUsuario(emailService);
+    
+    // WHEN - Quando notificamos um usuário
+    var resultado: Boolean;
+    resultado := notificador.notificar("usuario@teste.com");
+    
+    // THEN - Então deve retornar true
+    expect(resultado).toBeTrue();
+    
+    // E o método enviarEmail deve ter sido chamado
+    verify EmailService enviarEmail;
+end;
+
+// Função isolada para mockar
+function calcularDesconto(valor: Integer): Integer
+begin
+    // Cálculo complexo que queremos mockar
+    return valor * 10;
+end;
+
+test "Deve usar função mockada em vez da real"
+begin
+    // GIVEN - Dado uma função mockada
+    mock calcularDesconto thenReturn 50;
+    
+    // WHEN - Quando chamamos a função
+    var desconto: Integer;
+    desconto := calcularDesconto(100);
+    
+    // THEN - Então deve retornar o valor mockado
+    expect(desconto).toBe(50);
+    
+    // E a função deve ter sido chamada
+    verify calcularDesconto;
+end;

@@ -1,0 +1,35 @@
+// Chamada de API: POST com corpo JSON automático, autenticação, form-urlencoded
+// e httpRequest com query params. Usa a API pública de teste jsonplaceholder.
+
+uses http;
+
+var resp: Object;
+
+begin
+    // POST — o record vira JSON automaticamente (Content-Type: application/json)
+    resp := httpPost("https://jsonplaceholder.typicode.com/posts",
+        #{ title: "Olá", body: "enviado do NeoObjectPascal", userId: 1 });
+    WriteLn("POST status: ", resp.status);
+    WriteLn("ID criado: ", resp.json.id);
+
+    // POST com autenticação Bearer (o helper monta o header)
+    resp := httpPost("https://jsonplaceholder.typicode.com/posts",
+        #{ title: "Com auth" },
+        httpBearer("meu-token-secreto"));
+    WriteLn("POST autenticado status: ", resp.status);
+
+    // Corpo form-urlencoded
+    resp := httpPost("https://jsonplaceholder.typicode.com/posts",
+        httpForm(#{ campo: "valor", outro: "dado com espaço" }));
+    WriteLn("POST form status: ", resp.status);
+
+    // httpRequest — controle total (método, query, timeout, auth)
+    resp := httpRequest(#{
+        method: "GET",
+        url: "https://jsonplaceholder.typicode.com/comments",
+        query: #{ postId: 1 },
+        auth: httpBearer("token"),
+        timeout: 15
+    });
+    WriteLn("GET com query status: ", resp.status);
+end.

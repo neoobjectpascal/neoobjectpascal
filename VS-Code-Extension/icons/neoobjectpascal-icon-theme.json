@@ -1,0 +1,41 @@
+{
+	"iconDefinitions": {
+		"npas": {
+			"iconPath": "../vscode-symbols-icons/files/npas.png"
+		},
+		"test-npas": {
+			"iconPath": "../vscode-symbols-icons/files/test.npas.png"
+		},
+		"folder": { "iconPath": "../vscode-symbols-icons/folders/folder.svg" },
+		"folder-blue": { "iconPath": "../vscode-symbols-icons/folders/folder-blue.svg" },
+		"folder-gray": { "iconPath": "../vscode-symbols-icons/folders/folder-gray.svg" },
+		"folder-green": { "iconPath": "../vscode-symbols-icons/folders/folder-green.svg" },
+		"folder-orange": { "iconPath": "../vscode-symbols-icons/folders/folder-orange.svg" },
+		"folder-pink": { "iconPath": "../vscode-symbols-icons/folders/folder-pink.svg" },
+		"folder-purple": { "iconPath": "../vscode-symbols-icons/folders/folder-purple.svg" },
+		"folder-red": { "iconPath": "../vscode-symbols-icons/folders/folder-red.svg" },
+		"folder-sky": { "iconPath": "../vscode-symbols-icons/folders/folder-sky.svg" },
+		"folder-yellow": { "iconPath": "../vscode-symbols-icons/folders/folder-yellow.svg" },
+		"code-blue": { "iconPath": "../vscode-symbols-icons/files/code-blue.svg" },
+		"code-gray": { "iconPath": "../vscode-symbols-icons/files/code-gray.svg" },
+		"code-green": { "iconPath": "../vscode-symbols-icons/files/code-green.svg" },
+		"code-orange": { "iconPath": "../vscode-symbols-icons/files/code-orange.svg" },
+		"code-pink": { "iconPath": "../vscode-symbols-icons/files/code-pink.svg" },
+		"code-purple": { "iconPath": "../vscode-symbols-icons/files/code-purple.svg" },
+		"code-red": { "iconPath": "../vscode-symbols-icons/files/code-red.svg" },
+		"code-sky": { "iconPath": "../vscode-symbols-icons/files/code-sky.svg" },
+		"code-yellow": { "iconPath": "../vscode-symbols-icons/files/code-yellow.svg" }
+	},
+	"folder": "folder",
+	"folderExpanded": "folder",
+	"file": "code-blue",
+	"fileExtensions": {
+		"npas": "npas"
+	},
+	"fileNames": {
+		"*.test.npas": "test-npas"
+	},
+	"languageIds": {
+		"neoobjectpascal": "npas"
+	}
+}

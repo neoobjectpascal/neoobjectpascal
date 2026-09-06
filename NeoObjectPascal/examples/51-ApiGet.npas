@@ -1,0 +1,33 @@
+// Chamada de API: GET com resposta JSON auto-parseada.
+// Requer conexão com a internet (usa a API pública de teste jsonplaceholder).
+
+uses http;
+
+var resp: Object;
+var tarefa: Object;
+
+begin
+    resp := httpGet("https://jsonplaceholder.typicode.com/todos/1");
+
+    if resp.ok then
+    begin
+        WriteLn("Status HTTP: ", resp.status);
+        // resp.json é o corpo já parseado
+        tarefa := resp.json;
+        WriteLn("Título: ", tarefa.title);
+        WriteLn("Concluída: ", tarefa.completed);
+    end
+    else
+        WriteLn("Falhou com status ", resp.status);
+
+    // Tratamento de erro de transporte (rede) com try/catch
+    try
+    begin
+        resp := httpGet("https://host-que-nao-existe.invalido");
+        WriteLn(resp.status);
+    end
+    catch (e)
+    begin
+        WriteLn("Erro de rede capturado: ", e);
+    end;
+end.

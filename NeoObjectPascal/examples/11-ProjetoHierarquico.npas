@@ -1,0 +1,38 @@
+uses
+  helpers.matematica, lib.core.calculadora, lib.utils.formatacao;
+
+var resultado: Integer;
+
+begin
+  WriteLn(mensagemBemVindo());
+  WriteLn("=== Projeto com Módulos Hierárquicos ===");
+  
+  WriteLn("--- Módulo helpers.matematica ---");
+  resultado := somar(10, 20);
+  WriteLn("Soma: ", resultado);
+  
+  resultado := multiplicar(5, 6);
+  WriteLn("Multiplicação: ", resultado);
+  
+  WriteLn("--- Módulo lib.core.calculadora ---");
+  resultado := adicionar(15, 25);
+  WriteLn("Adição: ", resultado);
+  
+  resultado := subtrair(50, 20);
+  WriteLn("Subtração: ", resultado);
+  
+  resultado := elevarAoQuadrado(7);
+  WriteLn("Quadrado de 7: ", resultado);
+  
+  WriteLn("--- Módulo lib.utils.formatacao ---");
+  resultado := duplicar(12);
+  WriteLn("Duplicar 12: ", resultado);
+  
+  resultado := triplicar(8);
+  WriteLn("Triplicar 8: ", resultado);
+  
+  WriteLn("--- Programação Funcional Hierárquica ---");
+  WriteLn("Pipeline: 5 |> elevarAoQuadrado |> duplicar = ", 5 |> elevarAoQuadrado |> duplicar);
+  
+  WriteLn("=== Projeto concluído! ===");
+end.

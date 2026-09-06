@@ -1,0 +1,32 @@
+// TerminalInk (Fase 2): tema personalizado com extendTheme + setTheme.
+// O tema é global (modo imediato) — defina-o antes de render. Esc sai.
+
+uses terminalink;
+
+var tema: Object;
+
+function ui(): Object
+begin
+    return VBox(#{ padding: 1, gap: 1, border: "round", borderColor: "magenta" }, [
+        Text(#{ bold: true, color: "magenta" }, "Tema personalizado"),
+        Spinner(#{ label: "Processando..." }),
+        HBox(#{ gap: 1 }, [
+            Badge(#{}, "novo"),
+            Badge(#{}, "pro")
+        ]),
+        Text(#{ dim: true }, "Barra de progresso tematizada:"),
+        ProgressBar(#{ value: 70 }),
+        StatusMessage(#{ variant: "success" }, "Tema aplicado a Spinner, Badge e ProgressBar")
+    ]);
+end;
+
+begin
+    // Estende o tema padrão sobrescrevendo apenas alguns tokens de estilo.
+    tema := extendTheme(defaultTheme(), #{
+        Spinner: #{ color: "magenta" },
+        Badge: #{ color: "cyan" },
+        ProgressBar: #{ completeColor: "magenta" }
+    });
+    setTheme(tema);
+    render(ui);
+end.

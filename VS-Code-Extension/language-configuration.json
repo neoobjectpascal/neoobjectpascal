@@ -1,0 +1,36 @@
+{
+    "comments": {
+        // symbol used for single line comment. NeoObjectPascal only supports // line comments.
+        "lineComment": "//"
+    },
+    // symbols used as brackets
+    "brackets": [
+        ["Begin", "End"],
+        ["{", "}"],
+        ["[", "]"],
+        ["(*", "*)"],
+        ["(.", ".)"],
+        ["(", ")"]
+    ],
+    // symbols that are auto closed when typing
+    "autoClosingPairs": [
+        ["#{", "}"],
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"],
+        ["(.", "."],
+        ["(*", "*"],
+        {"open": "'", "close": "'", "notIn": ["string", "comment"]}
+    ],
+    "autoCloseBefore": ";:.,=}])>` \n\t",
+    // symbols that that can be used to surround a selection
+    "surroundingPairs": [
+        ["{", "}"],
+        ["[", "]"],
+        ["(", ")"],
+        ["*", "*"],
+        [".", "."],
+        ["'", "'"]
+    ],
+    "wordPattern": "(?i:([_a-z][0-9_a-z]*))"
+}

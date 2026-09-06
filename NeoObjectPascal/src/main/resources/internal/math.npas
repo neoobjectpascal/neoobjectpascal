@@ -1,0 +1,87 @@
+function abs(x): Integer
+begin
+    if x < 0 then
+        return 0 - x
+    else
+        return x;
+end;
+
+function max(a, b): Integer
+begin
+    if a > b then
+        return a
+    else
+        return b;
+end;
+
+function min(a, b): Integer
+begin
+    if a < b then
+        return a
+    else
+        return b;
+end;
+
+function square(x): Integer
+begin
+    return x * x;
+end;
+
+function cube(x): Integer
+begin
+    return x * x * x;
+end;
+
+function factorial(n): Integer
+begin
+    if n <= 1 then
+        return 1
+    else
+        return n * factorial(n - 1);
+end;
+
+function fibonacci(n): Integer
+begin
+    if n <= 1 then
+        return n
+    else
+        return fibonacci(n - 1) + fibonacci(n - 2);
+end;
+
+function isEven(n): Boolean
+begin
+    return (n / 2) * 2 = n;
+end;
+
+function isOdd(n): Boolean
+begin
+    return (n / 2) * 2 <> n;
+end;
+
+function gcd(a, b): Integer
+begin
+    if b = 0 then
+        return a
+    else
+        return gcd(b, a - (a / b) * b);
+end;
+
+function lcm(a, b): Integer
+begin
+    return (a * b) / gcd(a, b);
+end;
+
+function sign(x): Integer
+begin
+    if x > 0 then
+        return 1
+    else if x < 0 then
+        return 0 - 1
+    else
+        return 0;
+end;
+
+function clamp(value, minVal, maxVal): Integer
+begin
+    return max(minVal, min(value, maxVal));
+end;

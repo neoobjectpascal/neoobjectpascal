@@ -1,0 +1,19 @@
+uses internal.math;
+
+var numero: Integer;
+var resultado: Integer;
+
+begin
+    WriteLn("=== Teste Simples das Bibliotecas Internas ===");
+    
+    numero := 10;
+    WriteLn("Número: ", numero);
+    
+    resultado := abs(numero);
+    WriteLn("Valor absoluto: ", resultado);
+    
+    resultado := max(5, 8);
+    WriteLn("Máximo entre 5 e 8: ", resultado);
+    
+    WriteLn("=== Teste Concluído ===");
+end.

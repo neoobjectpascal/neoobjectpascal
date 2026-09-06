@@ -1,0 +1,35 @@
+var nome: String;
+var sobrenome: String;
+var nomeCompleto: String;
+var idade: Integer;
+var mensagem: String;
+begin
+    WriteLn("=== Demonstracao de Concatenacao de Strings ===");
+    
+    WriteLn("Qual o seu nome?");
+    ReadLn(nome);
+    
+    WriteLn("Qual o seu sobrenome?");
+    ReadLn(sobrenome);
+    
+    WriteLn("Qual a sua idade?");
+    ReadLn(idade);
+    
+    { Concatenacao simples de strings }
+    nomeCompleto := nome + " " + sobrenome;
+    WriteLn("Nome completo: ", nomeCompleto);
+    
+    { Concatenacao de string com literal }
+    mensagem := "Ola, " + nome + "!";
+    WriteLn(mensagem);
+    
+    { Concatenacao de string com numero }
+    mensagem := nome + " tem " + idade + " anos.";
+    WriteLn(mensagem);
+    
+    { Concatenacao mais complexa }
+    mensagem := "Sr(a). " + nomeCompleto + " (" + idade + " anos) - Bem-vindo!";
+    WriteLn("Mensagem final: ", mensagem);
+    
+    WriteLn("=== Concatenacao realizada com sucesso! ===");
+end.

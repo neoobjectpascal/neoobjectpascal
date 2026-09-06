@@ -1,0 +1,33 @@
+// Exemplo de interface em NeoObjectPascal
+
+interface Calculavel
+    function calcular(a: Integer, b: Integer): Integer;
+end;
+
+class Soma implements Calculavel
+    public function calcular(a: Integer, b: Integer): Integer
+    begin
+        return a + b;
+    end;
+end;
+
+class Multiplicacao implements Calculavel
+    public function calcular(a: Integer, b: Integer): Integer
+    begin
+        return a * b;
+    end;
+end;
+
+var soma: Soma;
+var mult: Multiplicacao;
+var resultado: Integer;
+
+begin
+    soma := new Soma();
+    resultado := soma.calcular(10, 5);
+    WriteLn("Soma: 10 + 5 = ", resultado);
+    
+    mult := new Multiplicacao();
+    resultado := mult.calcular(10, 5);
+    WriteLn("Multiplicação: 10 * 5 = ", resultado);
+end.

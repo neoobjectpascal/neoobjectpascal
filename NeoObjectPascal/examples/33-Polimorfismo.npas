@@ -1,0 +1,62 @@
+// Exemplo de polimorfismo em NeoObjectPascal
+
+class Forma
+    public virtual function calcularArea(): Integer
+    begin
+        return 0;
+    end;
+    
+    public virtual function descrever(): String
+    begin
+        return "Forma genérica";
+    end;
+end;
+
+class Retangulo extends Forma
+    var largura: Integer;
+    var altura: Integer;
+    
+    constructor Create(l: Integer, a: Integer)
+    begin
+        self.largura := l;
+        self.altura := a;
+    end;
+    
+    public override function calcularArea(): Integer
+    begin
+        return self.largura * self.altura;
+    end;
+    
+    public override function descrever(): String
+    begin
+        return "Retângulo " + self.largura + "x" + self.altura;
+    end;
+end;
+
+class Quadrado extends Retangulo
+    constructor Create(lado: Integer)
+    begin
+        self.largura := lado;
+        self.altura := lado;
+    end;
+    
+    public override function descrever(): String
+    begin
+        return "Quadrado " + self.largura + "x" + self.largura;
+    end;
+end;
+
+var forma: Forma;
+var retangulo: Retangulo;
+var quadrado: Quadrado;
+
+begin
+    forma := new Forma();
+    WriteLn(forma.descrever(), " - Área: ", forma.calcularArea());
+    
+    retangulo := new Retangulo(5, 10);
+    WriteLn(retangulo.descrever(), " - Área: ", retangulo.calcularArea());
+    
+    quadrado := new Quadrado(7);
+    WriteLn(quadrado.descrever(), " - Área: ", quadrado.calcularArea());
+end.

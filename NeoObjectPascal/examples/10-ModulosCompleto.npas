@@ -1,0 +1,24 @@
+uses
+  helpers.matematica, lib.core.calculadora, lib.utils.formatacao;
+
+var resultado: Integer;
+
+begin
+  WriteLn("=== Demonstração do Sistema de Módulos ===");
+  
+  resultado := somar(10, 5);
+  WriteLn("Soma de 10 + 5 = ", resultado);
+  
+  resultado := multiplicar(4, 7);
+  WriteLn("Multiplicação de 4 * 7 = ", resultado);
+  
+  resultado := elevarAoQuadrado(6);
+  WriteLn("Quadrado de 6 = ", resultado);
+  
+  resultado := duplicar(15);
+  WriteLn("Duplicar 15 = ", resultado);
+  
+  WriteLn("=== Módulo concluído! ===");
+  
+  WriteLn("Pipeline com função de módulo: ", 5 |> elevarAoQuadrado);
+end.

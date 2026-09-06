@@ -1,0 +1,53 @@
+// TerminalInk: formulário interativo com TextInput e estado reativo.
+// O estado vive em variáveis; a cada tecla o callback atualiza e a UI é redesenhada.
+// Digite o nome e pressione ENTER para confirmar. Saia com Esc ou Ctrl+C
+// (a tecla 'q' não sai enquanto o campo de texto está focado — ela é digitada).
+
+uses terminalink;
+
+var nome: String;
+var enviado: Boolean;
+
+function onNome(v): Boolean
+begin
+    nome := v;
+    return true;
+end;
+
+function enviar(v): Boolean
+begin
+    nome := v;
+    enviado := true;
+    return true;
+end;
+
+function ui(): Object
+begin
+    // A UI reage ao estado: antes do envio mostra uma dica; depois, a confirmação.
+    var msg: String;
+    var variante: String;
+    if enviado then
+    begin
+        msg := "Cadastro de " + nome + " enviado com sucesso!";
+        variante := "success";
+    end
+    else
+    begin
+        msg := "Pressione Enter para enviar";
+        variante := "info";
+    end;
+
+    return VBox(#{ padding: 1, gap: 1, border: "round", borderColor: "blue" }, [
+        Text(#{ bold: true, color: "blue" }, "Cadastro"),
+        Text(#{}, "Nome:"),
+        TextInput(#{ placeholder: "Digite seu nome...", onChange: onNome, onSubmit: enviar }),
+        Text(#{}, "Olá, " + nome),
+        StatusMessage(#{ variant: variante }, msg)
+    ]);
+end;
+
+begin
+    nome := "";
+    enviado := false;
+    render(ui);
+end.

@@ -1,0 +1,35 @@
+// TerminalInk (Fase 2): EmailInput, PasswordInput e ConfirmInput.
+// Tab alterna o foco entre os campos. Esc ou Ctrl+C para sair.
+
+uses terminalink;
+
+var email: String;
+var senha: String;
+var resposta: String;
+
+function onEmail(v): Boolean begin email := v; return true; end;
+function onSenha(v): Boolean begin senha := v; return true; end;
+function aceitar(): Boolean begin resposta := "aceitou"; return true; end;
+function recusar(): Boolean begin resposta := "recusou"; return true; end;
+
+function ui(): Object
+begin
+    return VBox(#{ padding: 1, gap: 1, border: "round", borderColor: "green" }, [
+        Text(#{ bold: true, color: "green" }, "Cadastro"),
+        Text(#{}, "E-mail (digite e veja o domínio ser sugerido):"),
+        EmailInput(#{ placeholder: "voce@...", onChange: onEmail }),
+        Text(#{}, "Senha:"),
+        PasswordInput(#{ placeholder: "secreta", onChange: onSenha }),
+        Text(#{}, "Aceita os termos?"),
+        ConfirmInput(#{ defaultChoice: "confirm", onConfirm: aceitar, onCancel: recusar }),
+        Text(#{ dim: true }, "Tab alterna o foco · Esc sai"),
+        Text(#{}, "Você " + resposta)
+    ]);
+end;
+
+begin
+    email := "";
+    senha := "";
+    resposta := "(pendente)";
+    render(ui);
+end.

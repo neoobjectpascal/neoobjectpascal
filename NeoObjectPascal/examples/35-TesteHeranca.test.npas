@@ -1,0 +1,115 @@
+// Teste unitário para herança e polimorfismo
+
+class ContaBancaria
+    var saldo: Integer;
+    
+    constructor Create(saldoInicial: Integer)
+    begin
+        self.saldo := saldoInicial;
+    end;
+    
+    public function getSaldo(): Integer
+    begin
+        return self.saldo;
+    end;
+    
+    public virtual function depositar(valor: Integer): Integer
+    begin
+        self.saldo := self.saldo + valor;
+        return self.saldo;
+    end;
+    
+    public function sacar(valor: Integer): Integer
+    begin
+        self.saldo := self.saldo - valor;
+        return self.saldo;
+    end;
+end;
+
+class ContaPoupanca extends ContaBancaria
+    var taxaRendimento: Integer;
+    
+    constructor Create(saldoInicial: Integer, taxa: Integer)
+    begin
+        self.saldo := saldoInicial;
+        self.taxaRendimento := taxa;
+    end;
+    
+    public function aplicarRendimento(): Integer
+    begin
+        var rendimento: Integer;
+        rendimento := self.saldo * self.taxaRendimento;
+        self.saldo := self.saldo + rendimento;
+        return self.saldo;
+    end;
+end;
+
+test "ContaBancaria deve inicializar com saldo correto"
+begin
+    // GIVEN - Dado um saldo inicial de 1000
+    var saldoInicial: Integer;
+    saldoInicial := 1000;
+    
+    // WHEN - Quando criamos uma conta
+    var conta: ContaBancaria;
+    conta := new ContaBancaria(saldoInicial);
+    
+    // THEN - Então o saldo deve ser 1000
+    expect(conta.getSaldo()).toBe(1000);
+end;
+
+test "ContaBancaria deve depositar valor corretamente"
+begin
+    // GIVEN
+    var conta: ContaBancaria;
+    conta := new ContaBancaria(100);
+    
+    // WHEN
+    var novoSaldo: Integer;
+    novoSaldo := conta.depositar(50);
+    
+    // THEN
+    expect(novoSaldo).toBe(150);
+    expect(conta.getSaldo()).toBe(150);
+end;
+
+test "ContaBancaria deve sacar valor corretamente"
+begin
+    // GIVEN
+    var conta: ContaBancaria;
+    conta := new ContaBancaria(200);
+    
+    // WHEN
+    var novoSaldo: Integer;
+    novoSaldo := conta.sacar(75);
+    
+    // THEN
+    expect(novoSaldo).toBe(125);
+end;
+
+test "ContaPoupanca deve herdar funcionalidades da ContaBancaria"
+begin
+    // GIVEN
+    var poupanca: ContaPoupanca;
+    poupanca := new ContaPoupanca(1000, 10);
+    
+    // WHEN
+    poupanca.depositar(500);
+    
+    // THEN
+    expect(poupanca.getSaldo()).toBe(1500);
+end;
+
+test "ContaPoupanca deve aplicar rendimento corretamente"
+begin
+    // GIVEN - Dado uma poupança com saldo 100 e taxa 5
+    var poupanca: ContaPoupanca;
+    poupanca := new ContaPoupanca(100, 5);
+    
+    // WHEN - Quando aplicamos o rendimento
+    var saldoComRendimento: Integer;
+    saldoComRendimento := poupanca.aplicarRendimento();
+    
+    // THEN - Então o saldo deve ser 100 + (100 * 5) = 600
+    expect(saldoComRendimento).toBe(600);
+end;

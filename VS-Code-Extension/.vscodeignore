@@ -1,0 +1,32 @@
+# Dev / workspace files
+.vscode/**
+.gitignore
+vsc-extension-quickstart.md
+object-pascal-syntax-highlighting.code-workspace
+
+# Built artifacts — never ship a .vsix inside the package
+*.vsix
+
+# Grammar source — only the generated .json is loaded at runtime
+syntaxes/*.yaml
+
+# Source-only / oversized image assets (icon.png is the one that ships)
+images/Pascal.xcf
+images/icon-source-1024.png
+
+# Legacy / dev-only docs
+*-old.md
+INSTALACAO.md
+INSTALLATION-GUIDE.md
+SYNTAX_IMPROVEMENTS.md
+
+# Scratch sample
+test-example.npas
+
+# Icon pack: keep only the ~20 icons the "NeoObjectPascal Icons" theme references (of 315)
+vscode-symbols-icons/**
+!vscode-symbols-icons/files/npas.png
+!vscode-symbols-icons/files/test.npas.png
+!vscode-symbols-icons/files/code-*.svg
+!vscode-symbols-icons/folders/folder.svg
+!vscode-symbols-icons/folders/folder-*.svg

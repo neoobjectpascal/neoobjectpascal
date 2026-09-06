@@ -1,0 +1,7 @@
+uses
+  meu_modulo;
+
+begin
+  WriteLn(mensagem());
+end.
+

@@ -1,0 +1,10 @@
+function testeSimples(): String
+begin
+    return java:() {
+        return "Olá do Java!";
+    };
+end;
+
+begin
+    WriteLn("Teste: ", testeSimples());
+end.

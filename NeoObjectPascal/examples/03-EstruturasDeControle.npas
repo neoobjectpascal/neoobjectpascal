@@ -1,0 +1,9 @@
+var i: Integer;
+
+begin
+  if (10 > 5) then
+    WriteLn("10 é maior que 5");
+
+  for i := 1 to 3 do
+    WriteLn("Contagem do for: ", i);
+end.

@@ -1,0 +1,7 @@
+var nome: String;
+
+begin
+  WriteLn("Qual é o seu nome?");
+  showMenu("Opção 1", "Opção 2", "Opção 3");
+  WriteLn("Menu exibido com sucesso!");
+end.

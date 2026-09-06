@@ -1,0 +1,26 @@
+// Exemplo de classe simples em NeoObjectPascal
+
+class Pessoa
+    var nome: String;
+    var idade: Integer;
+    
+    constructor Create(n: String, i: Integer)
+    begin
+        self.nome := n;
+        self.idade := i;
+    end;
+    
+    public function apresentar(): String
+    begin
+        return "Olá, meu nome é " + self.nome + " e tenho " + self.idade + " anos.";
+    end;
+end;
+
+var pessoa: Pessoa;
+var mensagem: String;
+
+begin
+    pessoa := new Pessoa("João", 30);
+    mensagem := pessoa.apresentar();
+    WriteLn(mensagem);
+end.

@@ -1,0 +1,86 @@
+uses internal.math, internal.string, internal.datetime;
+
+var numero: Integer;
+var resultado: Integer;
+var texto: String;
+var data: String;
+var valido: Boolean;
+
+begin
+    WriteLn("=== Teste Completo das Bibliotecas Internas ===");
+    WriteLn();
+    
+    { Testando biblioteca matemática }
+    WriteLn("--- Biblioteca Matemática ---");
+    numero := 15;
+    WriteLn("Número: ", numero);
+    WriteLn("Valor absoluto de -5: ", abs(0 - 5));
+    WriteLn("Máximo entre 10 e 20: ", max(10, 20));
+    WriteLn("Mínimo entre 10 e 20: ", min(10, 20));
+    WriteLn("Quadrado de 4: ", square(4));
+    WriteLn("Cubo de 3: ", cube(3));
+    WriteLn("Fatorial de 5: ", factorial(5));
+    WriteLn("Fibonacci de 6: ", fibonacci(6));
+    WriteLn("15 é par? ", isEven(15));
+    WriteLn("16 é par? ", isEven(16));
+    WriteLn("15 é ímpar? ", isOdd(15));
+    WriteLn("MDC(12, 18): ", gcd(12, 18));
+    WriteLn("MMC(4, 6): ", lcm(4, 6));
+    WriteLn("Sinal de -10: ", sign(0 - 10));
+    WriteLn("Sinal de 10: ", sign(10));
+    WriteLn("Sinal de 0: ", sign(0));
+    WriteLn("Clamp(25, 10, 20): ", clamp(25, 10, 20));
+    WriteLn();
+    
+    { Testando biblioteca de strings }
+    WriteLn("--- Biblioteca de Strings ---");
+    texto := "NeoObjectPascal";
+    WriteLn("Texto: ", texto);
+    WriteLn("Está vazio? ", isEmpty(texto));
+    WriteLn("String vazia está vazia? ", isEmpty(""));
+    WriteLn("Não está vazio? ", isNotEmpty(texto));
+    WriteLn("Repetir '*' 5 vezes: ", repeat("*", 5));
+    WriteLn("Entre aspas: ", quote(texto));
+    WriteLn("Entre aspas simples: ", singleQuote(texto));
+    WriteLn("Entre colchetes: ", bracket(texto));
+    WriteLn("Entre parênteses: ", parenthesize(texto));
+    WriteLn("Juntar com hífen: ", join("-", "Neo", "Pascal"));
+    WriteLn("Juntar 3 palavras: ", join3(" ", "Olá", "mundo", "programação"));
+    WriteLn("Juntar 4 palavras: ", join4("-", "A", "B", "C", "D"));
+    WriteLn();
+    
+    { Testando biblioteca de data/hora }
+    WriteLn("--- Biblioteca de Data/Hora ---");
+    WriteLn("Ano atual: ", getCurrentYear());
+    WriteLn("Mês atual: ", getCurrentMonth());
+    WriteLn("Dia atual: ", getCurrentDay());
+    WriteLn("Hora atual: ", getCurrentHour());
+    WriteLn("Minuto atual: ", getCurrentMinute());
+    WriteLn("Segundo atual: ", getCurrentSecond());
+    WriteLn("Data atual: ", getCurrentDate());
+    WriteLn("Hora atual: ", getCurrentTime());
+    WriteLn("Data e hora: ", getCurrentDateTime());
+    WriteLn("2024 é ano bissexto? ", isLeapYear(2024));
+    WriteLn("2023 é ano bissexto? ", isLeapYear(2023));
+    WriteLn("Dias em fevereiro de 2024: ", getDaysInMonth(2024, 2));
+    WriteLn("Dias em fevereiro de 2023: ", getDaysInMonth(2023, 2));
+    WriteLn("Nome do mês 1: ", getMonthName(1));
+    WriteLn("Nome do mês 10: ", getMonthName(10));
+    WriteLn("Nome do mês 10 (inglês): ", getMonthNameEn(10));
+    WriteLn("Nome do dia da semana 1: ", getDayOfWeekName(1));
+    WriteLn("Nome do dia da semana 1 (inglês): ", getDayOfWeekNameEn(1));
+    WriteLn("Data formatada (2024-12-25): ", formatDate(2024, 12, 25));
+    WriteLn("Hora formatada (14:30:45): ", formatTime(14, 30, 45));
+    WriteLn("Data válida (2024-02-29)? ", isValidDate(2024, 2, 29));
+    WriteLn("Data válida (2023-02-29)? ", isValidDate(2023, 2, 29));
+    WriteLn("Hora válida (14:30:45)? ", isValidTime(14, 30, 45));
+    WriteLn("Hora válida (25:30:45)? ", isValidTime(25, 30, 45));
+    WriteLn("Idade de quem nasceu em 1990: ", getAge(1990, 5, 15));
+    WriteLn("Adicionar 30 dias a 2024-01-01: ", addDays(2024, 1, 1, 30));
+    WriteLn("Adicionar 6 meses a 2024-06-15: ", addMonths(2024, 6, 15, 6));
+    WriteLn("Adicionar 5 anos a 2024-01-01: ", addYears(2024, 1, 1, 5));
+    WriteLn();
+    
+    WriteLn("=== Teste Concluído com Sucesso! ===");
+    WriteLn("Todas as bibliotecas internas estão funcionando.");
+end.

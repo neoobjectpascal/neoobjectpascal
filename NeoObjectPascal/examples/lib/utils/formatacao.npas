@@ -1,0 +1,14 @@
+function duplicar(valor: Integer): Integer;
+begin
+  return valor * 2;
+end;
+
+function triplicar(valor: Integer): Integer;
+begin
+  return valor * 3;
+end;
+
+function mensagemBemVindo(): String;
+begin
+  return "Bem-vindo ao NeoObjectPascal!";
+end;

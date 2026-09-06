@@ -1,0 +1,17 @@
+uses internal.datetime;
+
+begin
+    WriteLn("=== Teste da Biblioteca Datetime Híbrida ===");
+    WriteLn("Ano atual: ", getCurrentYear());
+    WriteLn("Mês atual: ", getCurrentMonth());
+    WriteLn("Dia atual: ", getCurrentDay());
+    WriteLn("Data atual: ", getCurrentDate());
+    WriteLn("Hora atual: ", getCurrentTime());
+    WriteLn("Data e hora: ", getCurrentDateTime());
+    WriteLn("2024 é bissexto? ", isLeapYear(2024));
+    WriteLn("Dias em fevereiro de 2024: ", getDaysInMonth(2024, 2));
+    WriteLn("Nome do mês 12: ", getMonthName(12));
+    WriteLn("Idade de quem nasceu em 1990-05-15: ", getAge(1990, 5, 15));
+    WriteLn("Data válida (2024-02-29)? ", isValidDate(2024, 2, 29));
+    WriteLn("Adicionar 30 dias a 2024-01-01: ", addDays(2024, 1, 1, 30));
+end.

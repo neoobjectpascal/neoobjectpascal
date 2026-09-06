@@ -1,0 +1,60 @@
+// Exemplo de teste unitário simples usando padrão GIVEN-WHEN-THEN
+
+class Calculadora
+    public function somar(a: Integer, b: Integer): Integer
+    begin
+        return a + b;
+    end;
+    
+    public function subtrair(a: Integer, b: Integer): Integer
+    begin
+        return a - b;
+    end;
+    
+    public function multiplicar(a: Integer, b: Integer): Integer
+    begin
+        return a * b;
+    end;
+end;
+
+test "Calculadora deve somar dois números corretamente"
+begin
+    // GIVEN - Dado uma calculadora
+    var calc: Calculadora;
+    calc := new Calculadora();
+    
+    // WHEN - Quando somamos 5 + 3
+    var resultado: Integer;
+    resultado := calc.somar(5, 3);
+    
+    // THEN - Então o resultado deve ser 8
+    expect(resultado).toBe(8);
+end;
+
+test "Calculadora deve subtrair dois números corretamente"
+begin
+    // GIVEN
+    var calc: Calculadora;
+    calc := new Calculadora();
+    
+    // WHEN
+    var resultado: Integer;
+    resultado := calc.subtrair(10, 4);
+    
+    // THEN
+    expect(resultado).toBe(6);
+end;
+
+test "Calculadora deve multiplicar dois números corretamente"
+begin
+    // GIVEN
+    var calc: Calculadora;
+    calc := new Calculadora();
+    
+    // WHEN
+    var resultado: Integer;
+    resultado := calc.multiplicar(7, 6);
+    
+    // THEN
+    expect(resultado).toBe(42);
+end;

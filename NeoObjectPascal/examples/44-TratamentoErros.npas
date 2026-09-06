@@ -1,0 +1,75 @@
+// Exemplo: tratamento de erros com try/catch/finally
+
+var resultado: Integer;
+var erro: String;
+var x: Real;
+
+function dividir(a: Integer, b: Integer): Real
+begin
+    if b = 0 then
+        raise "Divisao por zero nao permitida";
+    return java:(a, b) {
+        return ((Integer)param0).doubleValue() / ((Integer)param1).doubleValue();
+    };
+end;
+
+function validarIdade(idade: Integer): String
+begin
+    if idade < 0 then
+        raise "Idade invalida: " + idade;
+    if idade > 150 then
+        raise "Idade improvavel: " + idade;
+    return "Idade valida: " + idade;
+end;
+
+begin
+    // try/catch basico
+    try
+    begin
+        x := dividir(10, 2);
+        WriteLn("10 / 2 = ", x);
+    end
+    catch (erro)
+    begin
+        WriteLn("Erro: ", erro);
+    end;
+
+    // capturar erro de divisao por zero
+    try
+    begin
+        x := dividir(5, 0);
+        WriteLn("Nunca chegara aqui");
+    end
+    catch (erro)
+    begin
+        WriteLn("Capturado: ", erro);
+    end;
+
+    // try/catch/finally
+    try
+    begin
+        WriteLn(validarIdade(25));
+    end
+    catch (erro)
+    begin
+        WriteLn("Erro de validacao: ", erro);
+    end
+    finally
+    begin
+        WriteLn("Finally sempre executa");
+    end;
+
+    // erro capturado com finally
+    try
+    begin
+        WriteLn(validarIdade(0 - 5));
+    end
+    catch (erro)
+    begin
+        WriteLn("Capturado: ", erro);
+    end
+    finally
+    begin
+        WriteLn("Cleanup concluido");
+    end;
+end.

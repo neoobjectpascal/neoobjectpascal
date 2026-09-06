@@ -1,0 +1,74 @@
+uses internal.datetime;
+
+function exemploJavaSimples(): String
+begin
+    return java:() {
+        return "Olá do Java!";
+    };
+end;
+
+function calcularComJava(a, b): Integer
+begin
+    return java:(a, b) {
+        Integer x = (Integer)param0;
+        Integer y = (Integer)param1;
+        return x * x + y * y;
+    };
+end;
+
+function obterDataAtualJava(): String
+begin
+    return java:() {
+        java.time.LocalDateTime agora = java.time.LocalDateTime.now();
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+        return agora.format(formatter);
+    };
+end;
+
+var resultado: Integer;
+var texto: String;
+var data: String;
+
+begin
+    WriteLn("=== Demonstração do Sistema Híbrido NeoObjectPascal-Java ===");
+    WriteLn();
+    
+    { Teste de função Java simples }
+    WriteLn("--- Função Java Simples ---");
+    texto := exemploJavaSimples();
+    WriteLn("Resultado: ", texto);
+    WriteLn();
+    
+    { Teste de cálculo com parâmetros }
+    WriteLn("--- Cálculo com Java ---");
+    resultado := calcularComJava(3, 4);
+    WriteLn("3² + 4² = ", resultado);
+    WriteLn();
+    
+    { Teste de data/hora com Java }
+    WriteLn("--- Data/Hora com Java ---");
+    data := obterDataAtualJava();
+    WriteLn("Data/hora atual: ", data);
+    WriteLn();
+    
+    { Teste das bibliotecas internas híbridas }
+    WriteLn("--- Bibliotecas Internas Híbridas ---");
+    WriteLn("Ano atual: ", getCurrentYear());
+    WriteLn("Mês atual: ", getCurrentMonth());
+    WriteLn("Dia atual: ", getCurrentDay());
+    WriteLn("Data atual: ", getCurrentDate());
+    WriteLn("Hora atual: ", getCurrentTime());
+    WriteLn("Data e hora: ", getCurrentDateTime());
+    WriteLn("2024 é bissexto? ", isLeapYear(2024));
+    WriteLn("Dias em fevereiro de 2024: ", getDaysInMonth(2024, 2));
+    WriteLn("Nome do mês 12: ", getMonthName(12));
+    WriteLn("Nome do mês 12 (inglês): ", getMonthNameEn(12));
+    WriteLn("Idade de quem nasceu em 1990-05-15: ", getAge(1990, 5, 15));
+    WriteLn("Data válida (2024-02-29)? ", isValidDate(2024, 2, 29));
+    WriteLn("Data válida (2023-02-29)? ", isValidDate(2023, 2, 29));
+    WriteLn("Adicionar 30 dias a 2024-01-01: ", addDays(2024, 1, 1, 30));
+    WriteLn();
+    
+    WriteLn("=== Sistema Híbrido Funcionando Perfeitamente! ===");
+    WriteLn("NeoObjectPascal + Java = Poder Ilimitado!");
+end.

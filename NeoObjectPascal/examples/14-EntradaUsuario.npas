@@ -1,0 +1,17 @@
+var nome: String;
+var idade: Integer;
+
+begin
+  WriteLn("=== Demonstracao de Entrada do Usuario ===");
+  
+  WriteLn("Qual e o seu nome?");
+  ReadLn(nome);
+  
+  WriteLn("Qual e a sua idade?");
+  ReadLn(idade);
+  
+  WriteLn("Ola, ", nome, "!");
+  WriteLn("Voce tem ", idade, " anos.");
+  
+  WriteLn("=== Entrada processada com sucesso! ===");
+end.

@@ -1,0 +1,51 @@
+// WebInk: um painel web profissional (Tailwind + Chart.js) servido localmente.
+// Rode: java -jar neoobjectpascal.jar examples/56-WebInkDashboard.npas
+// (abre o navegador; Ctrl+C para sair)
+
+uses webink;
+
+var cliques: Integer;
+
+function registrar(): Boolean
+begin
+    cliques := cliques + 1;
+    return true;
+end;
+
+function home(): Object
+begin
+    return Page(#{}, [
+        Navbar(#{}, [
+            Heading(#{ level: 3 }, "Acme Inc."),
+            Link(#{ href: "/relatorio" }, "Relatório")
+        ]),
+        Container(#{ className: "py-8 space-y-6" }, [
+            Heading(#{ level: 1 }, "Painel"),
+            Grid(#{ cols: 3 }, [
+                StatCard(#{ label: "Receita", value: "R$ 128k", delta: "+12%" }),
+                StatCard(#{ label: "Usuários", value: "3.420", delta: "+5%" }),
+                StatCard(#{ label: "Cliques", value: cliques })
+            ]),
+            Card(#{}, [
+                Heading(#{ level: 4 }, "Vendas por mês"),
+                Chart(#{ type: "line", data: #{ labels: ["Jan","Fev","Mar","Abr"], datasets: [ #{ label: "R$ mil", data: [30, 45, 38, 52] } ] } })
+            ]),
+            Button(#{ onClick: registrar }, "Registrar clique")
+        ])
+    ]);
+end;
+
+function relatorio(): Object
+begin
+    return Page(#{}, [
+        Navbar(#{}, [ Heading(#{ level: 3 }, "Relatório"), Link(#{ href: "/" }, "Início") ]),
+        Container(#{ className: "py-8" }, [
+            Table(#{ columns: ["Produto", "Qtd", "Total"], rows: [ ["Café", "120", "R$ 600"], ["Chá", "80", "R$ 320"] ] })
+        ])
+    ]);
+end;
+
+begin
+    cliques := 0;
+    render(#{ "/": home, "/relatorio": relatorio }, #{ title: "Acme · Painel" });
+end.

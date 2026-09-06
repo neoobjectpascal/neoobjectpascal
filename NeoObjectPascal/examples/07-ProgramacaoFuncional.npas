@@ -1,0 +1,14 @@
+function dobrar(x: Integer): Integer;
+begin
+  return x * 2;
+end;
+
+function adicionarUm(x: Integer): Integer;
+begin
+  return x + 1;
+end;
+
+begin
+  WriteLn("O resultado do pipeline é: ", 5 |> dobrar |> adicionarUm);
+end.
+

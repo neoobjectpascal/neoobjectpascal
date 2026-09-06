@@ -1,0 +1,34 @@
+// Exemplo: aritmética com números Real (Double)
+
+var pi: Real;
+var raio: Real;
+var area: Real;
+var preco: Real;
+var desconto: Real;
+var total: Real;
+
+begin
+    pi := 3.14159;
+    raio := 5.0;
+    area := pi * raio * raio;
+    WriteLn("Area do circulo: ", area);
+
+    preco := 99.90;
+    desconto := 0.15;
+    total := preco - (preco * desconto);
+    WriteLn("Preco com desconto: ", total);
+
+    // Divisao real
+    var resultado: Real;
+    resultado := 10.0 / 3.0;
+    WriteLn("10 / 3 = ", resultado);
+
+    // Mistura Integer e Real (auto-promocao)
+    var x: Real;
+    x := 5;
+    WriteLn("Integer atribuido a Real: ", x);
+
+    var y: Real;
+    y := 2 * 3.5;
+    WriteLn("2 * 3.5 = ", y);
+end.

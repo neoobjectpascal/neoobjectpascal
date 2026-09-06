@@ -1,0 +1,33 @@
+// Integração Java: acessar os argumentos pelo NOME (além de param0, param1, ...).
+// Quando o argumento é um identificador simples, ele fica disponível dentro do bloco
+// com o mesmo nome — e já tipado, então o cast se torna opcional.
+
+function saudar(nome: String): String
+begin
+    return java:(nome) {
+        // 'nome' é declarado como String — sem precisar de (String)param0
+        return "Olá, " + nome.toUpperCase();
+    };
+end;
+
+function hipotenusa(a: Real, b: Real): Real
+begin
+    return java:(a, b) {
+        // 'a' e 'b' são Double; a aritmética faz o auto-unboxing
+        return Math.sqrt(a * a + b * b);
+    };
+end;
+
+// Argumento que é uma expressão (não um nome) continua acessível por param0
+function proximo(x: Integer): Integer
+begin
+    return java:(x + 1) {
+        return ((Integer) param0) * 10;
+    };
+end;
+
+begin
+    WriteLn(saudar("ada"));
+    WriteLn("hipotenusa(3, 4) = ", hipotenusa(3.0, 4.0));
+    WriteLn("proximo(5) -> ", proximo(5));
+end.

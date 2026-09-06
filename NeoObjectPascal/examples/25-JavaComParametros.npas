@@ -1,0 +1,13 @@
+function calcular(a, b): Integer
+begin
+    return java:(a, b) {
+        Integer x = (Integer)param0;
+        Integer y = (Integer)param1;
+        return x * x + y * y;
+    };
+end;
+
+begin
+    WriteLn("3² + 4² = ", calcular(3, 4));
+    WriteLn("5² + 12² = ", calcular(5, 12));
+end.

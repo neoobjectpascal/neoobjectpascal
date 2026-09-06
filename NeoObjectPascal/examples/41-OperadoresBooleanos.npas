@@ -1,0 +1,33 @@
+// Exemplo: operadores booleanos and, or, not
+
+var a: Integer;
+var b: Integer;
+var ativo: Boolean;
+var admin: Boolean;
+
+begin
+    a := 10;
+    b := 20;
+    ativo := true;
+    admin := false;
+
+    // and
+    if a > 0 and b > 0 then
+        WriteLn("Ambos positivos");
+
+    // or
+    if ativo or admin then
+        WriteLn("Tem acesso ao sistema");
+
+    // not
+    if not admin then
+        WriteLn("Nao e administrador");
+
+    // combinacao
+    if a < b and not admin then
+        WriteLn("a menor que b e nao e admin");
+
+    // expressao complexa
+    if (a > 5 and b > 5) or ativo then
+        WriteLn("Condicao composta verdadeira");
+end.
