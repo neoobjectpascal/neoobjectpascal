@@ -24,6 +24,7 @@ export const frConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
       testing: 'Tests et outils',
       reference: 'Référence',
       introduction: 'Introduction',
+      aboutAuthor: 'À propos de l’auteur',
       installation: 'Installation et premier programme',
       programStructure: 'Structure d’un programme',
       variablesAndTypes: 'Variables et types',

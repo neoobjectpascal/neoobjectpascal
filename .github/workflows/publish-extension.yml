@@ -32,9 +32,9 @@ jobs:
           java-version: '17'
           cache: maven
 
-      - name: Build interpreter (fat jar)
+      - name: Test and build interpreter (fat jar)
         working-directory: NeoObjectPascal
-        run: mvn -B -DskipTests package
+        run: mvn -B test package
 
       - name: Bundle jar into the extension
         run: cp NeoObjectPascal/target/neoobjectpascal-1.0-SNAPSHOT-jar-with-dependencies.jar VS-Code-Extension/bin/neoobjectpascal.jar
@@ -45,7 +45,11 @@ jobs:
 
       - name: Install extension deps
         working-directory: VS-Code-Extension
-        run: npm install
+        run: npm ci
+
+      - name: Test extension
+        working-directory: VS-Code-Extension
+        run: npm test
 
       - name: Bump patch version
         working-directory: VS-Code-Extension
@@ -53,15 +57,17 @@ jobs:
 
       - name: Publish to the VS Code Marketplace
         working-directory: VS-Code-Extension
-        run: npx @vscode/vsce publish -p "$VSCE_PAT"
+        # A prior publish can succeed while the release commit fails. In that case,
+        # accept the existing Marketplace version and persist the local release state.
+        run: npx @vscode/vsce publish --skip-duplicate -p "$VSCE_PAT"
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
 
-      - name: Commit the version bump
+      - name: Commit release artifacts
         run: |
           VERSION=$(node -p "require('./VS-Code-Extension/package.json').version")
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add VS-Code-Extension/package.json
+          git add VS-Code-Extension/package.json VS-Code-Extension/package-lock.json VS-Code-Extension/bin/neoobjectpascal.jar
           git commit -m "chore(release): extension v$VERSION [skip ci]" || echo "nada a commitar"
           git push

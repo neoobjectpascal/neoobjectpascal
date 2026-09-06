@@ -14,7 +14,7 @@ const neoLang = {
 }
 
 // GitHub URL of the monorepo — adjust if the canonical remote changes.
-export const REPO_URL = 'https://github.com/alvaro-brito/NeoObjectPascal-Monorepo'
+export const REPO_URL = 'https://github.com/neoobjectpascal/neoobjectpascal'
 
 export const sharedConfig: UserConfig<DefaultTheme.Config> = {
   // The `.npas` slug is what authors type after ``` in fences.

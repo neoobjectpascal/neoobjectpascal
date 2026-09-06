@@ -320,7 +320,7 @@ See `CHANGELOG.md` for the full history.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please visit the [GitHub repository](https://github.com/alvarobrito/neoobjectpascal).
+Contributions are welcome! Please visit the [GitHub repository](https://github.com/neoobjectpascal/neoobjectpascal).
 
 ## 📄 License
 

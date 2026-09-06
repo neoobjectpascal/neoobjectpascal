@@ -17,7 +17,7 @@ hero:
       link: /de/reference/language-reference
     - theme: alt
       text: GitHub
-      link: https://github.com/alvaro-brito/NeoObjectPascal-Monorepo
+      link: https://github.com/neoobjectpascal/neoobjectpascal
 
 features:
   - icon: 🏗️

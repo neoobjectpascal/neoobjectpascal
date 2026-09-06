@@ -24,6 +24,7 @@ export const deConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
       testing: 'Testen & Werkzeuge',
       reference: 'Referenz',
       introduction: 'Einführung',
+      aboutAuthor: 'Über den Autor',
       installation: 'Installation & erstes Programm',
       programStructure: 'Programmstruktur',
       variablesAndTypes: 'Variablen und Typen',

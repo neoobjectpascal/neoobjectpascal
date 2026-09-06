@@ -14,6 +14,7 @@ export interface SidebarLabels {
   reference: string
   // getting-started
   introduction: string
+  aboutAuthor: string
   installation: string
   programStructure: string
   // language
@@ -62,6 +63,7 @@ export function buildSidebar(base: string, l: SidebarLabels): DefaultTheme.Sideb
       collapsed: false,
       items: [
         { text: l.introduction, link: p('getting-started/introduction') },
+        { text: l.aboutAuthor, link: p('getting-started/about-author') },
         { text: l.installation, link: p('getting-started/installation') },
         { text: l.programStructure, link: p('getting-started/program-structure') }
       ]

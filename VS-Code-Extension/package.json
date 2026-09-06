@@ -9,7 +9,7 @@
   "icon": "images/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/alvarobrito/neoobjectpascal"
+    "url": "https://github.com/neoobjectpascal/neoobjectpascal"
   },
   "engines": {
     "vscode": "^1.60.0"

@@ -24,6 +24,7 @@ export const ptConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
       testing: 'Testes e Ferramentas',
       reference: 'Referência',
       introduction: 'Introdução',
+      aboutAuthor: 'Sobre o autor',
       installation: 'Instalação e primeiro programa',
       programStructure: 'Estrutura de um programa',
       variablesAndTypes: 'Variáveis e tipos',

@@ -258,7 +258,7 @@ If you encounter issues:
 1. **Check this guide** for common solutions
 2. **Check VS Code Output Panel**: `View` → `Output` → Select "NeoObjectPascal"
 3. **Check VS Code Developer Tools**: `Help` → `Toggle Developer Tools`
-4. **Report issues** on GitHub: [github.com/alvarobrito/neoobjectpascal](https://github.com/alvarobrito/neoobjectpascal)
+4. **Report issues** on GitHub: [github.com/neoobjectpascal/neoobjectpascal](https://github.com/neoobjectpascal/neoobjectpascal)
 
 ## 🎉 Success!
 
