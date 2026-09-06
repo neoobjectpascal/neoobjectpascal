@@ -2,7 +2,7 @@
   "name": "neoobjectpascal",
   "displayName": "NeoObjectPascal",
   "description": "Complete IDE support for NeoObjectPascal: syntax highlighting, debugging, testing, and cloud execution",
-  "version": "2.16.0",
+  "version": "2.16.1",
   "publisher": "alvarobrito",
   "author": "Álvaro Brito",
   "license": "MIT",
@@ -119,7 +119,14 @@
         },
         "neoobjectpascal.uiBuilder.language": {
           "type": "string",
-          "enum": ["auto", "pt", "en", "de", "fr", "it"],
+          "enum": [
+            "auto",
+            "pt",
+            "en",
+            "de",
+            "fr",
+            "it"
+          ],
           "enumDescriptions": [
             "Follow the VS Code display language (falls back to Portuguese)",
             "Português",
