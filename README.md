@@ -1,8 +1,31 @@
 # NeoObjectPascal
 
-NeoObjectPascal is a modern Pascal language implemented in Java. It includes object-oriented programming, native testing, error handling, Java integration, terminal and web user interfaces, and a Visual Studio Code extension.
+NeoObjectPascal is a modern Pascal language implemented in Java. Its interpreter runs `.npas` programs and provides object-oriented programming, native testing, error handling, modules, data parsing, HTTP requests, and direct Java integration.
 
 The project repository is [github.com/neoobjectpascal/neoobjectpascal](https://github.com/neoobjectpascal/neoobjectpascal).
+
+## The language
+
+NeoObjectPascal keeps the familiar Pascal syntax while adding classes, interfaces, inheritance, polymorphism, arrays, functional pipelines, exceptions, and built-in date, time, and currency types. Programs can also use TerminalInk for terminal interfaces and WebInk for locally served web interfaces.
+
+```npas
+var message: String;
+
+begin
+    message := "Hello from NeoObjectPascal!";
+    WriteLn(message);
+end.
+```
+
+## Visual Studio Code extension
+
+The [NeoObjectPascal extension for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=alvarobrito.neoobjectpascal) includes syntax highlighting, snippets, run and test commands, debugging through the Debug Adapter Protocol (DAP), native executable builds, and the visual UI Builder for `.xnpas` files.
+
+The extension bundles the NeoObjectPascal runtime. Install the extension, make sure Java 11 or later is available on your system, and start writing `.npas` programs.
+
+## Documentation
+
+Read the language guide, feature reference, examples, installation instructions, and Visual Studio Code workflow at [neoobjectpascal.com](https://neoobjectpascal.com).
 
 ## Author
 
