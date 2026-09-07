@@ -1,6 +1,6 @@
-# Debugger, VS Code e execução na nuvem
+# Debugger e extensão do VS Code
 
-Além do framework de testes, o NeoObjectPascal oferece ferramentas para investigar, editar e executar código em escala: um **debugger interativo** (com modo DAP para editores), uma **extensão para o VS Code** e a **execução remota na nuvem** via NeoObjectPascalCloud. Este guia apresenta as três.
+Além do framework de testes, o NeoObjectPascal oferece ferramentas para investigar, editar e executar código: um **debugger interativo** (com modo DAP para editores) e uma **extensão para o VS Code** com três complementos. Este guia apresenta ambas.
 
 ## Debugger interativo
 
@@ -97,7 +97,11 @@ Ao depurar pelo VS Code, a saída do programa (`WriteLn`) aparece no **Debug Con
 
 ## Extensão do VS Code
 
-A extensão oficial para o **VS Code** transforma o editor em um ambiente completo para NeoObjectPascal. Ela inclui:
+O NeoObjectPascal oferece três extensões para o **VS Code** que transformam o editor em um ambiente completo para desenvolvimento:
+
+### 1. NeoObjectPascal (`alvarobrito.neoobjectpascal`)
+
+A extensão principal inclui:
 
 - **Realce de sintaxe** para arquivos `.npas` e `.test.npas`.
 - **Interpretador embutido** — a extensão traz o JAR empacotado (em `VS-Code-Extension/bin/`), então você não precisa configurar o caminho do interpretador manualmente.
@@ -113,98 +117,18 @@ Os comandos ficam disponíveis pela paleta de comandos (`Cmd/Ctrl+Shift+P`):
 | `neoobjectpascal.runAllTests` | roda todos os testes do projeto de forma recursiva |
 | `neoobjectpascal.build` | gera um executável nativo (exe/app/bin) do projeto — veja [Gerar executáveis nativos](./building-executables) |
 
-::: info Execução na nuvem
-A execução na nuvem é feita pela linha de comando com a flag `--execute-on-cloud` do interpretador (veja a seção abaixo).
-:::
+### 2. NeoObjectPascal RealCoder (`alvarobrito.neoobjectpascal-realcoder`)
+
+Tema escuro inspirado no Monokai, com fundo preto puro e cores neon intensas para sintaxe.
+
+### 3. NeoObjectPascal RealCoder Icons (`alvarobrito.neoobjectpascal-realcoder-icons`)
+
+Tema de ícones neon para o VS Code com suporte a arquivos NeoObjectPascal (`.npas`), inspirado no Material Icon Theme.
 
 ::: tip Fluxo recomendado
 Escreva o código com realce e autocompletar, rode `neoobjectpascal.runTest` para validar o arquivo aberto, e use `neoobjectpascal.debug` para acompanhar a execução com breakpoints visuais. Tudo usando o JAR que já vem com a extensão.
 :::
 
-## Execução na nuvem
-
-O NeoObjectPascal integra-se nativamente ao **NeoObjectPascalCloud**, permitindo executar um projeto em um servidor remoto com um único comando. Isso é útil para compartilhar execuções via URL, manter histórico de logs e rodar sem depender do ambiente local.
-
-### Sintaxe
-
-```bash
-java -jar neoobjectpascal.jar --execute-on-cloud <url> <projeto> <usuario> <senha> <arquivo.npas>
-```
-
-| Parâmetro | Descrição |
-|-----------|-----------|
-| `<url>` | URL base da API do cloud (ex.: `http://localhost:8000`) |
-| `<projeto>` | nome do projeto (pasta base) |
-| `<usuario>` | usuário do cloud |
-| `<senha>` | senha do cloud |
-| `<arquivo.npas>` | arquivo principal a executar |
-
-### Exemplo
-
-Dado o programa `hello.npas`:
-
-```npas
-var mensagem: String;
-var numero: Integer;
-
-begin
-    mensagem := "Olá do NeoObjectPascal Cloud!";
-    numero := 42;
-
-    WriteLn("=================================");
-    WriteLn(mensagem);
-    WriteLn("Número mágico: ", numero);
-    WriteLn("=================================");
-end.
-```
-
-Executamos na nuvem:
-
-```bash
-java -jar neoobjectpascal.jar \
-  --execute-on-cloud \
-  http://localhost:8000 \
-  hello_project \
-  usuario@email.com \
-  senha123 \
-  hello.npas
-```
-
-O interpretador autentica, coleta **todos os arquivos `.npas`** do diretório do projeto (mantendo a estrutura de pastas), faz o upload, dispara a execução remota e devolve um link para acompanhar os logs:
-
-<Output>
-🔐 Autenticando no cloud...
-✓ Autenticado com sucesso!
-
-📁 Coletando arquivos do projeto...
-✓ Encontrados 1 arquivo(s)
-  - hello.npas
-
-⬆️  Fazendo upload dos arquivos...
-  [1/1] hello.npas
-✓ Upload concluído!
-
-🚀 Executando projeto no cloud...
-✅ Projeto executado com sucesso!
-
-🔗 Link da execução:
-   http://localhost:8000/executions/123
-</Output>
-
-::: warning Não exponha senhas
-Evite passar a senha diretamente na linha de comando, pois ela fica visível no histórico do shell e na lista de processos. Prefira variáveis de ambiente:
-
-```bash
-export CLOUD_PASSWORD="senha123"
-java -jar neoobjectpascal.jar --execute-on-cloud \
-  http://localhost:8000 meu_projeto usuario@email.com "$CLOUD_PASSWORD" main.npas
-```
-:::
-
-::: info Projetos com múltiplos arquivos
-A coleta é recursiva: se o projeto tiver subpastas (`helpers/`, `utils/`), todos os arquivos `.npas` são detectados e enviados automaticamente, preservando os caminhos relativos. Basta indicar o arquivo principal no comando.
-:::
-
 ## Próximos passos
 
-Você agora conhece as três ferramentas de investigação e execução do NeoObjectPascal. Para consultar a sintaxe completa da linguagem em um único lugar, siga para a [Referência da linguagem](../reference/language-reference).
+Você agora conhece as ferramentas de depuração e extensão do NeoObjectPascal. Para consultar a sintaxe completa da linguagem em um único lugar, siga para a [Referência da linguagem](../reference/language-reference).

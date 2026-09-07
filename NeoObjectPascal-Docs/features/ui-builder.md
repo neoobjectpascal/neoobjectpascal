@@ -14,6 +14,8 @@ O editor trabalha com arquivos de extensão **`.xnpas`** — um JSON com o desen
 
 ## A interface do editor
 
+![Editor visual](/screenshots/editor.jpg)
+
 - **Paleta** (esquerda) — os componentes do alvo escolhido, agrupados. Arraste um componente para o canvas.
 - **Canvas** (centro) — pré-visualização fiel. Clique para selecionar um componente; arraste um componente já colocado para **reordenar** (ou movê-lo para dentro de outro contêiner).
 - **Inspetor** (direita) — abas **Propriedades**, **Estado** e **Eventos**.
@@ -29,7 +31,12 @@ O editor trabalha com arquivos de extensão **`.xnpas`** — um JSON com o desen
 Um `.xnpas` é inteiramente **WebInk** ou **TerminalInk**. O alternador na barra troca o alvo (reiniciando a árvore, pois os conjuntos de componentes diferem).
 
 - **WebInk** — `Page`, `Container`, `Section`, `Grid`, `Row`, `Col`, `Card`, `Navbar`, `Sidebar`, `Tabs`, `Heading`, `Text`, `Badge`, `StatCard`, `Link`, `Button`, `TextInput`, `TextArea`, `Select`, `Checkbox`, `Form`, `Table`, `List`, `Chart`, `Alert`, `ProgressBar`, `Spinner`.
+
+![WebInk](/screenshots/web-ink.jpg)
+
 - **TerminalInk** — `VBox`, `HBox`, `Box`, `Spacer`, `Text`, `Badge`, `TextInput`, `PasswordInput`, `EmailInput`, `ConfirmInput`, `Select`, `MultiSelect`, `Spinner`, `ProgressBar`, `StatusMessage`, `Alert`, `UnorderedList`, `OrderedList`.
+
+![TerminalInk](/screenshots/terminal-ink.jpg)
 
 ## Sincronização e o `.npas` gerado
 

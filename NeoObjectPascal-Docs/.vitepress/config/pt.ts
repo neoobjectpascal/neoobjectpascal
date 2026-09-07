@@ -51,7 +51,7 @@ export const ptConfig: LocaleSpecificConfig<DefaultTheme.Config> = {
       webinkIntro: 'Introdução',
       webinkComponents: 'Componentes',
       unitTesting: 'Testes unitários e mocking',
-      debuggingTools: 'Debugger, VS Code e nuvem',
+      debuggingTools: 'Debugger e extensão do VS Code',
       buildingExecutables: 'Gerar executáveis nativos',
       languageReference: 'Referência da linguagem',
       examples: 'Galeria de exemplos'
