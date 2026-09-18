@@ -4,7 +4,7 @@ Die VS-Code-Erweiterung enthält einen **visuellen (WYSIWYG-)Editor**, um Oberfl
 
 ## Die `.xnpas`-Datei
 
-Der Editor arbeitet mit **`.xnpas`**-Dateien — ein JSON, das das Bildschirmdesign enthält. Beim Speichern von `test.xnpas` **(re)generiert** der Editor die zugehörige `test.npas`. Die Synchronisierung ist **einseitig**: die `.xnpas` ist die Quelle der Wahrheit, und die generierte `.npas` trägt einen Hinweis, dass sie **nicht von Hand bearbeitet** werden sollte.
+Der Editor arbeitet mit **`.xnpas`**-Dateien — ein JSON, das das Bildschirmdesign enthält. Beim Speichern von `test.xnpas` **(re)generiert** der Editor die zugehörige `test.npas`. Die Synchronisierung läuft **in beide Richtungen**: Beim Speichern aktualisiert die neuere Datei die andere. Die generierte `.npas` trägt einen Hinweis, der sie als Datei des visuellen Editors kennzeichnet.
 
 ## Einen Bildschirm erstellen
 
@@ -15,7 +15,7 @@ Der Editor arbeitet mit **`.xnpas`**-Dateien — ein JSON, das das Bildschirmdes
 ## Aufbau des Editors
 
 - **Palette** (links) — die Komponenten des gewählten Ziels, gruppiert. Ziehen Sie eine auf die Arbeitsfläche.
-- **Arbeitsfläche** (Mitte) — eine originalgetreue Vorschau. Klicken zum Auswählen; eine platzierte Komponente ziehen, um sie **neu anzuordnen** (oder in einen anderen Container zu verschieben).
+- **Arbeitsfläche** (Mitte) — eine originalgetreue Vorschau. Klicken zum Auswählen; eine platzierte Komponente ziehen, um sie **neu anzuordnen** (oder in einen anderen Container zu verschieben). Leere Container (etwa ein frisch eingefügtes `Grid`) zeigen eine gestrichelte Fläche mit dem Hinweis *Komponente hier ablegen*, breit genug zum Ablegen.
 - **Inspektor** (rechts) — Reiter **Eigenschaften**, **Zustand** und **Ereignisse**.
 - **Symbolleiste** — der Umschalter **WebInk / TerminalInk**, die Bildschirm-/Routenauswahl und **Live ausführen** (erzeugt und startet die `.npas`).
 
@@ -31,9 +31,33 @@ Eine `.xnpas` ist vollständig **WebInk** oder **TerminalInk**. Der Umschalter w
 - **WebInk** — `Page`, `Container`, `Grid`, `Card`, `Navbar`, `Heading`, `Text`, `Badge`, `StatCard`, `Button`, `TextInput`, `Select`, `Checkbox`, `Table`, `List`, `Chart`, `Alert`, `ProgressBar` …
 - **TerminalInk** — `VBox`, `HBox`, `Box`, `Text`, `Badge`, `TextInput`, `Select`, `MultiSelect`, `ConfirmInput`, `ProgressBar`, `StatusMessage`, `Alert`, Listen …
 
-## Synchronisierung und die generierte `.npas`
+## Synchronisierung zwischen `.xnpas` und `.npas`
 
-Beim Speichern der `.xnpas` wird die zugehörige `.npas` aus dem Design neu erzeugt. **Bearbeiten Sie die generierte `.npas` nicht von Hand** — sie wird beim nächsten Speichern überschrieben. Öffnen Sie eine generierte `.npas`, warnt der Editor und bietet an, die zugehörige `.xnpas` zu öffnen.
+Beide Dateien bleiben in beide Richtungen synchron, und der Änderungszeitpunkt entscheidet: Beim Speichern aktualisiert die neuere Datei die andere.
+
+- `test.xnpas` gespeichert? Die `test.npas` wird aus dem Design neu erzeugt.
+- Eine generierte `test.npas` gespeichert? Die Änderungen fließen zurück in die `test.xnpas` und erscheinen im visuellen Editor.
+- Den visuellen Editor geöffnet? Vor dem Zeichnen des Bildschirms vergleicht er die Zeitstempel und übernimmt die neuere Datei.
+- Hat der visuelle Editor ungespeicherte Änderungen? Der Import wird zurückgestellt: Der Editor warnt und wartet auf Speichern oder Rückgängig, statt Arbeit zu verwerfen, die nie auf der Festplatte ankam.
+
+Bei Gleichstand gewinnt die `.xnpas` als kanonische Quelle des Designs.
+
+### Was der Rückweg versteht
+
+Das Zurücklesen einer `.npas` in das Design deckt genau das ab, was der Editor erzeugt: die `uses`-Klausel, die Zustandsvariablen, die Ereignisfunktionen, die Bildschirmfunktionen und den `render`-Aufruf. Daher die drei folgenden Regeln.
+
+- Nur eine `.npas` mit der Kopfzeile einer generierten Datei wird zurückgelesen. Eine von Hand geschriebene Datei überschreibt die `.xnpas` nie.
+- Wurde die Datei über diese Form hinaus verändert, warnt der Editor, lässt die `.xnpas` unberührt und bietet an, die `.npas` neu zu erzeugen.
+- Kommentare und Code außerhalb der generierten Form überstehen den Rückweg nicht.
+
+::: tip
+Eine `test.xnpas` erzeugt eine `test.npas`. Führen Sie die `.npas` normal aus (Schaltfläche *Run*) oder nutzen Sie **Live ausführen** direkt im visuellen Editor.
+:::
+
+### Zurück zur Einbahnstraße
+
+Die Einstellung **`neoobjectpascal.uiBuilder.sync`** nimmt `bidirectional` (Standard) oder `xnpasFirst`, womit die `.xnpas` die einzige Quelle bleibt und die `.npas` immer überschrieben wird.
+
 ## Sichtbarkeit, dynamische Daten und Fokus
 
 Drei Funktionen lassen Bildschirme zur Laufzeit auf den Zustand reagieren.

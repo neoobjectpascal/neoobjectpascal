@@ -4,7 +4,7 @@ The VS Code extension includes a **visual (WYSIWYG) editor** to build interfaces
 
 ## The `.xnpas` file
 
-The editor works with **`.xnpas`** files — a JSON that holds the screen design. When you save `test.xnpas`, the editor **(re)generates** the sibling `test.npas`. Sync is **one-way**: the `.xnpas` is the source of truth, and the generated `.npas` carries a header warning that it **should not be edited by hand**.
+The editor works with **`.xnpas`** files — a JSON that holds the screen design. When you save `test.xnpas`, the editor **(re)generates** the sibling `test.npas`. Sync runs **both ways**: on save, the newer file updates the other. The generated `.npas` carries a header that marks it as a file of the visual editor.
 
 ## Creating a screen
 
@@ -15,7 +15,7 @@ The editor works with **`.xnpas`** files — a JSON that holds the screen design
 ## The editor layout
 
 - **Palette** (left) — the components for the chosen target, grouped. Drag one onto the canvas.
-- **Canvas** (center) — a faithful preview. Click to select a component; drag a placed component to **reorder** it (or move it into another container).
+- **Canvas** (center) — a faithful preview. Click to select a component; drag a placed component to **reorder** it (or move it into another container). Empty containers (a freshly added `Grid`, say) show a dashed area labelled *Drop a component here*, wide enough to take the drag.
 - **Inspector** (right) — **Properties**, **State** and **Events** tabs.
 - **Toolbar** — the **WebInk / TerminalInk** toggle, the screen/route picker, and **Run live** (generates and runs the `.npas`).
 
@@ -31,13 +31,33 @@ An `.xnpas` is entirely **WebInk** or **TerminalInk**. The toolbar toggle switch
 - **WebInk** — `Page`, `Container`, `Section`, `Grid`, `Row`, `Col`, `Card`, `Navbar`, `Sidebar`, `Tabs`, `Heading`, `Text`, `Badge`, `StatCard`, `Link`, `Button`, `TextInput`, `TextArea`, `Select`, `Checkbox`, `Form`, `Table`, `List`, `Chart`, `Alert`, `ProgressBar`, `Spinner`.
 - **TerminalInk** — `VBox`, `HBox`, `Box`, `Spacer`, `Text`, `Badge`, `TextInput`, `PasswordInput`, `EmailInput`, `ConfirmInput`, `Select`, `MultiSelect`, `Spinner`, `ProgressBar`, `StatusMessage`, `Alert`, `UnorderedList`, `OrderedList`.
 
-## Sync and the generated `.npas`
+## Sync between the `.xnpas` and the `.npas`
 
-Saving the `.xnpas` regenerates the sibling `.npas` from the design. **Do not edit the generated `.npas` by hand** — it is overwritten on the next save. If you open a generated `.npas`, the editor warns you and offers to open the matching `.xnpas`.
+The two files stay in step both ways, and the modification time decides who wins: on save, the newer file updates the other.
+
+- Saved `test.xnpas`? `test.npas` is regenerated from the design.
+- Saved a generated `test.npas`? The changes are read back into `test.xnpas` and show up in the visual editor.
+- Opened the visual editor? Before drawing the screen, it compares the timestamps and adopts the newer file.
+- Does the visual editor hold unsaved changes? The import is held back: the editor warns you and waits for a save or an undo, rather than discarding work that never reached the disk.
+
+On a tie the `.xnpas` wins, as the canonical source of the design.
+
+### What the way back understands
+
+Reading a `.npas` back into the design covers exactly what the editor emits: the `uses` clause, the state variables, the event functions, the screen functions and the `render` call. Hence the three rules below.
+
+- Only a `.npas` carrying the generated-file header is read back. A hand-written file never overwrites the `.xnpas`.
+- If the file was changed beyond that shape, the editor warns you, keeps the `.xnpas` untouched and offers to regenerate the `.npas`.
+- Comments and code outside the generated shape do not survive the trip back.
 
 ::: tip
 A `test.xnpas` generates a `test.npas`. Run the `.npas` normally (the *Run* button), or use **Run live** straight from the visual editor.
 :::
+
+### Going back to one-way
+
+The setting **`neoobjectpascal.uiBuilder.sync`** takes `bidirectional` (the default) or `xnpasFirst`, which keeps the `.xnpas` as the only source and always overwrites the `.npas`.
+
 ## Visibility, dynamic data, and focus
 
 Three features let screens react to state at runtime.

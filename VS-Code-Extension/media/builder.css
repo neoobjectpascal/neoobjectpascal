@@ -97,6 +97,18 @@ body {
 .node-tag button:hover { opacity: 1; }
 .drop-ok { outline: 2px dashed var(--vscode-focusBorder, #4ea1e0) !important; outline-offset: 2px; background: rgba(78,161,224,.06); }
 
+/* An empty container (Grid, Row, Card…) renders at zero height, so there is
+   nothing to drag onto. Give it a sized, labelled drop area — canvas only. */
+[data-id].is-empty { min-height: 76px; }
+.drop-hint { display: flex; align-items: center; justify-content: center; text-align: center;
+  min-height: 64px; padding: 10px 12px; box-sizing: border-box; pointer-events: none; flex: 1 1 auto;
+  border: 1px dashed rgba(100,116,139,.55); border-radius: 8px;
+  background: rgba(148,163,184,.10); color: #64748b; font-size: 11.5px; }
+/* In a Grid the hint spans every column, so the whole row is droppable. */
+.wk-grid > .drop-hint { grid-column: 1 / -1; }
+.tk-root .drop-hint { border-color: rgba(148,163,184,.45); background: rgba(148,163,184,.12); color: #94a3b8; }
+.drop-ok > .drop-hint { border-color: var(--vscode-focusBorder, #4ea1e0); color: var(--vscode-focusBorder, #4ea1e0); }
+
 /* inspector */
 .inspector { width: 306px; flex: none; border-left: 1px solid var(--vscode-panel-border, rgba(128,128,128,.25));
   display: flex; flex-direction: column; background: var(--vscode-sideBar-background, transparent); }

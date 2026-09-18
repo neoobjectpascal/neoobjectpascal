@@ -4,7 +4,7 @@ A extensão do VS Code inclui um **editor visual (WYSIWYG)** para criar interfac
 
 ## O arquivo `.xnpas`
 
-O editor trabalha com arquivos de extensão **`.xnpas`** — um JSON com o desenho da tela. Ao salvar `teste.xnpas`, o editor **(re)gera** o `teste.npas` irmão. A sincronização é de **uma via**: o `.xnpas` é a fonte da verdade, e o `.npas` gerado traz um cabeçalho avisando que **não deve ser editado à mão**.
+O editor trabalha com arquivos de extensão **`.xnpas`** — um JSON com o desenho da tela. Ao salvar `teste.xnpas`, o editor **(re)gera** o `teste.npas` irmão. A sincronização é **bilateral**: ao salvar, o arquivo mais recente atualiza o outro. O `.npas` gerado traz um cabeçalho que o identifica como arquivo do editor visual.
 
 ## Criando uma tela
 
@@ -17,7 +17,7 @@ O editor trabalha com arquivos de extensão **`.xnpas`** — um JSON com o desen
 ![Editor visual](/screenshots/editor.jpg)
 
 - **Paleta** (esquerda) — os componentes do alvo escolhido, agrupados. Arraste um componente para o canvas.
-- **Canvas** (centro) — pré-visualização fiel. Clique para selecionar um componente; arraste um componente já colocado para **reordenar** (ou movê-lo para dentro de outro contêiner).
+- **Canvas** (centro) — pré-visualização fiel. Clique para selecionar um componente; arraste um componente já colocado para **reordenar** (ou movê-lo para dentro de outro contêiner). Contêineres vazios (um `Grid` recém-criado, por exemplo) exibem uma área tracejada com o aviso *Solte um componente aqui*, larga o bastante para receber o arrasto.
 - **Inspetor** (direita) — abas **Propriedades**, **Estado** e **Eventos**.
 - **Barra superior** — o alternador **WebInk / TerminalInk**, o seletor de tela/rota, e o botão **Rodar ao vivo** (gera e executa o `.npas`).
 
@@ -38,13 +38,33 @@ Um `.xnpas` é inteiramente **WebInk** ou **TerminalInk**. O alternador na barra
 
 ![TerminalInk](/screenshots/terminal-ink.jpg)
 
-## Sincronização e o `.npas` gerado
+## Sincronização entre o `.xnpas` e o `.npas`
 
-Ao salvar o `.xnpas`, o `.npas` irmão é regerado a partir do desenho. **Não edite o `.npas` gerado à mão** — ele será sobrescrito no próximo salvamento. Se você abrir um `.npas` gerado, o editor avisa e oferece abrir o `.xnpas` correspondente.
+Os dois arquivos ficam sincronizados nos dois sentidos, e a data de modificação decide quem manda: ao salvar, o arquivo mais recente atualiza o outro.
+
+- Salvou o `teste.xnpas`? O `teste.npas` é regerado a partir do desenho.
+- Salvou o `teste.npas` gerado? As alterações voltam para o `teste.xnpas` e aparecem no editor visual.
+- Abriu o editor visual? Antes de desenhar a tela, ele compara as datas e adota o arquivo mais recente.
+- O editor visual tem alterações não salvas? A importação é adiada: o editor avisa e espera você salvar ou desfazer, para não descartar o que ainda não foi gravado.
+
+Havendo empate, o `.xnpas` vence, por ser a fonte canônica do desenho.
+
+### O que o caminho de volta entende
+
+A leitura do `.npas` de volta para o desenho cobre exatamente aquilo que o editor gera: a cláusula `uses`, as variáveis de estado, as funções de evento, as funções de tela e a chamada `render`. Daí as três regras abaixo.
+
+- Só um `.npas` com o cabeçalho de arquivo gerado é lido de volta. Um arquivo escrito à mão nunca sobrescreve o `.xnpas`.
+- Se o arquivo tiver sido alterado para fora dessa forma, o editor avisa, preserva o `.xnpas` e oferece regerar o `.npas`.
+- Comentários e código fora da forma gerada não sobrevivem à volta.
 
 ::: tip Dica
 Um `teste.xnpas` gera um `teste.npas`. Rode o `.npas` normalmente (botão *Run*), ou use **Rodar ao vivo** direto do editor visual.
 :::
+
+### Voltando ao sentido único
+
+A configuração **`neoobjectpascal.uiBuilder.sync`** aceita `bidirectional` (padrão) ou `xnpasFirst`, que mantém o `.xnpas` como fonte única e sempre sobrescreve o `.npas`.
+
 ## Visibilidade, dados dinâmicos e foco
 
 Três recursos deixam as telas reagirem ao estado em tempo de execução.

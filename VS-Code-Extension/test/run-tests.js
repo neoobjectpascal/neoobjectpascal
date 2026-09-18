@@ -143,6 +143,123 @@ t('sem handlers/estado ainda gera', () => {
   has(s, 'render(#{ "/": home }');
 });
 
+console.log('Round-trip — .npas de volta para o modelo (.xnpas)');
+const { parse, isGenerated } = require('../npasParser');
+// A ida-e-volta é estável quando regerar a partir do modelo importado devolve
+// exatamente a mesma fonte: é essa igualdade que impede os dois arquivos de
+// ficarem se atualizando em laço.
+function roundTrip(name, model) {
+  t(name + ' — regerar é idempotente', () => {
+    const a = gen(model);
+    const b = gen(parse(a));
+    if (a !== b) {
+      const al = a.split('\n'), bl = b.split('\n');
+      for (let i = 0; i < Math.max(al.length, bl.length); i++) {
+        if (al[i] !== bl[i]) throw new Error('linha ' + (i + 1) + '\n      gerado:    ' + al[i] + '\n      reimportado: ' + bl[i]);
+      }
+      throw new Error('fontes diferentes');
+    }
+  });
+}
+roundTrip('WebInk', webink);
+roundTrip('TerminalInk', terminalink);
+roundTrip('visible/fx', visModel);
+roundTrip('dados vinculados (fx)', fxModel);
+roundTrip('foco TerminalInk', focusModel);
+
+const rtW = parse(gen(webink));
+t('target e rotas preservados', () => {
+  if (rtW.target !== 'webink') throw new Error('target: ' + rtW.target);
+  const rotas = rtW.screens.map((s) => s.route + '=' + s.name).join(',');
+  if (rotas !== '/=home,/sobre=sobre') throw new Error('rotas: ' + rotas);
+});
+t('title preservado', () => { if (rtW.title !== 'Acme') throw new Error('title: ' + rtW.title); });
+t('estado com nome, tipo e inicial', () => {
+  const s = rtW.state[0];
+  if (s.name !== 'cliques' || s.type !== 'Integer' || s.initial !== '0') throw new Error(JSON.stringify(s));
+});
+t('handler com assinatura e corpo', () => {
+  const h = rtW.handlers[0];
+  if (h.name !== 'registrar' || h.returns !== 'Boolean') throw new Error(JSON.stringify(h));
+  if (h.body !== 'cliques := cliques + 1;\nreturn true;') throw new Error(JSON.stringify(h.body));
+});
+t('evento volta como @handler e fx como =expr', () => {
+  const kids = rtW.screens[0].root.children;
+  const botao = kids.find((n) => n.type === 'Button');
+  const stat = kids.find((n) => n.type === 'Grid').children[0];
+  if (botao.props.onClick !== '@registrar') throw new Error('onClick: ' + botao.props.onClick);
+  if (stat.props.value !== '=cliques') throw new Error('value: ' + stat.props.value);
+});
+t('aspas escapadas voltam ao texto original', () => {
+  const botao = rtW.screens[0].root.children.find((n) => n.type === 'Button');
+  if (botao.props.text !== 'Ok "x"') throw new Error(JSON.stringify(botao.props.text));
+});
+t('props aninhadas (Chart) e arrays preservados', () => {
+  const chart = rtW.screens[0].root.children.find((n) => n.type === 'Chart');
+  if (JSON.stringify(chart.props.data) !== JSON.stringify(webink.screens[0].root.children[4].props.data))
+    throw new Error(JSON.stringify(chart.props.data));
+});
+t('todo nó importado recebe id', () => {
+  const ids = [];
+  const walk = (n) => { ids.push(n.id); (n.children || []).forEach(walk); };
+  rtW.screens.forEach((s) => walk(s.root));
+  if (ids.some((i) => !i)) throw new Error('nó sem id');
+  if (new Set(ids).size !== ids.length) throw new Error('ids repetidos');
+});
+const rtT = parse(gen(terminalink));
+t('TerminalInk — texto posicional e itens de lista', () => {
+  const kids = rtT.screens[0].root.children;
+  if (kids[0].props.text !== 'Cadastro') throw new Error('text: ' + kids[0].props.text);
+  const lista = kids.find((n) => n.type === 'UnorderedList');
+  if (JSON.stringify(lista.props.items) !== '["x","y"]') throw new Error('items: ' + JSON.stringify(lista.props.items));
+  if (rtT.screens[0].route !== '') throw new Error('tela de terminal não tem rota');
+});
+t('expressão com operador não vira string', () => {
+  const m = { xnpas: 1, target: 'terminalink', screens: [{ name: 'ui', route: '', root: { type: 'VBox', props: {}, children: [
+    { type: 'Text', props: { text: '="Olá, " + nome' } },
+  ] } }] };
+  const n = parse(gen(m)).screens[0].root.children[0];
+  if (n.props.text !== '="Olá, " + nome') throw new Error(JSON.stringify(n.props.text));
+});
+
+console.log('Round-trip — recusas');
+t('isGenerated só aceita arquivo com a marca', () => {
+  if (!isGenerated(gen(webink))) throw new Error('deveria reconhecer o gerado');
+  if (isGenerated('uses webink;\n\nbegin\nend.\n')) throw new Error('não deveria reconhecer o escrito à mão');
+});
+function refuses(name, src) {
+  t(name, () => {
+    let threw = false;
+    try { parse(src); } catch (e) { threw = true; }
+    if (!threw) throw new Error('deveria recusar');
+  });
+}
+refuses('.npas escrito à mão é recusado', 'uses webink;\n\nbegin\n    render(#{ "/": home });\nend.\n');
+refuses('.npas vazio é recusado', '');
+refuses('componente sem fechamento é recusado',
+  '// GERADO por teste.xnpas — NeoObjectPascal UI Builder\nuses webink;\n\nfunction home(): Object\nbegin\n    return Page(#{ ;\nend;\n\nbegin\n    render(#{ "/": home });\nend.\n');
+refuses('sem render(...) é recusado',
+  '// GERADO por teste.xnpas — NeoObjectPascal UI Builder\nuses webink;\n\nbegin\nend.\n');
+refuses('tela citada sem function é recusada',
+  '// GERADO por teste.xnpas — NeoObjectPascal UI Builder\nuses webink;\n\nbegin\n    render(#{ "/": home });\nend.\n');
+
+console.log('Canvas — área de soltura dos containers vazios');
+const builderSrc = fs.readFileSync(path.join(__dirname, '..', 'media', 'builder.js'), 'utf8');
+const builderCss = fs.readFileSync(path.join(__dirname, '..', 'media', 'builder.css'), 'utf8');
+t('container vazio ganha classe e placeholder', () => {
+  has(builderSrc, "elm.classList.add('is-empty')");
+  has(builderSrc, "hint.className = 'drop-hint'");
+});
+t('placeholder não entra na contagem de filhos', () => {
+  // dropIndex conta ':scope > [data-id]'; o placeholder não tem data-id.
+  hasnt(builderSrc, "hint.setAttribute('data-id'");
+});
+t('CSS dá altura ao container vazio e espalha o hint no Grid', () => {
+  has(builderCss, '[data-id].is-empty');
+  has(builderCss, '.wk-grid > .drop-hint { grid-column: 1 / -1; }');
+});
+t('dropIndex decide nos dois eixos', () => has(builderSrc, 'function dropIndex(containerEl, x, y)'));
+
 console.log('i18n — dicionário e cobertura');
 global.window = global;
 const NpI18n = require('../media/i18n');
