@@ -2,7 +2,7 @@
   "name": "neoobjectpascal",
   "displayName": "NeoObjectPascal",
   "description": "Complete IDE support for NeoObjectPascal: syntax highlighting, debugging, testing, and cloud execution",
-  "version": "2.16.2",
+  "version": "2.17.0",
   "publisher": "alvarobrito",
   "author": "Álvaro Brito",
   "license": "MIT",
@@ -137,6 +137,19 @@
           ],
           "default": "auto",
           "description": "Language of the .xnpas visual UI Builder editor (properties, palette, events). 'auto' follows the VS Code display language."
+        },
+        "neoobjectpascal.uiBuilder.sync": {
+          "type": "string",
+          "enum": [
+            "bidirectional",
+            "xnpasFirst"
+          ],
+          "enumDescriptions": [
+            "The newer file updates the other: saving the .xnpas regenerates the .npas, and saving a generated .npas is imported back into the .xnpas",
+            "One-way: the .xnpas is the only source of truth and always overwrites the .npas"
+          ],
+          "default": "bidirectional",
+          "description": "How a .xnpas design and its sibling .npas source are kept in step."
         }
       }
     },
@@ -304,7 +317,7 @@
   "scripts": {
     "prepare": "js-yaml syntaxes/neoobjectpascal.tmLanguage.yaml > syntaxes/neoobjectpascal.tmLanguage.json",
     "clean": "rm -f syntaxes/neoobjectpascal.tmLanguage.json",
-    "test": "node test/run-tests.js",
+    "test": "node test/run-tests.js && node test/sync-tests.js",
     "package": "vsce package"
   },
   "devDependencies": {

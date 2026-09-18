@@ -1,48 +1,15 @@
 // uiBuilder.js — CustomTextEditorProvider for .xnpas (the visual UI Builder).
 // The .xnpas file is a JSON document; the webview edits it via WorkspaceEdit
-// (so undo/redo/dirty/save are native). On save, the sibling .npas is generated.
+// (so undo/redo/dirty/save are native). The sibling .npas is kept in step by
+// sync.js: whichever of the two files is newer updates the other.
 'use strict';
 const vscode = require('vscode');
-const path = require('path');
-const { generate } = require('./codegen');
-const NpI18n = require('./media/i18n.js');
+const { arbitrate, writeNpas, resolveLang, syncMode, t } = require('./sync');
 
 const VIEW_TYPE = 'neoobjectpascal.uiBuilder';
 
-// The editor UI language: the setting `neoobjectpascal.uiBuilder.language`, where
-// 'auto' (default) follows the VS Code display language, falling back to Portuguese.
-function resolveLang() {
-  const cfg = vscode.workspace.getConfiguration('neoobjectpascal').get('uiBuilder.language', 'auto');
-  return NpI18n.normalize(!cfg || cfg === 'auto' ? (vscode.env.language || 'pt') : cfg);
-}
-const t = (s) => NpI18n.tr(s, resolveLang());
-
-function baseName(uri) {
-  return path.basename(uri.fsPath).replace(/\.xnpas$/i, '');
-}
-
 // Generate and write the sibling <name>.npas next to <name>.xnpas.
-async function writeSibling(document) {
-  let model;
-  try {
-    const text = document.getText().trim();
-    model = text ? JSON.parse(text) : { target: 'webink', screens: [] };
-  } catch (e) {
-    vscode.window.showWarningMessage(t('NeoObjectPascal UI: .xnpas inválido — .npas não foi gerado.'));
-    return null;
-  }
-  const base = baseName(document.uri);
-  const npasUri = vscode.Uri.joinPath(vscode.Uri.file(path.dirname(document.uri.fsPath)), base + '.npas');
-  let src;
-  try {
-    src = generate(model, base);
-  } catch (e) {
-    vscode.window.showWarningMessage(t('NeoObjectPascal UI: erro ao gerar .npas — ') + e.message);
-    return null;
-  }
-  await vscode.workspace.fs.writeFile(npasUri, Buffer.from(src, 'utf8'));
-  return npasUri;
-}
+const writeSibling = (document) => writeNpas(document);
 
 class UiBuilderProvider {
   constructor(context) { this.context = context; }
@@ -64,20 +31,27 @@ class UiBuilderProvider {
     webview.html = this.getHtml(webview);
 
     const post = () => webview.postMessage({ type: 'init', text: document.getText() });
-    const postLang = () => webview.postMessage({ type: 'lang', lang: resolveLang() });
+    const postLang = () => webview.postMessage({ type: 'lang', lang: resolveLang(), sync: syncMode() });
 
     const changeSub = vscode.workspace.onDidChangeTextDocument((e) => {
       if (e.document.uri.toString() === document.uri.toString()) post();
     });
     // Keep the editor in sync when the language setting changes elsewhere.
     const cfgSub = vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration('neoobjectpascal.uiBuilder.language')) postLang();
+      if (e.affectsConfiguration('neoobjectpascal.uiBuilder.language')
+        || e.affectsConfiguration('neoobjectpascal.uiBuilder.sync')) postLang();
     });
     panel.onDidDispose(() => { changeSub.dispose(); cfgSub.dispose(); });
 
     webview.onDidReceiveMessage(async (msg) => {
       switch (msg && msg.type) {
-        case 'ready': postLang(); post(); break;
+        case 'ready':
+          postLang();
+          // A .npas edited since the last save wins: adopt it before the first
+          // paint, so the builder never opens on a stale model.
+          try { await arbitrate(document.uri); } catch (e) { /* keep the model as-is */ }
+          post();
+          break;
         case 'update': await this.applyEdit(document, msg.text); break;
         case 'undo': await vscode.commands.executeCommand('undo'); break;
         case 'redo': await vscode.commands.executeCommand('redo'); break;
@@ -151,4 +125,4 @@ class UiBuilderProvider {
   }
 }
 
-module.exports = { UiBuilderProvider, writeSibling, VIEW_TYPE, resolveLang, t };
+module.exports = { UiBuilderProvider, writeSibling, VIEW_TYPE, resolveLang, t, arbitrate };

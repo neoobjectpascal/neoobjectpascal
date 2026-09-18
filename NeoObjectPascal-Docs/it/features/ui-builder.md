@@ -4,7 +4,7 @@ L'estensione VS Code include un **editor visivo (WYSIWYG)** per creare interfacc
 
 ## Il file `.xnpas`
 
-L'editor lavora con file **`.xnpas`** — un JSON che contiene il progetto della schermata. Quando salvi `test.xnpas`, l'editor **(ri)genera** il `test.npas` associato. La sincronizzazione è **unidirezionale**: il `.xnpas` è la fonte di verità e il `.npas` generato riporta un'intestazione che avvisa di **non modificarlo a mano**.
+L'editor lavora con file **`.xnpas`** — un JSON che contiene il progetto della schermata. Quando salvi `test.xnpas`, l'editor **(ri)genera** il `test.npas` associato. La sincronizzazione è **bidirezionale**: al salvataggio, il file più recente aggiorna l'altro. Il `.npas` generato riporta un'intestazione che lo identifica come file dell'editor visivo.
 
 ## Creare una schermata
 
@@ -15,7 +15,7 @@ L'editor lavora con file **`.xnpas`** — un JSON che contiene il progetto della
 ## Il layout dell'editor
 
 - **Tavolozza** (a sinistra) — i componenti del target scelto, raggruppati. Trascinane uno sulla tela.
-- **Tela** (al centro) — un'anteprima fedele. Clicca per selezionare; trascina un componente già posizionato per **riordinarlo** (o spostarlo in un altro contenitore).
+- **Tela** (al centro) — un'anteprima fedele. Clicca per selezionare; trascina un componente già posizionato per **riordinarlo** (o spostarlo in un altro contenitore). I contenitori vuoti (una `Grid` appena inserita, per esempio) mostrano un'area tratteggiata con la scritta *Rilascia un componente qui*, abbastanza ampia da accogliere il trascinamento.
 - **Ispettore** (a destra) — schede **Proprietà**, **Stato** ed **Eventi**.
 - **Barra degli strumenti** — l'interruttore **WebInk / TerminalInk**, il selettore di schermata/rotta e **Esegui dal vivo** (genera ed esegue il `.npas`).
 
@@ -31,9 +31,33 @@ Un `.xnpas` è interamente **WebInk** o **TerminalInk**. L'interruttore cambia i
 - **WebInk** — `Page`, `Container`, `Grid`, `Card`, `Navbar`, `Heading`, `Text`, `Badge`, `StatCard`, `Button`, `TextInput`, `Select`, `Checkbox`, `Table`, `List`, `Chart`, `Alert`, `ProgressBar`…
 - **TerminalInk** — `VBox`, `HBox`, `Box`, `Text`, `Badge`, `TextInput`, `Select`, `MultiSelect`, `ConfirmInput`, `ProgressBar`, `StatusMessage`, `Alert`, liste…
 
-## Sincronizzazione e il `.npas` generato
+## Sincronizzazione tra il `.xnpas` e il `.npas`
 
-Salvando il `.xnpas` si rigenera il `.npas` associato a partire dal progetto. **Non modificare il `.npas` generato a mano** — verrà sovrascritto al salvataggio successivo. Se apri un `.npas` generato, l'editor ti avvisa e propone di aprire il `.xnpas` corrispondente.
+I due file restano allineati in entrambe le direzioni, e la data di modifica decide chi comanda: al salvataggio, il file più recente aggiorna l'altro.
+
+- Hai salvato `test.xnpas`? Il `test.npas` viene rigenerato dal progetto.
+- Hai salvato un `test.npas` generato? Le modifiche tornano nel `test.xnpas` e compaiono nell'editor visivo.
+- Hai aperto l'editor visivo? Prima di disegnare la schermata confronta le date e adotta il file più recente.
+- L'editor visivo ha modifiche non salvate? L'importazione viene rimandata: l'editor avvisa e attende un salvataggio o un annullamento, invece di buttare via un lavoro mai finito su disco.
+
+In caso di parità vince il `.xnpas`, in quanto fonte canonica del progetto.
+
+### Che cosa capisce il percorso di ritorno
+
+La rilettura di un `.npas` verso il progetto copre esattamente ciò che l'editor genera: la clausola `uses`, le variabili di stato, le funzioni di evento, le funzioni di schermata e la chiamata `render`. Da qui le tre regole seguenti.
+
+- Viene riletto solo un `.npas` con l'intestazione di file generato. Un file scritto a mano non sovrascrive mai il `.xnpas`.
+- Se il file è stato modificato oltre questa forma, l'editor avvisa, preserva il `.xnpas` e propone di rigenerare il `.npas`.
+- Commenti e codice fuori dalla forma generata non sopravvivono al ritorno.
+
+::: tip
+Un `test.xnpas` genera un `test.npas`. Esegui il `.npas` normalmente (pulsante *Run*) oppure usa **Esegui dal vivo** direttamente dall'editor visivo.
+:::
+
+### Tornare al senso unico
+
+L'impostazione **`neoobjectpascal.uiBuilder.sync`** accetta `bidirectional` (predefinito) oppure `xnpasFirst`, che mantiene il `.xnpas` come unica fonte e sovrascrive sempre il `.npas`.
+
 ## Visibilità, dati dinamici e focus
 
 Tre funzionalità permettono alle schermate di reagire allo stato in fase di esecuzione.

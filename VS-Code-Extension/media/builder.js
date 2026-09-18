@@ -11,6 +11,9 @@
 
   // ── i18n: the editor UI language (set by the extension host; user-selectable) ──
   let LANG = 'pt';
+  // How the .xnpas and its .npas are kept in step ('bidirectional' | 'xnpasFirst'),
+  // set by the extension host — the toolbar chip reports it.
+  let SYNC = 'bidirectional';
   const t = (s) => NpI18n.tr(s, LANG);
   const LANG_NAMES = { pt: 'Português', en: 'English', de: 'Deutsch', fr: 'Français', it: 'Italiano' };
 
@@ -111,7 +114,7 @@
        <button class="tbtn icon" id="addScreen" title="${esc(term ? t('Nova tela') : t('Nova rota/tela'))}">${icon('plus')}</button>
        <div class="spring"></div>
        <div class="lang" title="${esc(t('Idioma'))}">${icon('globe', { s: 14 })}<select id="langSel">${langOpts}</select></div>
-       <div class="sync">${icon('check', { s: 14 })} ${esc(t('sincroniza com o .npas ao salvar'))}</div>
+       <div class="sync">${icon('check', { s: 14 })} ${esc(t(SYNC === 'bidirectional' ? 'sincroniza com o .npas nos dois sentidos' : 'sincroniza com o .npas ao salvar'))}</div>
        <button class="tbtn icon" id="undo" title="${esc(t('Desfazer'))}">${icon('undo')}</button>
        <button class="tbtn icon" id="redo" title="${esc(t('Refazer'))}">${icon('redo')}</button>
        <button class="tbtn run" id="run">${icon('play', { s: 14 })} ${esc(t('Rodar ao vivo'))}</button>`;
@@ -172,17 +175,46 @@
         e.dataTransfer.effectAllowed = 'move';
       });
     }
-    if (def && def.container) (node.children || []).forEach((c) => elm.appendChild(buildNode(c, false)));
+    if (def && def.container) {
+      const kids = node.children || [];
+      kids.forEach((c) => elm.appendChild(buildNode(c, false)));
+      // An empty container (a fresh Grid, Row, Card…) collapses to a few pixels,
+      // which leaves nothing to drop onto. Give it a sized, labelled drop area.
+      if (!kids.length && !isRoot) {           // the root already has its own hint
+        elm.classList.add('is-empty');
+        const hint = document.createElement('div');
+        hint.className = 'drop-hint';            // no data-id: invisible to dropIndex
+        hint.textContent = t('Solte um componente aqui');
+        elm.appendChild(hint);
+      }
+    }
     return elm;
   }
-  // where a drop lands among a container's children (by vertical midpoint)
-  function dropIndex(containerEl, y) {
+  // Where a drop lands among a container's children. Children laid out side by
+  // side (Grid, Row) are compared on X; stacked ones on Y.
+  function dropIndex(containerEl, x, y) {
     const kids = containerEl.querySelectorAll(':scope > [data-id]');
+    if (!kids.length) return 0;
+    const horizontal = isHorizontal(kids);
     for (let i = 0; i < kids.length; i++) {
       const r = kids[i].getBoundingClientRect();
-      if (y < r.top + r.height / 2) return i;
+      if (horizontal) {
+        // Past the bottom of a row means "after it" — keep scanning.
+        if (y > r.bottom) continue;
+        if (x < r.left + r.width / 2) return i;
+      } else if (y < r.top + r.height / 2) return i;
     }
     return kids.length;
+  }
+  // A multi-column grid or a flex row lays its children out side by side; with a
+  // single child the computed style is the only tell, so it is checked first.
+  function isHorizontal(kids) {
+    const cs = getComputedStyle(kids[0].parentElement);
+    if (cs.display === 'grid') return cs.gridTemplateColumns.split(/\s+/).filter(Boolean).length > 1;
+    if (cs.display === 'flex' && cs.flexDirection.indexOf('row') === 0) return true;
+    if (kids.length < 2) return false;
+    const a = kids[0].getBoundingClientRect(), b = kids[1].getBoundingClientRect();
+    return b.left >= a.right - 1 && b.top < a.bottom;
   }
 
   // The selection tag (type label + delete) is a canvas-level overlay so it is
@@ -228,7 +260,7 @@
           ev.preventDefault(); ev.stopPropagation(); elm.classList.remove('drop-ok');
           const moveId = ev.dataTransfer.getData('text/move');
           const wt = ev.dataTransfer.getData('text/widget');
-          const index = dropIndex(elm, ev.clientY);
+          const index = dropIndex(elm, ev.clientX, ev.clientY);
           if (moveId) moveNode(moveId, id, index);
           else if (wt) addChild(id, wt, index);
         };
@@ -773,7 +805,10 @@
     const msg = e.data;
     if (msg.type === 'lang') {                 // language set by the extension host
       const L = NpI18n.normalize(msg.lang);
-      if (L !== LANG) { LANG = L; render(); }
+      const S = msg.sync || SYNC;
+      const changed = (L !== LANG) || (S !== SYNC);
+      LANG = L; SYNC = S;
+      if (changed) render();
       return;
     }
     if (msg.type === 'init') {

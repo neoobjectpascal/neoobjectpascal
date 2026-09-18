@@ -2,6 +2,16 @@
 
 All notable changes to the "NeoObjectPascal" extension will be documented in this file.
 
+## [2.17.0] - 2026-09-17
+
+### Added
+- **Bidirectional sync between `.xnpas` and `.npas`.** The pair now syncs both ways, and the modification time decides the winner: saving the `.xnpas` regenerates the `.npas` as before, saving a generated `.npas` reads the changes back into the `.xnpas`, and opening the visual editor adopts whichever file is newer. A new reverse parser (`npasParser.js`) turns generated source back into the design model, covering the `uses` clause, state variables, event functions, screen functions and the `render` call. Two guards keep the pair quiet: nothing is written when the content would not change (codegen and the parser round-trip byte for byte), and a `.npas` without the generated-file header, or one the parser cannot read, never overwrites the `.xnpas`. In that case the editor warns once and offers to regenerate the `.npas`. Unsaved work in the visual editor also holds the import back, so a design that never reached the disk is not thrown away. The setting **`neoobjectpascal.uiBuilder.sync`** (`bidirectional` by default) restores the old one-way behavior with `xnpasFirst`.
+
+### Changed
+- **Empty containers are now a real drop target.** A freshly added `Grid`, `Row`, `Col`, `Card` or `Section` rendered at a few pixels tall, so there was almost nothing to drag onto. Every empty container now shows a sized, dashed area labelled "Drop a component here" (spanning all columns inside a `Grid`), in the five editor languages. The placeholder carries no node id, so it stays out of the child ordering.
+- **Drop position is computed on both axes.** `dropIndex` compared only the vertical midpoint, which always appended to the end in side-by-side layouts. Children laid out in a row (`Grid`, `Row`) are now compared on X, stacked ones on Y as before.
+- The notice shown when a generated `.npas` is focused no longer says the file will be overwritten: it explains that the two files sync by modification time.
+
 ## [2.16.0] - 2026-07-26
 
 ### Changed

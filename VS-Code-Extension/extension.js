@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const { UiBuilderProvider, writeSibling, t: uiT } = require('./uiBuilder');
+const { writeXnpas, syncMode } = require('./sync');
 
 /**
  * @param {vscode.ExtensionContext} context
@@ -510,13 +511,17 @@ function activate(context) {
     );
 
     // ── Visual UI Builder (.xnpas) ─────────────────────────────────────────────
-    // Custom editor for .xnpas + one-way sync: saving the .xnpas regenerates the
-    // sibling .npas. A command scaffolds new .xnpas files.
+    // Custom editor for .xnpas + bidirectional sync: saving either file updates
+    // the other, and on open the newer of the two wins. A command scaffolds new
+    // .xnpas files.
     context.subscriptions.push(UiBuilderProvider.register(context));
     context.subscriptions.push(
         vscode.workspace.onDidSaveTextDocument(async (doc) => {
-            if (doc.uri.fsPath.toLowerCase().endsWith('.xnpas')) {
+            const p = doc.uri.fsPath.toLowerCase();
+            if (p.endsWith('.xnpas')) {
                 await writeSibling(doc);
+            } else if (p.endsWith('.npas') && syncMode() === 'bidirectional') {
+                await writeXnpas(doc.uri);
             }
         })
     );
@@ -524,7 +529,7 @@ function activate(context) {
         vscode.commands.registerCommand('neoobjectpascal.newUi', () => createNewUiFile())
     );
 
-    // Guard: warn when a generated .npas is focused — it is overwritten on .xnpas save.
+    // Tell the user, once per file, that this .npas is one half of a synced pair.
     const warnedGenerated = new Set();
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor(async (editor) => {
@@ -539,8 +544,11 @@ function activate(context) {
             try { await vscode.workspace.fs.stat(xnpasUri); } catch (e) { return; }
             warnedGenerated.add(p);
             const openLabel = uiT('Abrir editor visual');
-            const choice = await vscode.window.showWarningMessage(
-                uiT('{base}.npas é gerado pelo editor visual ({base}.xnpas) e será sobrescrito ao salvar o .xnpas. Edite a interface pelo editor visual.').replace(/\{base\}/g, base),
+            const msg = syncMode() === 'bidirectional'
+                ? uiT('{base}.npas e {base}.xnpas ficam sincronizados: ao salvar, o arquivo mais recente atualiza o outro. Edições feitas aqui voltam para o editor visual.')
+                : uiT('{base}.npas é gerado pelo editor visual ({base}.xnpas) e será sobrescrito ao salvar o .xnpas. Edite a interface pelo editor visual.');
+            const choice = await vscode.window.showInformationMessage(
+                msg.replace(/\{base\}/g, base),
                 openLabel
             );
             if (choice === openLabel) {
