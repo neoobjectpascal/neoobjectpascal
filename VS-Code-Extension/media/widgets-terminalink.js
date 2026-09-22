@@ -65,6 +65,12 @@
     Box: { group: 'Layout', label: 'Box', container: true, defaultProps: {},
       fields: [{ key: 'flexDirection', label: 'Direção', kind: 'enum', options: ['row', 'column'] }].concat(boxFields),
       preview: (n, i) => tkBox(n, i, p(n, 'flexDirection', 'row')) },
+    Modal: { group: 'Layout', label: 'Modal', container: true,
+      defaultProps: { title: 'Modal', open: false, width: 40, border: 'round', closeOnEscape: true },
+      fields: [{ key: 'title', label: 'Título', kind: 'text' }, { key: 'open', label: 'Aberto', kind: 'bool', bindable: true },
+        { key: 'width', label: 'Largura', kind: 'number', min: 10, max: 120 }, { key: 'height', label: 'Altura', kind: 'number', min: 3, max: 50 },
+        { key: 'closeOnEscape', label: 'Fechar com Escape', kind: 'bool' }, { key: 'onClose', label: 'onClose', kind: 'event' }].concat(boxFields),
+      preview: (n, i) => `<div class="tk-box" style="display:flex;flex-direction:column;min-width:240px;border:1px solid ${col(p(n, 'borderColor', 'cyan'))};padding:10px"><b style="color:${col('cyan')}">${showVal(p(n, 'title', 'Modal'))}</b>${i}</div>` },
     Spacer: { group: 'Layout', label: 'Spacer', container: false, defaultProps: {},
       fields: [], preview: () => `<div class="tk-spacer"></div>` },
 

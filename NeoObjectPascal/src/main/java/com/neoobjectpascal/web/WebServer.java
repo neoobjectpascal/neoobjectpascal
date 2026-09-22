@@ -67,7 +67,8 @@ final class WebServer {
         try {
             String shell = Assets.text("shell.html")
                     .replace("__TITLE__", HtmlRenderer.esc(
-                            runtime.getTitle() != null ? runtime.getTitle() : "NeoObjectPascal · WebInk"));
+                            runtime.getTitle() != null ? runtime.getTitle() : "NeoObjectPascal · WebInk"))
+                    .replace("__THEME__", runtime.getTheme());
             send(ex, 200, "text/html; charset=utf-8", shell.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             send(ex, 500, "text/plain; charset=utf-8", ("shell error: " + e.getMessage()).getBytes());
@@ -94,6 +95,7 @@ final class WebServer {
             String html = runtime.renderRoute(route);
             ObjectNode resp = JSON.createObjectNode();
             resp.put("html", html);
+            resp.put("theme", runtime.getTheme());
             sendJson(ex, resp);
         } catch (Exception e) {
             sendError(ex, e);
@@ -109,6 +111,7 @@ final class WebServer {
             ObjectNode resp = JSON.createObjectNode();
             resp.put("html", result.html);
             if (result.navigate != null) resp.put("navigate", result.navigate);
+            resp.put("theme", result.theme);
             sendJson(ex, resp);
         } catch (Exception e) {
             sendError(ex, e);

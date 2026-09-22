@@ -147,6 +147,8 @@ public class Interpreter extends NeoObjectPascalParserBaseVisitor<Object> {
                 registerNativeModule("terminalink");
             } else if (path.equals("webink") || path.equals("internal.webink")) {
                 registerNativeModule("webink");
+            } else if (path.equals("desktopink") || path.equals("internal.desktopink")) {
+                registerNativeModule("desktopink");
             } else if (path.equals("http") || path.equals("internal.http")) {
                 registerNativeModule("http");
             } else if (path.startsWith("internal.")) {
@@ -354,18 +356,21 @@ public class Interpreter extends NeoObjectPascalParserBaseVisitor<Object> {
     }
 
     private void registerNativeModule(String name) {
-        // A program is entirely TerminalInk or entirely WebInk — the two UI frameworks never mix
-        // (they both define `render`/`navigate` and target different surfaces).
-        if (name.equals("terminalink") && state.loadedNativeModules.contains("webink")
-                || name.equals("webink") && state.loadedNativeModules.contains("terminalink")) {
-            throw new NeoException("Um programa é totalmente TerminalInk ou totalmente WebInk — "
-                    + "não use 'uses terminalink' e 'uses webink' no mesmo programa.");
+        // UI frameworks own the same render/navigate names and target distinct surfaces.
+        boolean isUiModule = name.equals("terminalink") || name.equals("webink") || name.equals("desktopink");
+        if (isUiModule && state.loadedNativeModules.stream()
+                .anyMatch(loaded -> !loaded.equals(name)
+                        && (loaded.equals("terminalink") || loaded.equals("webink") || loaded.equals("desktopink")))) {
+            throw new NeoException("Um programa deve usar somente um framework de interface: "
+                    + "TerminalInk, WebInk ou DesktopInk.");
         }
         if (!state.loadedNativeModules.add(name)) return; // register once
         if (name.equals("terminalink")) {
             com.neoobjectpascal.tui.TerminalInk.register(this);
         } else if (name.equals("webink")) {
             com.neoobjectpascal.web.WebInk.register(this);
+        } else if (name.equals("desktopink")) {
+            com.neoobjectpascal.desktop.DesktopInk.register(this);
         } else if (name.equals("http")) {
             com.neoobjectpascal.http.HttpModule.register(this);
         }

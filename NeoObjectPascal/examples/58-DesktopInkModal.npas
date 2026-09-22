@@ -1,0 +1,145 @@
+// DesktopInk: formulario de criacao apresentado em Modal.
+// Rode: java -jar target/neoobjectpascal-1.0-SNAPSHOT-jar-with-dependencies.jar examples/58-DesktopInkModal.npas
+
+uses desktopink;
+
+var modalAberto: Boolean;
+var projetos: Object;
+var totalProjetos: Integer;
+var nomeProjeto: String;
+var responsavelProjeto: String;
+var descricaoProjeto: String;
+var linhaSelecionada: Integer;
+
+function abrirModal(): Boolean
+begin
+    modalAberto := true;
+    return true;
+end;
+
+function cancelar(): Boolean
+begin
+    modalAberto := false;
+    return true;
+end;
+
+function criarProjeto(): Boolean
+begin
+    totalProjetos := totalProjetos + 1;
+    if totalProjetos = 1 then
+        projetos := [[nomeProjeto, responsavelProjeto, "Em andamento"]]
+    else if totalProjetos = 2 then
+        projetos := [projetos[0], [nomeProjeto, responsavelProjeto, "Em andamento"]]
+    else
+        projetos := [projetos[0], projetos[1], [nomeProjeto, responsavelProjeto, "Em andamento"]];
+    modalAberto := false;
+    return true;
+end;
+
+function atualizarNome(valor): Boolean
+begin
+    nomeProjeto := valor;
+    return true;
+end;
+
+function atualizarResponsavel(valor): Boolean
+begin
+    responsavelProjeto := valor;
+    return true;
+end;
+
+function atualizarDescricao(valor): Boolean
+begin
+    descricaoProjeto := valor;
+    return true;
+end;
+
+function selecionarProjeto(indice): Boolean
+begin
+    linhaSelecionada := indice;
+    return true;
+end;
+
+function excluirProjeto(): Boolean
+begin
+    if totalProjetos = 1 then
+        projetos := []
+    else if totalProjetos = 2 then
+        if linhaSelecionada = 0 then projetos := [projetos[1]]
+        else projetos := [projetos[0]]
+    else
+        if linhaSelecionada = 0 then projetos := [projetos[1], projetos[2]]
+        else if linhaSelecionada = 1 then projetos := [projetos[0], projetos[2]]
+        else projetos := [projetos[0], projetos[1]];
+    if totalProjetos > 0 then totalProjetos := totalProjetos - 1;
+    if linhaSelecionada > 0 then linhaSelecionada := linhaSelecionada - 1;
+    return true;
+end;
+
+function principal(): Object
+begin
+    return Window(#{}, [
+        Container(#{ width: 920 }, [
+            Heading(#{ level: 1 }, "Projetos"),
+            Text(#{}, "Acompanhe e organize o trabalho da equipe."),
+            Grid(#{ cols: 3, gap: 16 }, [
+                StatCard(#{ label: "Ativos", value: "12", delta: "+2 este mes" }),
+                StatCard(#{ label: "Concluidos", value: "48", delta: "+14%" }),
+                StatCard(#{ label: "Em risco", value: "3", delta: "Requer atencao" })
+            ]),
+            Row(#{ gap: 12 }, [
+                Button(#{ text: "Adicionar projeto", variant: "primary", onClick: abrirModal }),
+                Button(#{ text: "Excluir projeto selecionado", variant: "secondary", onClick: excluirProjeto })
+            ]),
+            Card(#{}, [
+                Heading(#{ level: 3 }, "Lista de projetos"),
+                Table(#{
+                    columns: ["Projeto", "Responsavel", "Status"],
+                    rows: projetos,
+                    selectedRow: linhaSelecionada,
+                    onRowClick: selecionarProjeto
+                })
+            ]),
+            Modal(#{
+                open: modalAberto,
+                title: "Novo projeto",
+                width: 560,
+                height: 520,
+                closeOnEscape: true,
+                closeOnBackdrop: true
+            }, [
+                Text(#{}, "Preencha as informacoes iniciais para criar o projeto."),
+                Text(#{}, "Nome do projeto"),
+                TextInput(#{ value: nomeProjeto, placeholder: "Ex.: Portal de parceiros", width: 480, autoFocus: true, onChange: atualizarNome }),
+                Text(#{}, "Responsavel"),
+                Select(#{ value: responsavelProjeto, options: ["Ana Lima", "Bruno Silva", "Carla Souza"], width: 480, onChange: atualizarResponsavel }),
+                Text(#{}, "Descricao"),
+                TextArea(#{ value: descricaoProjeto, rows: 4, width: 480, placeholder: "Contexto e objetivos do projeto", onChange: atualizarDescricao }),
+                Row(#{ gap: 12 }, [
+                    Button(#{ text: "Cancelar", variant: "secondary", onClick: cancelar }),
+                    Button(#{ text: "Criar projeto", variant: "primary", onClick: criarProjeto })
+                ])
+            ])
+        ])
+    ]);
+end;
+
+begin
+    modalAberto := false;
+    totalProjetos := 2;
+    nomeProjeto := "Novo projeto";
+    responsavelProjeto := "Carla Souza";
+    descricaoProjeto := "";
+    linhaSelecionada := 0;
+    projetos := [
+        ["Aplicativo mobile", "Ana", "Em andamento"],
+        ["Portal do cliente", "Bruno", "Planejado"]
+    ];
+    render(#{ principal: principal }, #{
+        title: "Projetos",
+        width: 1080,
+        height: 760,
+        centered: true,
+        theme: "dark"
+    });
+end.

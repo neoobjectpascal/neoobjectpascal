@@ -6,6 +6,7 @@
 
   var app = document.getElementById("app");
   var charts = new WeakMap(); // canvas -> Chart instance (to destroy on re-render)
+  var modalRestoreId = null;
 
   function post(url, body) {
     return fetch(url, {
@@ -19,12 +20,17 @@
     if (data && typeof data.navigate === "string") {
       history.pushState(null, "", data.navigate);
     }
+    if (data && typeof data.theme === "string") {
+      document.documentElement.setAttribute("data-webink-theme", data.theme);
+    }
     // Preserve focus + caret across the full re-render, so a reactive text input
     // (onChange per keystroke) keeps focus and cursor position while you type.
     var ae = document.activeElement;
+    var wasInModal = ae && ae.closest && ae.closest("[data-webink-modal]");
     var focusId = ae && ae.getAttribute
-      ? ae.getAttribute("data-webink-change") || ae.getAttribute("data-webink-submit")
+      ? ae.getAttribute("data-webink-change") || ae.getAttribute("data-webink-submit") || ae.getAttribute("data-webink-click")
       : null;
+    if (!wasInModal && focusId) modalRestoreId = focusId;
     var caret = ae && typeof ae.selectionStart === "number" ? ae.selectionStart : null;
 
     app.innerHTML = (data && data.html) || "";
@@ -39,6 +45,14 @@
           try { el.setSelectionRange(caret, caret); } catch (e) {}
         }
       }
+    }
+    var modal = app.querySelector("[data-webink-modal-dialog]");
+    if (modal) {
+      if (!app.contains(document.activeElement)) modal.focus();
+    } else if (modalRestoreId) {
+      var restore = app.querySelector('[data-webink-click="' + modalRestoreId + '"],[data-webink-change="' + modalRestoreId + '"],[data-webink-submit="' + modalRestoreId + '"]');
+      if (restore) restore.focus();
+      modalRestoreId = null;
     }
   }
 
@@ -114,6 +128,38 @@
       }
     });
   }
+
+  // Modal interactions are delegated so the fresh DOM produced by each render needs no per-node wiring.
+  document.addEventListener("click", function (event) {
+    var backdrop = event.target.matches && event.target.matches("[data-webink-modal]") ? event.target : null;
+    if (backdrop && backdrop.getAttribute("data-webink-close-backdrop") === "true") {
+      fireEvent(backdrop.getAttribute("data-webink-close"), null);
+    }
+  });
+
+  document.addEventListener("click", function (event) {
+    var close = event.target.closest && event.target.closest("[data-webink-close]");
+    if (close && !close.matches("[data-webink-modal]")) {
+      event.preventDefault();
+      fireEvent(close.getAttribute("data-webink-close"), null);
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    var modal = app.querySelector("[data-webink-modal]");
+    if (!modal) return;
+    if (event.key === "Escape" && modal.getAttribute("data-webink-close-escape") === "true") {
+      event.preventDefault();
+      fireEvent(modal.getAttribute("data-webink-close"), null);
+      return;
+    }
+    if (event.key !== "Tab") return;
+    var focusable = modal.querySelectorAll("button, [href], input, select, textarea, [tabindex]:not([tabindex='-1'])");
+    if (!focusable.length) { event.preventDefault(); return; }
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
 
   window.addEventListener("popstate", function () {
     renderRoute(location.pathname);

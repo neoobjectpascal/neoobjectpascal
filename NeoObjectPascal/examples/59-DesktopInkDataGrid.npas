@@ -1,0 +1,65 @@
+// DesktopInk: DataGrid editavel com destaque de celulas alteradas e botao Salvar.
+// Rode: java -jar target/neoobjectpascal-1.0-SNAPSHOT-jar-with-dependencies.jar examples/59-DesktopInkDataGrid.npas
+
+uses desktopink;
+
+var dadosColetados: String;
+
+function onCellChange(row, col, old, valor): Boolean
+begin
+    WriteLn("Celula alterada: linha " + row + ", coluna " + col + " = " + valor);
+    return true;
+end;
+
+function salvar(valor): Boolean
+begin
+    dadosColetados := valor;
+    WriteLn("Dados coletados:");
+    WriteLn(valor);
+    return true;
+end;
+
+function principal(): Object
+begin
+    return Window(#{}, [
+        Container(#{ width: 980 }, [
+            Heading(#{ level: 1 }, "Equipe"),
+            Text(#{}, "Edite as celulas. As celulas alteradas ficarao destacadas em amarelo."),
+            Card(#{}, [
+                Table(#{
+                    columns: ["Nome", "E-mail", "Papel", "Status"],
+                    rows: [
+                        ["Ana Lima", "ana@empresa.com", "Admin", "Ativo"],
+                        ["Bruno Silva", "bruno@empresa.com", "Editor", "Ativo"],
+                        ["Carla Souza", "carla@empresa.com", "Leitor", "Pendente"]
+                    ],
+                    editable: true,
+                    onChange: onCellChange,
+                    onSave: salvar,
+                    editors: #{
+                        Papel: #{ options: ["Admin", "Editor", "Leitor"] },
+                        Status: #{ options: ["Ativo", "Pendente", "Inativo"] }
+                    }
+                })
+            ]),
+            Alert(#{
+                variant: "success",
+                visible: dadosColetados <> ""
+            }, [
+                Text(#{}, "Dados coletados apos Salvar:"),
+                Text(#{}, dadosColetados)
+            ])
+        ])
+    ]);
+end;
+
+begin
+    dadosColetados := "";
+    render(#{ principal: principal }, #{
+        title: "DataGrid editavel",
+        width: 1080,
+        height: 720,
+        centered: true,
+        theme: "dark"
+    });
+end.

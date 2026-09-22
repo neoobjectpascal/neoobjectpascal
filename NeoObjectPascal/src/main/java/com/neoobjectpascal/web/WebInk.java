@@ -23,7 +23,7 @@ public final class WebInk {
     public static void register(Interpreter interp) {
         WebWidgets.register(interp);
 
-        // render(routes)  or  render(routes, #{ title, port })
+        // render(routes)  or  render(routes, #{ title, port, theme })
         interp.registerNative("render", (NativeFunction) (args, i) -> {
             Map<String, Object> routes = mapAt(args, 0);
             Map<String, Object> opts = mapAt(args, 1);
@@ -33,8 +33,10 @@ public final class WebInk {
             }
             String title = Props.getString(opts, "title", null);
             int port = Props.getInt(opts, "port", 0); // 0 = porta livre efêmera
+            String theme = opts.containsKey("theme")
+                    ? WebTheme.normalize(opts.get("theme")) : WebTheme.defaultTheme();
 
-            WebRuntime runtime = new WebRuntime(i, routes, title);
+            WebRuntime runtime = new WebRuntime(i, routes, title, theme);
             WebServer server = new WebServer(runtime);
             try {
                 int actual = server.start(port);
@@ -55,6 +57,15 @@ public final class WebInk {
             if (WebRuntime.active != null && !args.isEmpty() && args.get(0) != null) {
                 WebRuntime.active.navigate(String.valueOf(args.get(0)));
             }
+            return null;
+        });
+
+        // setTheme("light" | "dark" | "auto") updates the active app immediately when called
+        // from a route or callback, and supplies the default for the next render otherwise.
+        interp.registerNative("setTheme", (NativeFunction) (args, i) -> {
+            Object theme = args.isEmpty() ? null : args.get(0);
+            if (WebRuntime.active != null) WebRuntime.active.setTheme(theme);
+            else WebTheme.setDefault(theme);
             return null;
         });
     }

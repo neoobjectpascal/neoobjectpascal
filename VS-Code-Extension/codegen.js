@@ -3,7 +3,7 @@
 // the .xnpas is the source of truth and this regenerates the sibling .npas.
 'use strict';
 
-const EVENT_PROPS = new Set(['onClick', 'onChange', 'onSubmit']);
+const EVENT_PROPS = new Set(['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel', 'onClose']);
 // Keys that are reserved words in the grammar → must be emitted as string keys.
 const RESERVED_KEYS = new Set(['class', 'to', 'type', 'end', 'begin', 'var', 'function', 'do', 'in', 'if']);
 
@@ -46,6 +46,18 @@ function nodeSrc(node, indent) {
     .map((c) => '    '.repeat(indent + 1) + nodeSrc(c, indent + 1))
     .join(',\n');
   return node.type + '(' + props + ', [\n' + inner + '\n' + pad + '])';
+}
+
+// Modal declarations live beside a screen root in .xnpas, but the runtimes
+// discover them as children of that root in the generated component tree.
+function screenRoot(sc) {
+  const root = Object.assign({}, sc.root || {});
+  const modals = (sc.modals || []).map((m) => {
+    if (!m || !m.root) return null;
+    return Object.assign({}, m.root, { props: Object.assign({ name: m.name }, m.root.props) });
+  }).filter(Boolean);
+  if (modals.length) root.children = (root.children || []).concat(modals);
+  return root;
 }
 
 function defaultInit(t) {
@@ -96,7 +108,7 @@ function generateWeb(model, fileBase) {
   for (const sc of screens) {
     L.push('function ' + sc.name + '(): Object');
     L.push('begin');
-    L.push('    return ' + nodeSrc(sc.root, 1) + ';');
+    L.push('    return ' + nodeSrc(screenRoot(sc), 1) + ';');
     L.push('end;');
     L.push('');
   }
@@ -113,7 +125,7 @@ function generateWeb(model, fileBase) {
 // ── TerminalInk ────────────────────────────────────────────────────────────
 // Widgets that take their text as a positional string arg after the props record.
 const TK_TEXT = new Set(['Text', 'Badge', 'StatusMessage', 'Alert']);
-const TK_CONTAINERS = new Set(['Box', 'VBox', 'HBox']);
+const TK_CONTAINERS = new Set(['Box', 'VBox', 'HBox', 'Modal']);
 const TK_LISTS = new Set(['UnorderedList', 'OrderedList']);
 
 function nodeSrcT(node, indent) {
@@ -166,7 +178,7 @@ function generateTerminal(model, fileBase) {
   for (const sc of screens) {
     L.push('function ' + sc.name + '(): Object');
     L.push('begin');
-    L.push('    return ' + nodeSrcT(sc.root, 1) + ';');
+    L.push('    return ' + nodeSrcT(screenRoot(sc), 1) + ';');
     L.push('end;');
     L.push('');
   }
@@ -182,10 +194,50 @@ function generateTerminal(model, fileBase) {
   return L.join('\n') + '\n';
 }
 
+function generateDesktop(model, fileBase) {
+  const L = header(fileBase);
+  L.push('');
+  L.push('uses desktopink;');
+  L.push('');
+  const state = model.state || [];
+  for (const s of state) L.push('var ' + s.name + ': ' + s.type + ';   // estado compartilhado');
+  if (state.length) L.push('');
+  for (const h of (model.handlers || [])) {
+    const params = (h.params || []).join(', ');
+    L.push('function ' + h.name + '(' + params + '): ' + (h.returns || 'Boolean'));
+    L.push('begin');
+    const body = (h.body && h.body.trim()) ? h.body : 'return true;';
+    for (const line of body.split('\n')) L.push(line ? '    ' + line : '');
+    L.push('end;');
+    L.push('');
+  }
+  const screen = (model.screens || [])[0] || { root: { type: 'Window', props: {}, children: [] } };
+  L.push('function screen(): Object');
+  L.push('begin');
+  L.push('    return ' + nodeSrc(screenRoot(screen), 1) + ';');
+  L.push('end;');
+  L.push('');
+  const desktop = model.desktop || {};
+  const options = {
+    title: model.title || desktop.title || 'DesktopInk',
+    centered: desktop.centered === undefined ? true : desktop.centered,
+    maximized: desktop.maximized === undefined ? false : desktop.maximized,
+    width: desktop.width === undefined ? 900 : desktop.width,
+    height: desktop.height === undefined ? 650 : desktop.height,
+    theme: desktop.theme || 'light',
+  };
+  L.push('begin');
+  for (const s of state) L.push('    ' + s.name + ' := ' + initValue(s) + ';');
+  L.push('    render(#{ screen: screen }, ' + record(options) + ');');
+  L.push('end.');
+  return L.join('\n') + '\n';
+}
+
 function generate(model, fileBase) {
   fileBase = fileBase || 'arquivo';
   if (!model || typeof model !== 'object') throw new Error('modelo .xnpas inválido');
   if (model.target === 'terminalink') return generateTerminal(model, fileBase);
+  if (model.target === 'desktopink') return generateDesktop(model, fileBase);
   return generateWeb(model, fileBase);
 }
 

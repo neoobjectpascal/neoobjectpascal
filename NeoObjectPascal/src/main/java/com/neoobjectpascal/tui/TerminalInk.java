@@ -26,6 +26,7 @@ public final class TerminalInk {
         interp.registerNative("VBox", Widgets.vbox());
         interp.registerNative("HBox", Widgets.hbox());
         interp.registerNative("Spacer", Widgets.spacer());
+        interp.registerNative("Modal", ModalWidgets.modal());
 
         // Interactive components (stateful, keyboard-driven).
         interp.registerNative("TextInput", InteractiveWidgets.textInput());
@@ -69,13 +70,14 @@ public final class TerminalInk {
             return null;
         });
 
-        // render(rootOrBuildFn): drive the loop over a real terminal, degrading gracefully.
+        // render(rootOrBuildFn, options?): drive the loop over a real terminal, degrading gracefully.
         interp.registerNative("render", (args, i) -> {
             if (args.isEmpty()) return null;
             Object spec = args.get(0);
+            Object options = args.size() > 1 ? args.get(1) : null;
             try {
                 Screen screen = new DefaultTerminalFactory().createScreen();
-                TerminalRuntime.render(spec, i, screen);
+                TerminalRuntime.render(spec, options, i, screen);
             } catch (Throwable t) {
                 // Non-TTY / headless / IO failure: report and continue rather than crash.
                 System.out.println("[TerminalInk] render skipped (no interactive terminal): "

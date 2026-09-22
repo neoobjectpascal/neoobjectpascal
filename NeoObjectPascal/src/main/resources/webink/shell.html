@@ -1,14 +1,47 @@
 <!doctype html>
-<html lang="pt-br">
+<html lang="pt-br" data-webink-theme="__THEME__">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>__TITLE__</title>
   <script src="/webink/tailwind.js"></script>
   <script src="/webink/chart.umd.js"></script>
-  <style>[x-cloak]{display:none}</style>
+  <style>
+    :root {
+      --np-background: #fafafa; --np-foreground: #18181b; --np-card: #ffffff;
+      --np-card-foreground: #18181b; --np-muted: #f4f4f5; --np-muted-foreground: #71717a;
+      --np-border: #e4e4e7; --np-input: #e4e4e7; --np-primary: #2563eb;
+      --np-primary-hover: #1d4ed8; --np-primary-foreground: #ffffff; --np-secondary: #f4f4f5;
+      --np-secondary-foreground: #18181b; --np-ring: #2563eb;
+    }
+    html[data-webink-theme="dark"] {
+      --np-background: #09090b; --np-foreground: #fafafa; --np-card: #18181b;
+      --np-card-foreground: #fafafa; --np-muted: #27272a; --np-muted-foreground: #a1a1aa;
+      --np-border: #27272a; --np-input: #3f3f46; --np-primary: #3b82f6;
+      --np-primary-hover: #60a5fa; --np-primary-foreground: #ffffff; --np-secondary: #27272a;
+      --np-secondary-foreground: #fafafa; --np-ring: #60a5fa;
+    }
+    html[data-webink-theme="auto"] { color-scheme: light dark; }
+    @media (prefers-color-scheme: dark) {
+      html[data-webink-theme="auto"] {
+        --np-background: #09090b; --np-foreground: #fafafa; --np-card: #18181b;
+        --np-card-foreground: #fafafa; --np-muted: #27272a; --np-muted-foreground: #a1a1aa;
+        --np-border: #27272a; --np-input: #3f3f46; --np-primary: #3b82f6;
+        --np-primary-hover: #60a5fa; --np-primary-foreground: #ffffff; --np-secondary: #27272a;
+        --np-secondary-foreground: #fafafa; --np-ring: #60a5fa;
+      }
+    }
+    .bg-background { background-color: var(--np-background) } .text-foreground { color: var(--np-foreground) }
+    .bg-card { background-color: var(--np-card) } .text-card-foreground { color: var(--np-card-foreground) }
+    .bg-muted { background-color: var(--np-muted) } .text-muted-foreground { color: var(--np-muted-foreground) }
+    .border-border { border-color: var(--np-border) } .border-input { border-color: var(--np-input) }
+    .bg-primary { background-color: var(--np-primary) } .text-primary-foreground { color: var(--np-primary-foreground) }
+    .bg-secondary { background-color: var(--np-secondary) } .text-secondary-foreground { color: var(--np-secondary-foreground) }
+    .focus\\:ring-ring:focus { --tw-ring-color: var(--np-ring) } .hover\\:bg-primary-hover:hover { background-color: var(--np-primary-hover) }
+    [x-cloak]{display:none}
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased">
+<body class="bg-background text-foreground antialiased">
   <div id="app"></div>
   <script src="/webink/runtime.js"></script>
 </body>

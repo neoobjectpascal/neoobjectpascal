@@ -112,13 +112,16 @@ public final class LayoutEngine {
         return applyExplicit(n, new int[]{outerW, outerH});
     }
 
-    /** Apply explicit width/height/minWidth overrides to an intrinsic size. */
+    /** Apply explicit dimension overrides and bounds to an intrinsic size. */
     private static int[] applyExplicit(TuiNode n, int[] sz) {
         int w = sz[0];
         int h = sz[1];
         if (Props.has(n.props, "width")) w = Props.getInt(n.props, "width", w);
         if (Props.has(n.props, "height")) h = Props.getInt(n.props, "height", h);
         if (Props.has(n.props, "minWidth")) w = Math.max(w, Props.getInt(n.props, "minWidth", 0));
+        if (Props.has(n.props, "minHeight")) h = Math.max(h, Props.getInt(n.props, "minHeight", 0));
+        if (Props.has(n.props, "maxWidth")) w = Math.min(w, Props.getInt(n.props, "maxWidth", w));
+        if (Props.has(n.props, "maxHeight")) h = Math.min(h, Props.getInt(n.props, "maxHeight", h));
         return new int[]{Math.max(0, w), Math.max(0, h)};
     }
 
