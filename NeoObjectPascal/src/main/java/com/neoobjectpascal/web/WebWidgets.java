@@ -27,7 +27,7 @@ final class WebWidgets {
         // forms
         "Button", "TextInput", "Select", "Checkbox", "TextArea", "Form",
         // data / feedback
-        "Table", "List", "Chart", "Alert", "ProgressBar", "Spinner"
+        "Table", "List", "Chart", "Alert", "ProgressBar", "Spinner", "Modal"
     };
 
     static void register(Interpreter interp) {

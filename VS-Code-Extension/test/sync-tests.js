@@ -60,7 +60,9 @@ const model = {
   xnpas: 1, target: 'webink', state: [], handlers: [],
   screens: [{ route: '/', name: 'home', root: { id: 'n1', type: 'Page', props: {}, children: [
     { id: 'n2', type: 'Heading', props: { level: 1, text: 'Painel' } },
-  ] } }],
+   ] }, modals: [{ name: 'ajuda', root: { id: 'n3', type: 'Modal', props: { title: 'Ajuda', open: false }, children: [
+     { id: 'n4', type: 'Text', props: { text: 'Conteúdo' } },
+   ] } }] }],
 };
 const read = (u) => fs.readFileSync(u.fsPath, 'utf8');
 const write = (u, s) => fs.writeFileSync(u.fsPath, s);
@@ -95,6 +97,10 @@ const textOf = (m) => m.screens[0].root.children[0].props.text;
   t('o .npas mais recente atualiza o .xnpas', () => {
     eq(r3, 'toXnpas', 'direção');
     eq(textOf(JSON.parse(read(xnpas))), 'Painel Novo', 'texto importado');
+  });
+  t('a importação preserva screen.modals', () => {
+    const imported = JSON.parse(read(xnpas)).screens[0].modals;
+    if (!imported || imported.length !== 1 || imported[0].root.props.title !== 'Ajuda') throw new Error(JSON.stringify(imported));
   });
 
   const x4 = read(xnpas), n4 = read(npas);
@@ -146,6 +152,26 @@ const textOf = (m) => m.screens[0].root.children[0].props.text;
     eq(read(npas), generate(m5, 'teste'), '.npas regerado');
   });
   config['uiBuilder.sync'] = 'bidirectional';
+
+  const desktopXnpas = vscode.Uri.file(path.join(dir, 'desktop.xnpas'));
+  const desktopNpas = vscode.Uri.file(path.join(dir, 'desktop.npas'));
+  const desktopModel = {
+    xnpas: 1, target: 'desktopink', title: 'Desktop',
+    desktop: { centered: true, maximized: false, width: 900, height: 650, theme: 'light' },
+    state: [], handlers: [], screens: [{ name: 'screen', route: '', root: { type: 'Window', props: {}, children: [] },
+      modals: [{ name: 'ajuda', root: { type: 'Modal', props: { title: 'Ajuda' }, children: [] } }] }],
+  };
+  write(desktopXnpas, JSON.stringify(desktopModel, null, 2));
+  await sync.arbitrate(desktopXnpas);
+  write(desktopNpas, read(desktopNpas).replace('title: "Desktop"', 'title: "Desktop Novo"'));
+  touch(desktopNpas, 30000);
+  const desktopDirection = await sync.arbitrate(desktopXnpas);
+  t('DesktopInk sincroniza opções e modais do .npas', () => {
+    eq(desktopDirection, 'toXnpas', 'direção');
+    const imported = JSON.parse(read(desktopXnpas));
+    if (imported.target !== 'desktopink' || imported.title !== 'Desktop Novo') throw new Error(JSON.stringify(imported));
+    if (imported.screens[0].modals[0].name !== 'ajuda') throw new Error('modal não preservado');
+  });
 
   fs.rmSync(dir, { recursive: true, force: true });
   console.log('\n' + (fail === 0 ? '✔ TODOS OS TESTES PASSARAM' : '✗ FALHAS') + `  (${pass} ok, ${fail} falhas)`);

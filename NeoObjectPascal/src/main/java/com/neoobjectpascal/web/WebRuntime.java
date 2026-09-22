@@ -22,7 +22,12 @@ final class WebRuntime {
     static final class EventResult {
         final String html;
         final String navigate; // route to push into history, or null
-        EventResult(String html, String navigate) { this.html = html; this.navigate = navigate; }
+        final String theme;
+        EventResult(String html, String navigate, String theme) {
+            this.html = html;
+            this.navigate = navigate;
+            this.theme = theme;
+        }
     }
 
     static WebRuntime active; // set around callback/render on the single server thread
@@ -30,19 +35,24 @@ final class WebRuntime {
     private final Interpreter interp;
     private final Map<String, Object> routes;
     private final String title;
+    private String theme;
 
     private String currentRoute = "/";
     private final Map<String, Object> handlers = new HashMap<>();
     private int handlerSeq = 0;
     private String pendingNavigate = null;
 
-    WebRuntime(Interpreter interp, Map<String, Object> routes, String title) {
+    WebRuntime(Interpreter interp, Map<String, Object> routes, String title, String theme) {
         this.interp = interp;
         this.routes = routes != null ? routes : new LinkedHashMap<>();
         this.title = title;
+        this.theme = WebTheme.normalize(theme);
     }
 
     String getTitle() { return title; }
+    String getTheme() { return theme; }
+
+    void setTheme(Object theme) { this.theme = WebTheme.normalize(theme); }
 
     boolean isCallable(Object fn) { return interp.isCallable(fn); }
 
@@ -93,7 +103,7 @@ final class WebRuntime {
         }
         String nav = pendingNavigate;
         String html = renderRoute(nav != null ? nav : currentRoute);
-        return new EventResult(html, nav);
+        return new EventResult(html, nav, theme);
     }
 
     /** Called by the {@code navigate} native during a callback. */

@@ -19,6 +19,7 @@ final class HtmlRenderer {
 
     private final WebRuntime runtime;
     private final StringBuilder out = new StringBuilder();
+    private int modalSeq;
 
     HtmlRenderer(WebRuntime runtime) {
         this.runtime = runtime;
@@ -50,19 +51,20 @@ final class HtmlRenderer {
             case "Alert":       alert(n); break;
             case "ProgressBar": progress(n); break;
             case "Spinner":     spinner(n); break;
+            case "Modal":       modal(n); break;
             case "Divider":     out.append("<hr class=\"").append(cls(n, "border-slate-200 my-4")).append("\"/>"); break;
             case "Spacer":      out.append("<div class=\"").append(cls(n, "h-4")).append("\"></div>"); break;
             case "Stat":
             case "StatCard":    statCard(n); break;
-            case "Navbar":      container(n, "nav", "bg-white border-b border-slate-200 px-6 py-3 flex items-center gap-4"); break;
-            case "Sidebar":     container(n, "aside", "w-60 shrink-0 bg-white border-r border-slate-200 p-4 flex flex-col gap-1"); break;
-            case "Tabs":        container(n, "div", "flex gap-1 border-b border-slate-200 mb-4"); break;
-            case "Page":        container(n, "div", "min-h-screen bg-slate-50 text-slate-800"); break;
+            case "Navbar":      container(n, "nav", "bg-background border-b border-border px-6 py-3 flex items-center gap-4"); break;
+            case "Sidebar":     container(n, "aside", "w-60 shrink-0 bg-background border-r border-border p-4 flex flex-col gap-1"); break;
+            case "Tabs":        container(n, "div", "flex gap-1 border-b border-border mb-4"); break;
+            case "Page":        container(n, "div", "min-h-screen bg-background text-foreground"); break;
             case "Section":     container(n, "section", "py-8"); break;
             case "Container":   container(n, "div", "max-w-6xl mx-auto px-4"); break;
             case "Row":         container(n, "div", "flex flex-wrap gap-4"); break;
             case "Col":         container(n, "div", "flex-1 min-w-0"); break;
-            case "Card":        container(n, "div", "bg-white rounded-xl shadow-sm border border-slate-200 p-6"); break;
+            case "Card":        container(n, "div", "bg-card text-card-foreground rounded-xl shadow-sm border border-border p-6"); break;
             case "Grid":        grid(n); break;
             default:            container(n, "div", ""); break;
         }
@@ -89,7 +91,7 @@ final class HtmlRenderer {
     // ---- leaves ----
 
     private void text(WebNode n) {
-        out.append("<p class=\"").append(cls(n, "text-slate-600 leading-relaxed")).append("\">")
+        out.append("<p class=\"").append(cls(n, "text-muted-foreground leading-relaxed")).append("\">")
            .append(esc(n.textContent())).append("</p>");
     }
 
@@ -97,7 +99,7 @@ final class HtmlRenderer {
         int level = Math.max(1, Math.min(6, Props.getInt(n.props, "level", 2)));
         String[] sizes = {"text-4xl", "text-3xl", "text-2xl", "text-xl", "text-lg", "text-base"};
         out.append("<h").append(level).append(" class=\"")
-           .append(cls(n, "font-bold tracking-tight text-slate-900 " + sizes[level - 1])).append("\">")
+           .append(cls(n, "font-bold tracking-tight text-foreground " + sizes[level - 1])).append("\">")
            .append(esc(textOf(n))).append("</h").append(level).append('>');
     }
 
@@ -114,10 +116,10 @@ final class HtmlRenderer {
         String base = "inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium "
                 + "transition focus:outline-none focus:ring-2 focus:ring-offset-1 ";
         base += variant.equals("secondary")
-                ? "bg-slate-100 text-slate-800 hover:bg-slate-200 focus:ring-slate-400"
+                ? "bg-secondary text-secondary-foreground hover:bg-muted focus:ring-ring"
                 : variant.equals("danger")
                 ? "bg-red-600 text-white hover:bg-red-700 focus:ring-red-400"
-                : "bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-400";
+                : "bg-primary text-primary-foreground hover:bg-primary-hover focus:ring-ring";
         out.append("<button class=\"").append(cls(n, base)).append('"')
            .append(handlerAttr(n, "onClick", "data-webink-click"))
            .append('>').append(esc(textOf(n))).append("</button>");
@@ -132,8 +134,8 @@ final class HtmlRenderer {
     }
 
     private void input(WebNode n, String htmlType) {
-        String base = "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm "
-                + "focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400";
+        String base = "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm "
+                + "focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring";
         out.append("<input type=\"").append(htmlType).append('"')
            .append(" placeholder=\"").append(esc(Props.getString(n.props, "placeholder", ""))).append('"')
            .append(" value=\"").append(esc(Props.getString(n.props, "value", ""))).append('"')
@@ -143,8 +145,8 @@ final class HtmlRenderer {
     }
 
     private void textarea(WebNode n) {
-        String base = "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm "
-                + "focus:outline-none focus:ring-2 focus:ring-indigo-400";
+        String base = "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm "
+                + "focus:outline-none focus:ring-2 focus:ring-ring";
         out.append("<textarea rows=\"").append(Props.getInt(n.props, "rows", 3)).append('"')
            .append(" placeholder=\"").append(esc(Props.getString(n.props, "placeholder", ""))).append('"')
            .append(handlerAttr(n, "onChange", "data-webink-change"))
@@ -153,8 +155,8 @@ final class HtmlRenderer {
     }
 
     private void select(WebNode n) {
-        String base = "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white "
-                + "focus:outline-none focus:ring-2 focus:ring-indigo-400";
+        String base = "w-full rounded-lg border border-input bg-background px-3 py-2 text-sm "
+                + "focus:outline-none focus:ring-2 focus:ring-ring";
         out.append("<select").append(handlerAttr(n, "onChange", "data-webink-change"))
            .append(" class=\"").append(cls(n, base)).append("\">");
         Object opts = n.props.get("options");
@@ -255,8 +257,37 @@ final class HtmlRenderer {
                 "inline-block h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-600")).append("\"></div>");
     }
 
+    private void modal(WebNode n) {
+        if (!Props.getBool(n.props, "open", false)) return;
+        String closeId = handlerId(n.props.get("onClose"));
+        boolean closeOnBackdrop = Props.getBool(n.props, "closeOnBackdrop", true) && closeId != null;
+        boolean closeOnEscape = Props.getBool(n.props, "closeOnEscape", true) && closeId != null;
+        boolean showCloseButton = Props.getBool(n.props, "showCloseButton", true);
+        String id = "webink-modal-" + (++modalSeq);
+        String title = Props.getString(n.props, "title", "");
+        out.append("<div class=\"fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50\" data-webink-modal")
+           .append(" data-webink-close-backdrop=\"").append(closeOnBackdrop).append("\"")
+           .append(" data-webink-close-escape=\"").append(closeOnEscape).append("\"")
+           .append(closeId == null ? "" : " data-webink-close=\"" + closeId + "\"")
+           .append("><div role=\"dialog\" aria-modal=\"true\"")
+           .append(title.isEmpty() ? " aria-label=\"Dialog\"" : " aria-labelledby=\"" + id + "-title\"")
+           .append(" tabindex=\"-1\" data-webink-modal-dialog class=\"")
+           .append(cls(n, "w-full bg-card text-card-foreground border border-border rounded-lg shadow-xl p-6"))
+           .append("\" style=\"").append(modalSize(n)).append("\">");
+        if (!title.isEmpty() || showCloseButton) {
+            out.append("<div class=\"flex items-start justify-between gap-4 mb-4\">");
+            if (!title.isEmpty()) out.append("<h2 id=\"").append(id).append("-title\" class=\"text-lg font-semibold\">")
+                    .append(esc(title)).append("</h2>");
+            if (showCloseButton && closeId != null) out.append("<button type=\"button\" aria-label=\"Close\" data-webink-close=\"")
+                    .append(closeId).append("\" class=\"text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring rounded\">&times;</button>");
+            out.append("</div>");
+        }
+        children(n);
+        out.append("</div></div>");
+    }
+
     private void statCard(WebNode n) {
-        out.append("<div class=\"").append(cls(n, "bg-white rounded-xl shadow-sm border border-slate-200 p-5")).append("\">")
+        out.append("<div class=\"").append(cls(n, "bg-card text-card-foreground rounded-xl shadow-sm border border-border p-5")).append("\">")
            .append("<p class=\"text-xs uppercase tracking-wide text-slate-500\">")
            .append(esc(Props.getString(n.props, "label", ""))).append("</p>")
            .append("<p class=\"mt-1 text-3xl font-bold text-slate-900\">")
@@ -291,6 +322,30 @@ final class HtmlRenderer {
         if (fn == null || !runtime.isCallable(fn)) return "";
         String id = runtime.registerHandler(fn);
         return " " + dataAttr + "=\"" + id + "\"";
+    }
+
+    private String handlerId(Object fn) {
+        return fn != null && runtime.isCallable(fn) ? runtime.registerHandler(fn) : null;
+    }
+
+    private String modalSize(WebNode n) {
+        StringBuilder size = new StringBuilder("width:").append(cssSize(n.props.get("width"), "32rem"))
+                .append(";height:").append(cssSize(n.props.get("height"), "auto"));
+        appendSize(size, "min-width", n.props.containsKey("minWidth") ? n.props.get("minWidth") : n.props.get("min"));
+        appendSize(size, "min-height", n.props.get("minHeight"));
+        appendSize(size, "max-width", n.props.containsKey("maxWidth") ? n.props.get("maxWidth") : n.props.get("max"));
+        appendSize(size, "max-height", n.props.get("maxHeight"));
+        return size.toString();
+    }
+
+    private void appendSize(StringBuilder size, String property, Object value) {
+        if (value != null) size.append(';').append(property).append(':').append(cssSize(value, "auto"));
+    }
+
+    private String cssSize(Object value, String fallback) {
+        if (value instanceof Number) return ((Number) value).intValue() + "px";
+        String size = value == null ? fallback : String.valueOf(value).trim();
+        return size.matches("(?:auto|0|[0-9]+(?:px|rem|em|vw|vh|%)?)") ? size : fallback;
     }
 
     static String esc(String s) {

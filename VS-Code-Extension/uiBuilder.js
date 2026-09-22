@@ -120,6 +120,7 @@ class UiBuilderProvider {
 <script nonce="${nonce}" src="${uri('icons.js')}"></script>
 <script nonce="${nonce}" src="${uri('widgets-webink.js')}"></script>
 <script nonce="${nonce}" src="${uri('widgets-terminalink.js')}"></script>
+<script nonce="${nonce}" src="${uri('widgets-desktopink.js')}"></script>
 <script nonce="${nonce}" src="${uri('builder.js')}"></script>
 </body></html>`;
   }

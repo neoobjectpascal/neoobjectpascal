@@ -22,32 +22,37 @@ public final class Renderer {
 
     /** Render the whole tree. {@code size} is the current terminal size for clipping. */
     public static void render(TextGraphics graphics, LaidOutNode root, TerminalSize size) {
-        draw(graphics, root, size.getColumns(), size.getRows());
+        render(graphics, root, size, 0, 0);
     }
 
-    private static void draw(TextGraphics graphics, LaidOutNode laid, int cols, int rows) {
+    /** Render logical coordinates translated into a physical terminal viewport. */
+    public static void render(TextGraphics graphics, LaidOutNode root, TerminalSize size, int offsetX, int offsetY) {
+        draw(graphics, root, size.getColumns(), size.getRows(), offsetX, offsetY);
+    }
+
+    private static void draw(TextGraphics graphics, LaidOutNode laid, int cols, int rows, int offsetX, int offsetY) {
         TuiNode n = laid.node;
         if (n.isText()) {
-            drawText(graphics, laid, cols, rows);
+            drawText(graphics, laid, cols, rows, offsetX, offsetY);
             return;
         }
         if ("ProgressBar".equals(n.type)) {
-            drawProgressBar(graphics, laid, cols, rows);
+            drawProgressBar(graphics, laid, cols, rows, offsetX, offsetY);
             return;
         }
         if (LayoutEngine.hasBorder(n)) {
-            drawBorder(graphics, laid, cols, rows);
+            drawBorder(graphics, laid, cols, rows, offsetX, offsetY);
         }
         for (LaidOutNode child : laid.children) {
-            draw(graphics, child, cols, rows);
+            draw(graphics, child, cols, rows, offsetX, offsetY);
         }
     }
 
-    private static void drawText(TextGraphics graphics, LaidOutNode laid, int cols, int rows) {
+    private static void drawText(TextGraphics graphics, LaidOutNode laid, int cols, int rows, int offsetX, int offsetY) {
         TuiNode n = laid.node;
         LayoutBox b = laid.content;
         String text = n.textContent();
-        int row = b.y;
+        int row = b.y + offsetY;
         if (row < 0 || row >= rows) return;
 
         TextColor fg = Props.getColor(n.props, "color", TextColor.ANSI.DEFAULT);
@@ -61,10 +66,11 @@ public final class Renderer {
         if (Props.getBool(n.props, "bold", false)) graphics.enableModifiers(SGR.BOLD);
         if (Props.getBool(n.props, "inverse", false)) graphics.enableModifiers(SGR.REVERSE);
 
-        int maxWidth = Math.min(b.width, cols - b.x);
-        if (b.x >= 0 && maxWidth > 0 && !text.isEmpty()) {
+        int x = b.x + offsetX;
+        int maxWidth = Math.min(b.width, cols - x);
+        if (x >= 0 && maxWidth > 0 && !text.isEmpty()) {
             String clipped = text.length() > maxWidth ? text.substring(0, maxWidth) : text;
-            graphics.putString(b.x, row, clipped);
+            graphics.putString(x, row, clipped);
         }
 
         graphics.disableModifiers(SGR.BOLD, SGR.REVERSE);
@@ -72,14 +78,15 @@ public final class Renderer {
         graphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
     }
 
-    private static void drawProgressBar(TextGraphics graphics, LaidOutNode laid, int cols, int rows) {
+    private static void drawProgressBar(TextGraphics graphics, LaidOutNode laid, int cols, int rows, int offsetX, int offsetY) {
         TuiNode n = laid.node;
         LayoutBox b = laid.content;
-        int row = b.y;
+        int row = b.y + offsetY;
         if (row < 0 || row >= rows) return;
 
-        int width = Math.min(b.width, cols - b.x);
-        if (b.x < 0 || width <= 0) return;
+        int x = b.x + offsetX;
+        int width = Math.min(b.width, cols - x);
+        if (x < 0 || width <= 0) return;
 
         int value = Math.max(0, Math.min(100, Props.getInt(n.props, "value", 0)));
         int complete = Math.round(value / 100f * width);
@@ -96,12 +103,12 @@ public final class Renderer {
         for (int i = 0; i < width; i++) {
             boolean filled = i < complete;
             graphics.setForegroundColor(filled ? completeColor : remainingColor);
-            put(graphics, b.x + i, row, filled ? completeCh : remainingCh, cols, rows);
+            put(graphics, x + i, row, filled ? completeCh : remainingCh, cols, rows);
         }
         graphics.setForegroundColor(TextColor.ANSI.DEFAULT);
     }
 
-    private static void drawBorder(TextGraphics graphics, LaidOutNode laid, int cols, int rows) {
+    private static void drawBorder(TextGraphics graphics, LaidOutNode laid, int cols, int rows, int offsetX, int offsetY) {
         LayoutBox b = laid.outer;
         if (b.width < 2 || b.height < 2) return; // no room for a frame
 
@@ -110,10 +117,10 @@ public final class Renderer {
         graphics.setForegroundColor(color);
         graphics.setBackgroundColor(TextColor.ANSI.DEFAULT);
 
-        int left = b.x;
-        int right = b.x + b.width - 1;
-        int top = b.y;
-        int bottom = b.y + b.height - 1;
+        int left = b.x + offsetX;
+        int right = left + b.width - 1;
+        int top = b.y + offsetY;
+        int bottom = top + b.height - 1;
 
         // Corners
         put(graphics, left, top, g[0], cols, rows);

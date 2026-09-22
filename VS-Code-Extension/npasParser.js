@@ -6,7 +6,7 @@
 
 // Props whose value is a handler reference (`@name`) rather than an expression.
 // Mirrors the event list used by the builder webview.
-const EVENT_PROPS = new Set(['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel']);
+const EVENT_PROPS = new Set(['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel', 'onClose']);
 
 // TerminalInk widgets that codegen emits with a positional argument.
 const TK_TEXT = new Set(['Text', 'Badge', 'StatusMessage', 'Alert']);
@@ -266,7 +266,7 @@ function parse(src) {
 
     let m = /^uses\s+([A-Za-z_][A-Za-z0-9_.]*)\s*;$/.exec(line);
     if (m) {
-      target = m[1] === 'terminalink' ? 'terminalink' : 'webink';
+      target = m[1] === 'terminalink' ? 'terminalink' : m[1] === 'desktopink' ? 'desktopink' : 'webink';
       i++; continue;
     }
 
@@ -353,7 +353,7 @@ function parse(src) {
   if (first.kind === 'record') {
     for (const [key, v] of first.entries) {
       if (v.kind !== 'raw' || !IDENT.test(v.value)) fail('rota "' + key + '" não aponta para uma tela');
-      screenOrder.push({ name: v.value, route: target === 'terminalink' ? '' : key });
+      screenOrder.push({ name: v.value, route: target === 'webink' ? key : '' });
     }
   } else if (first.kind === 'raw' && IDENT.test(first.value)) {
     screenOrder.push({ name: first.value, route: '' });
@@ -367,6 +367,12 @@ function parse(src) {
   if (titleArg && titleArg.kind === 'record') {
     const props = recordToProps(titleArg);
     if (props.title !== undefined) model.title = props.title;
+    if (target === 'desktopink') {
+      model.desktop = {};
+      for (const key of ['centered', 'maximized', 'width', 'height', 'theme']) {
+        if (props[key] !== undefined) model.desktop[key] = props[key];
+      }
+    }
   }
 
   for (const s of state) {
@@ -397,7 +403,18 @@ function parse(src) {
     if (!m) fail('a tela "' + s.name + '" não é um "return <componente>;"');
     const reader = new Reader(m[1]);
     const root = toNode(reader.value(), target, nextId);
-    model.screens.push({ route: s.route, name: s.name, root: root });
+    // codegen places modal declarations at the screen root. Restore the
+    // builder model boundary while preserving each modal's editable root node.
+    const modals = (root.children || []).filter((n) => n.type === 'Modal')
+      .map((modal, index) => {
+        const name = modal.props.name || 'modal' + (index + 1);
+        delete modal.props.name;
+        return { name: name, root: modal };
+      });
+    if (modals.length) root.children = root.children.filter((n) => n.type !== 'Modal');
+    const screen = { route: s.route, name: target === 'desktopink' ? 'screen' : s.name, root: root };
+    if (modals.length) screen.modals = modals;
+    model.screens.push(screen);
   }
   if (!model.screens.length) fail('nenhuma tela encontrada');
 

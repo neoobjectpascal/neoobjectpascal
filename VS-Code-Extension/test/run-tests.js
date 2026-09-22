@@ -61,6 +61,29 @@ const terminalink = {
     { name: 'sobre', route: '', root: { type: 'VBox', props: {}, children: [{ type: 'Text', props: { text: 'Sobre' } }] } },
   ],
 };
+const modalModel = {
+  xnpas: 1, target: 'webink',
+  state: [{ name: 'confirmacaoAberta', type: 'Boolean', initial: 'false' }],
+  handlers: [
+    { name: 'abrirConfirmacao', returns: 'Boolean', params: [], body: 'confirmacaoAberta := true;\nreturn true;' },
+    { name: 'fecharConfirmacao', returns: 'Boolean', params: [], body: 'confirmacaoAberta := false;\nreturn true;' },
+  ],
+  screens: [{ route: '/', name: 'home', root: { type: 'Page', props: {}, children: [
+    { type: 'Button', props: { text: 'Abrir', onClick: '@abrirConfirmacao' } },
+  ] }, modals: [{ name: 'confirmacao', root: { type: 'Modal', props: {
+    title: 'Confirmar', open: '=confirmacaoAberta', onClose: '@fecharConfirmacao', closeOnBackdrop: true,
+  }, children: [{ type: 'Text', props: { text: 'Tem certeza?' } }] } }] }],
+};
+const desktopink = {
+  xnpas: 1, target: 'desktopink', title: 'Desktop Acme',
+  desktop: { centered: true, maximized: false, width: 1024, height: 720, theme: 'dark' },
+  state: [{ name: 'mostrarAjuda', type: 'Boolean', initial: 'false' }], handlers: [],
+  screens: [{ name: 'screen', route: '', root: { type: 'Window', props: {}, children: [
+    { type: 'Heading', props: { text: 'Painel', level: 1 } },
+  ] }, modals: [{ name: 'ajuda', root: { type: 'Modal', props: { title: 'Ajuda', open: '=mostrarAjuda' }, children: [
+    { type: 'Text', props: { text: 'Conteúdo' } },
+  ] } }] }],
+};
 
 // ── codegen golden tests ──────────────────────────────────────────────────────
 console.log('Codegen — WebInk');
@@ -77,6 +100,16 @@ t('Chart data aninhado', () => has(w, 'data: #{ labels: ["Jan"], datasets: [#{ l
 t('escape de aspas no texto', () => has(w, 'text: "Ok \\"x\\""'));
 t('container vazio (WebInk sem filhos)', () => has(w, 'return Page(#{});'));
 
+console.log('Codegen — modais');
+const modalSrc = gen(modalModel);
+t('modal de screen.modals é anexado à raiz', () => has(modalSrc, 'Modal(#{ name: "confirmacao", title: "Confirmar", open: confirmacaoAberta, onClose: fecharConfirmacao, closeOnBackdrop: true }, ['));
+t('ações de abrir e fechar usam estado booleano', () => { has(modalSrc, 'confirmacaoAberta := true;'); has(modalSrc, 'confirmacaoAberta := false;'); });
+
+console.log('Codegen — DesktopInk');
+const desk = gen(desktopink);
+t('uses desktopink e render de tela única', () => { has(desk, 'uses desktopink;'); has(desk, 'render(#{ screen: screen }, #{ title: "Desktop Acme", centered: true, maximized: false, width: 1024, height: 720, theme: "dark" });'); });
+t('DesktopInk anexa modal à janela', () => has(desk, 'Modal(#{ name: "ajuda", title: "Ajuda", open: mostrarAjuda }, ['));
+
 console.log('Codegen — TerminalInk');
 const tk = gen(terminalink);
 t('uses terminalink', () => has(tk, 'uses terminalink;'));
@@ -88,6 +121,14 @@ t('lista expandida em Item', () => { has(tk, 'UnorderedList(#{ marker: "-" }, ['
 t('VBox vazio', () => has(tk, 'VBox(#{}, [])'));
 t('ConfirmInput onConfirm', () => has(tk, 'ConfirmInput(#{ onConfirm: irSobre })'));
 t('navigate no handler', () => has(tk, 'navigate("sobre");'));
+const terminalModal = {
+  xnpas: 1, target: 'terminalink', state: [], handlers: [],
+  screens: [{ name: 'ui', route: '', root: { type: 'VBox', props: {}, children: [] }, modals: [
+    { name: 'ajuda', root: { type: 'Modal', props: { title: 'Ajuda', open: false }, children: [{ type: 'Text', props: { text: 'Atalhos' } }] } },
+  ] }],
+};
+const tm = gen(terminalModal);
+t('TerminalInk emite Modal com conteúdo', () => has(tm, 'Modal(#{ name: "ajuda", title: "Ajuda", open: false }, ['));
 
 console.log('Codegen — visible / fx-binding / foco');
 // visible como condição (fx) e como false fixo.
@@ -166,6 +207,9 @@ roundTrip('TerminalInk', terminalink);
 roundTrip('visible/fx', visModel);
 roundTrip('dados vinculados (fx)', fxModel);
 roundTrip('foco TerminalInk', focusModel);
+roundTrip('modais', modalModel);
+roundTrip('modal TerminalInk', terminalModal);
+roundTrip('DesktopInk', desktopink);
 
 const rtW = parse(gen(webink));
 t('target e rotas preservados', () => {
@@ -221,6 +265,21 @@ t('expressão com operador não vira string', () => {
   const n = parse(gen(m)).screens[0].root.children[0];
   if (n.props.text !== '="Olá, " + nome') throw new Error(JSON.stringify(n.props.text));
 });
+const rtModal = parse(modalSrc);
+t('modal volta para screen.modals com conteúdo e onClose', () => {
+  const modal = rtModal.screens[0].modals[0];
+  if (!modal || modal.root.type !== 'Modal') throw new Error('modal ausente');
+  if (modal.name !== 'confirmacao') throw new Error('nome: ' + modal.name);
+  if (modal.root.props.open !== '=confirmacaoAberta') throw new Error('open: ' + modal.root.props.open);
+  if (modal.root.props.onClose !== '@fecharConfirmacao') throw new Error('onClose: ' + modal.root.props.onClose);
+  if (modal.root.children[0].props.text !== 'Tem certeza?') throw new Error('conteúdo do modal perdido');
+});
+const rtDesk = parse(desk);
+t('DesktopInk restaura opções, tela e modal', () => {
+  if (rtDesk.target !== 'desktopink' || rtDesk.screens[0].name !== 'screen') throw new Error(JSON.stringify(rtDesk));
+  if (rtDesk.title !== 'Desktop Acme' || rtDesk.desktop.theme !== 'dark' || rtDesk.desktop.width !== 1024) throw new Error(JSON.stringify(rtDesk.desktop));
+  if (rtDesk.screens[0].modals[0].name !== 'ajuda') throw new Error('modal não preservado');
+});
 
 console.log('Round-trip — recusas');
 t('isGenerated só aceita arquivo com a marca', () => {
@@ -266,6 +325,7 @@ const NpI18n = require('../media/i18n');
 require('../media/i18n'); // also attaches global.NpI18n
 require('../media/widgets-webink');
 require('../media/widgets-terminalink');
+require('../media/widgets-desktopink');
 t('5 idiomas (pt/en/de/fr/it)', () => {
   if (NpI18n.langs.join(',') !== 'pt,en,de,fr,it') throw new Error('idiomas: ' + NpI18n.langs);
 });
@@ -287,9 +347,9 @@ t('placeholders {name}/{base} preservados na tradução', () => {
 t('todos os rótulos de campo e grupos têm tradução (de)', () => {
   const KEEP = new Set(['className (Tailwind)', 'Padding', 'Placeholder', 'Layout', 'Feedback',
     'Delta (opcional)', 'Rota (href)', 'Variante']);
-  const EVENTS = new Set(['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel']);
+   const EVENTS = new Set(['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel', 'onClose']);
   const miss = [];
-  for (const R of [global.WebInkWidgets, global.TerminalInkWidgets]) {
+  for (const R of [global.WebInkWidgets, global.TerminalInkWidgets, global.DesktopInkWidgets]) {
     for (const g of R.groups) if (NpI18n.tr(g, 'de') === g && !KEEP.has(g)) miss.push('grupo ' + g);
     for (const def of Object.values(R.defs))
       for (const f of (def.fields || []))

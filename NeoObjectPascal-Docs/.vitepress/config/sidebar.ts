@@ -10,6 +10,7 @@ export interface SidebarLabels {
   features: string
   terminalink: string
   webink: string
+  desktopink: string
   testing: string
   reference: string
   // getting-started
@@ -45,6 +46,10 @@ export interface SidebarLabels {
   // webink
   webinkIntro: string
   webinkComponents: string
+  // desktopink
+  desktopinkIntro: string
+  desktopinkComponents: string
+  // desktopink
   // testing & tools
   unitTesting: string
   debuggingTools: string
@@ -119,6 +124,14 @@ export function buildSidebar(base: string, l: SidebarLabels): DefaultTheme.Sideb
       items: [
         { text: l.webinkIntro, link: p('webink/introduction') },
         { text: l.webinkComponents, link: p('webink/components') }
+      ]
+    },
+    {
+      text: l.desktopink,
+      collapsed: false,
+      items: [
+        { text: l.desktopinkIntro, link: p('desktopink/introduction') },
+        { text: l.desktopinkComponents, link: p('desktopink/components') }
       ]
     },
     {

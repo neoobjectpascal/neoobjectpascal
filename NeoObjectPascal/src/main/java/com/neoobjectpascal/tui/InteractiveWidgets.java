@@ -62,7 +62,7 @@ public final class InteractiveWidgets {
             int index = ctx.registerFocusable(key, handler);
             boolean focused = ctx.isFocused(index);
 
-            return expandTextInput(state, props, focused);
+            return focusableNode(expandTextInput(state, props, focused), key);
         };
     }
 
@@ -169,7 +169,7 @@ public final class InteractiveWidgets {
             KeyHandler handler = k -> handleSelectKey(state, options, props, interp, k);
             ctx.registerFocusable(key, handler);
 
-            return expandSelect(state, options, props);
+            return focusableNode(expandSelect(state, options, props), key);
         };
     }
 
@@ -281,6 +281,12 @@ public final class InteractiveWidgets {
         }
     }
 
+    /** Marks an expanded interactive subtree so the runtime can apply a modal focus scope. */
+    private static TuiNode focusableNode(TuiNode node, String key) {
+        node.props.put("_focusKey", key);
+        return node;
+    }
+
     // =================================================================== PasswordInput
 
     /** {@code PasswordInput(props?)} — same editing as TextInput, masked with '*'. */
@@ -295,7 +301,7 @@ public final class InteractiveWidgets {
             int index = ctx.registerFocusable(key, handler);
             boolean focused = ctx.isFocused(index);
 
-            return expandPasswordInput(state, props, focused);
+            return focusableNode(expandPasswordInput(state, props, focused), key);
         };
     }
 
@@ -337,7 +343,7 @@ public final class InteractiveWidgets {
             int index = ctx.registerFocusable(key, handler);
             boolean focused = ctx.isFocused(index);
 
-            return expandEmailInput(state, props, domains, focused);
+            return focusableNode(expandEmailInput(state, props, domains, focused), key);
         };
     }
 
@@ -433,7 +439,7 @@ public final class InteractiveWidgets {
             KeyHandler handler = k -> handleConfirmInputKey(props, interp, k);
             ctx.registerFocusable(key, handler);
 
-            return expandConfirmInput(props);
+            return focusableNode(expandConfirmInput(props), key);
         };
     }
 
@@ -506,7 +512,7 @@ public final class InteractiveWidgets {
             KeyHandler handler = k -> handleMultiSelectKey(state, options, props, interp, k);
             ctx.registerFocusable(key, handler);
 
-            return expandMultiSelect(state, options, props);
+            return focusableNode(expandMultiSelect(state, options, props), key);
         };
     }
 

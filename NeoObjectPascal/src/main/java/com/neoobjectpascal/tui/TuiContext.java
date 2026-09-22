@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -40,6 +41,8 @@ public final class TuiContext {
 
     /** Currently focused index into {@link #focusables}; SURVIVES across frames. */
     public int focusIndex = 0;
+    private String focusKey;
+    private Set<String> focusScope;
 
     /** Whether an {@code autoFocus} request already ran (one-shot; never reset). */
     private boolean initialFocusApplied = false;
@@ -117,8 +120,9 @@ public final class TuiContext {
     /** Move focus to the focusable whose {@code key} matches; returns true if found. */
     public boolean focusByKey(String key) {
         for (int i = 0; i < focusables.size(); i++) {
-            if (java.util.Objects.equals(focusables.get(i).key, key)) {
+            if (java.util.Objects.equals(focusables.get(i).key, key) && inScope(focusables.get(i))) {
                 focusIndex = i;
+                focusKey = key;
                 return true;
             }
         }
@@ -139,36 +143,58 @@ public final class TuiContext {
     }
 
     public int focusableCount() {
-        return focusables.size();
+        int count = 0;
+        for (Focusable focusable : focusables) if (inScope(focusable)) count++;
+        return count;
     }
+
+    /** Restrict keyboard focus to these keys while a modal is active. */
+    void setFocusScope(Set<String> keys) { focusScope = keys; }
+
+    void clearFocusScope() { focusScope = null; }
+
+    String focusedKey() { return focusKey; }
 
     /** Clamp {@link #focusIndex} into range after a build. */
     void clampFocus() {
-        if (focusables.isEmpty()) {
+        if (focusables.isEmpty() || focusableCount() == 0) {
             focusIndex = 0;
-        } else if (focusIndex < 0) {
-            focusIndex = 0;
-        } else if (focusIndex >= focusables.size()) {
-            focusIndex = focusables.size() - 1;
+            return;
+        }
+        if (focusKey != null && focusByKey(focusKey)) return;
+        if (focusIndex >= 0 && focusIndex < focusables.size() && inScope(focusables.get(focusIndex))) {
+            focusKey = focusables.get(focusIndex).key;
+            return;
+        }
+        for (int i = 0; i < focusables.size(); i++) {
+            if (inScope(focusables.get(i))) { focusIndex = i; focusKey = focusables.get(i).key; return; }
         }
     }
 
     /** Move focus by {@code delta} with wrap-around. */
     void cycleFocus(int delta) {
-        int n = focusables.size();
-        if (n <= 0) {
+        List<Integer> eligible = new ArrayList<>();
+        for (int i = 0; i < focusables.size(); i++) if (inScope(focusables.get(i))) eligible.add(i);
+        if (eligible.isEmpty()) {
             return;
         }
-        focusIndex = ((focusIndex + delta) % n + n) % n;
+        int current = eligible.indexOf(focusIndex);
+        if (current < 0) current = 0;
+        focusIndex = eligible.get(((current + delta) % eligible.size() + eligible.size()) % eligible.size());
+        focusKey = focusables.get(focusIndex).key;
     }
 
     /** Offer a key to the focused focusable; true if it consumed it. */
     boolean dispatchToFocused(KeyStroke key) {
-        if (focusIndex < 0 || focusIndex >= focusables.size()) {
+        if (focusIndex < 0 || focusIndex >= focusables.size() || !inScope(focusables.get(focusIndex))) {
             return false;
         }
         KeyHandler h = focusables.get(focusIndex).handler;
         return h != null && h.handleKey(key);
+    }
+
+    private boolean inScope(Focusable focusable) {
+        return focusScope == null || focusScope.contains(focusable.key);
     }
 
     /** A registered focusable: its stable key and the key handler bound to its state. */

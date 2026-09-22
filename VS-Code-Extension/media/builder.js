@@ -5,7 +5,11 @@
 (function () {
   'use strict';
   const vscode = acquireVsCodeApi();
-  const TARGETS = { webink: WebInkWidgets, terminalink: (typeof TerminalInkWidgets !== 'undefined' ? TerminalInkWidgets : WebInkWidgets) };
+   const TARGETS = {
+     webink: WebInkWidgets,
+     terminalink: (typeof TerminalInkWidgets !== 'undefined' ? TerminalInkWidgets : WebInkWidgets),
+     desktopink: (typeof DesktopInkWidgets !== 'undefined' ? DesktopInkWidgets : WebInkWidgets),
+   };
   let W = WebInkWidgets;   // active widget registry (switches with model.target)
   const icon = (n, o) => NpIcons.get(n, o);
 
@@ -20,7 +24,8 @@
   let model = scaffold();
   let sel = null;        // selected node id
   let tab = 'props';     // props | state | events
-  let screenIdx = 0;
+   let screenIdx = 0;
+   let modalIdx = -1;    // -1 edits the screen root; otherwise edits screen.modals[index]
   let applyingRemote = false;
   // Texts we posted to the extension. The extension echoes each change back as
   // an 'init'; we must ignore our own echoes, otherwise a full re-render on every
@@ -56,14 +61,18 @@
     else { const m = /^n(\d+)$/.exec(node.id); if (m) idSeq = Math.max(idSeq, +m[1] + 1); }
     (node.children || []).forEach(ensureIds);
   }
-  function curScreen() { return model.screens[screenIdx] || model.screens[0]; }
+   function curScreen() { return model.screens[screenIdx] || model.screens[0]; }
+   function curRoot() {
+     const s = curScreen();
+     return modalIdx >= 0 && s.modals && s.modals[modalIdx] ? s.modals[modalIdx].root : s.root;
+   }
   function find(node, id, parent) {
     if (!node) return null;
     if (node.id === id) return { node, parent };
     for (const c of (node.children || [])) { const r = find(c, id, node); if (r) return r; }
     return null;
   }
-  function selected() { const s = curScreen(); return sel ? find(s.root, sel) : null; }
+   function selected() { return sel ? find(curRoot(), sel) : null; }
 
   function push() {
     if (applyingRemote) return;
@@ -72,7 +81,7 @@
     pending.add(text);
     vscode.postMessage({ type: 'update', text });
   }
-  const EVENT_PROPS = ['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel'];
+   const EVENT_PROPS = ['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel', 'onClose'];
   function pruneHandlers() {
     const used = new Set();
     const walk = (n) => {
@@ -82,7 +91,10 @@
       }
       (n.children || []).forEach(walk);
     };
-    model.screens.forEach((s) => walk(s.root));
+     model.screens.forEach((s) => {
+       walk(s.root);
+       (s.modals || []).forEach((m) => walk(m.root));
+     });
     model.handlers = (model.handlers || []).filter((h) => used.has(h.name));
   }
 
@@ -101,17 +113,24 @@
 
   function renderToolbar() {
     const tb = el('#toolbar');
-    const screens = model.screens.map((s, i) =>
-      `<option value="${i}" ${i === screenIdx ? 'selected' : ''}>${s.route ? esc(s.route) + ' · ' : ''}${esc(s.name)}</option>`).join('');
+     const screens = model.screens.map((s, i) => {
+       const root = `<option value="s:${i}" ${i === screenIdx && modalIdx < 0 ? 'selected' : ''}>${s.route ? esc(s.route) + ' · ' : ''}${esc(s.name)}</option>`;
+       const modals = (s.modals || []).map((m, j) => `<option value="m:${i}:${j}" ${i === screenIdx && j === modalIdx ? 'selected' : ''}>  ${esc(t('Modal'))}: ${esc(m.name)}</option>`).join('');
+       return root + modals;
+     }).join('');
     const term = model.target === 'terminalink';
+    const desktop = model.target === 'desktopink';
     const langOpts = NpI18n.langs.map((l) => `<option value="${l}" ${l === LANG ? 'selected' : ''}>${esc(LANG_NAMES[l] || l)}</option>`).join('');
     tb.innerHTML =
       `<div class="seg">
-         <button id="tgWeb" class="${term ? '' : 'active'}">WebInk</button>
+         <button id="tgWeb" class="${term || desktop ? '' : 'active'}">WebInk</button>
          <button id="tgTerm" class="${term ? 'active' : ''}">TerminalInk</button>
+         <button id="tgDesk" class="${desktop ? 'active' : ''}">DesktopInk</button>
        </div>
-       <div class="route">${icon('route')}<select id="routeSel">${screens}</select></div>
-       <button class="tbtn icon" id="addScreen" title="${esc(term ? t('Nova tela') : t('Nova rota/tela'))}">${icon('plus')}</button>
+        <div class="route">${icon('route')}<select id="routeSel">${screens}</select></div>
+         <button class="tbtn icon" id="addScreen" ${desktop ? 'disabled' : ''} title="${esc(term ? t('Nova tela') : t('Nova rota/tela'))}">${icon('plus')}</button>
+        <button class="tbtn" id="addModal">${icon('plus', { s: 13 })} ${esc(t('Modal'))}</button>
+        ${modalIdx >= 0 ? `<button class="tbtn icon" id="delModal" title="${esc(t('Remover modal'))}">${icon('trash')}</button>` : ''}
        <div class="spring"></div>
        <div class="lang" title="${esc(t('Idioma'))}">${icon('globe', { s: 14 })}<select id="langSel">${langOpts}</select></div>
        <div class="sync">${icon('check', { s: 14 })} ${esc(t(SYNC === 'bidirectional' ? 'sincroniza com o .npas nos dois sentidos' : 'sincroniza com o .npas ao salvar'))}</div>
@@ -120,8 +139,14 @@
        <button class="tbtn run" id="run">${icon('play', { s: 14 })} ${esc(t('Rodar ao vivo'))}</button>`;
     el('#tgWeb').onclick = () => setTarget('webink');
     el('#tgTerm').onclick = () => setTarget('terminalink');
-    el('#routeSel').onchange = (e) => { screenIdx = +e.target.value; sel = null; render(); };
-    el('#addScreen').onclick = addScreen;
+    el('#tgDesk').onclick = () => setTarget('desktopink');
+     el('#routeSel').onchange = (e) => {
+       const parts = e.target.value.split(':'); screenIdx = +parts[1]; modalIdx = parts[0] === 'm' ? +parts[2] : -1;
+       sel = null; render();
+     };
+     el('#addScreen').onclick = addScreen;
+     el('#addModal').onclick = addModal;
+     if (el('#delModal')) el('#delModal').onclick = deleteModal;
     el('#langSel').onchange = (e) => setLang(e.target.value);
     el('#undo').onclick = () => vscode.postMessage({ type: 'undo' });
     el('#redo').onclick = () => vscode.postMessage({ type: 'redo' });
@@ -235,17 +260,17 @@
 
   function renderCanvas() {
     const stage = el('#stage');
-    const s = curScreen();
-    const term = model.target === 'terminalink';
-    const empty = !(s.root.children && s.root.children.length);
+     const rootNode = curRoot();
+     const term = model.target === 'terminalink';
+     const empty = !(rootNode.children && rootNode.children.length);
     const device = document.createElement('div'); device.className = 'device' + (term ? ' device-term' : '');
     const root = document.createElement('div'); root.className = term ? 'tk-root' : 'wk-root';
-    root.appendChild(buildNode(s.root, true));
+     root.appendChild(buildNode(rootNode, true));
     device.appendChild(root);
     if (empty) {
       const e = document.createElement('div'); e.className = 'empty';
       e.innerHTML = t('Arraste um componente da paleta para dentro do {name} para começar.')
-        .replace('{name}', '<b>' + esc(s.root.type) + '</b>');
+         .replace('{name}', '<b>' + esc(rootNode.type) + '</b>');
       device.appendChild(e);
     }
     stage.innerHTML = ''; stage.appendChild(device);
@@ -270,11 +295,11 @@
     stage.onscroll = positionTag;
     stage.onclick = () => { if (sel) { sel = null; render(); } };
   }
-  function nodeType(id) { const r = find(curScreen().root, id); return r ? r.node.type : null; }
+   function nodeType(id) { const r = find(curRoot(), id); return r ? r.node.type : null; }
 
   function addChild(containerId, widgetType, index) {
     const def = W.def(widgetType); if (!def) return;
-    const r = find(curScreen().root, containerId); if (!r) return;
+     const r = find(curRoot(), containerId); if (!r) return;
     const n = { id: 'n' + (idSeq++), type: widgetType, props: Object.assign({}, def.defaultProps) };
     if (def.container) n.children = [];
     r.node.children = r.node.children || [];
@@ -284,10 +309,10 @@
   }
   function moveNode(moveId, targetId, index) {
     if (moveId === targetId) return;
-    const src = find(curScreen().root, moveId);
+     const src = find(curRoot(), moveId);
     if (!src || !src.parent) return;             // never move a screen root
     if (find(src.node, targetId)) return;        // never move into own subtree
-    const target = find(curScreen().root, targetId);
+     const target = find(curRoot(), targetId);
     if (!target || !W.isContainer(target.node.type)) return;
     const sameParent = src.parent === target.node;
     const oldIndex = src.parent.children.indexOf(src.node);
@@ -300,7 +325,7 @@
     sel = moveId; render(); push();
   }
   function removeNode(id) {
-    const r = find(curScreen().root, id);
+     const r = find(curRoot(), id);
     if (!r || !r.parent) return; // never remove the Page root
     r.parent.children = r.parent.children.filter((c) => c.id !== id);
     if (sel === id) sel = null;
@@ -530,14 +555,30 @@
     inc: { label: 'Incrementar variável', needsVar: true, body: (v) => `${v} := ${v} + 1;\nreturn true;` },
     set: { label: 'Definir variável', needsVar: true, needsValue: true, body: (v, val) => `${v} := ${val};\nreturn true;` },
     fromInput: { label: 'Usar valor do input', needsVar: true, param: 'v', body: (v) => `${v} := v;\nreturn true;` },
-    nav: { label: 'Ir para rota', needsRoute: true, body: (v, val, route) => `navigate("${route}");\nreturn true;` },
-    focus: { label: 'Focar componente', needsKey: true, term: true, body: (v, val, route, key) => `focus("${key}");\nreturn true;` },
-  };
+     nav: { label: 'Ir para rota', needsRoute: true, body: (v, val, route) => `navigate("${route}");\nreturn true;` },
+     focus: { label: 'Focar componente', needsKey: true, term: true, body: (v, val, route, key) => `focus("${key}");\nreturn true;` },
+     openModal: { label: 'Abrir modal', needsModal: true, body: (v, val, route, key, modal) => `${modal} := true;\nreturn true;` },
+     closeModal: { label: 'Fechar modal', needsModal: true, body: (v, val, route, key, modal) => `${modal} := false;\nreturn true;` },
+   };
+   function allModals() {
+     const out = [];
+     model.screens.forEach((s) => (s.modals || []).forEach((m) => out.push({ screen: s, modal: m })));
+     return out;
+   }
+   function modalState(entry) {
+     const open = entry.modal.root.props.open;
+     if (isBound(open) && /^[A-Za-z_][A-Za-z0-9_]*$/.test(open.slice(1))) return open.slice(1);
+     const base = String(entry.modal.name || 'modal').replace(/[^A-Za-z0-9_]/g, '_').replace(/^[^A-Za-z_]/, '_');
+     const name = base + 'Aberto';
+     if (!(model.state || []).some((s) => s.name === name)) model.state.push({ name, type: 'Boolean', initial: 'false' });
+     entry.modal.root.props.open = '=' + name;
+     return name;
+   }
   // Keys defined on components of the current screen (targets for the focus action).
   function focusKeys() {
     const keys = [];
     const walk = (n) => { const k = n.props && n.props.key; if (k && !isBound(k)) keys.push(k); (n.children || []).forEach(walk); };
-    walk(curScreen().root);
+     walk(curRoot());
     return keys;
   }
   function handlerOf(node, ev) {
@@ -551,8 +592,10 @@
     if (b === '' || b === 'return true;' || b === 'return true') return { action: 'none' };
     let m;
     if ((m = /^(\w+) := \1 \+ 1;/.exec(b))) return { action: 'inc', varName: m[1] };
-    if ((m = /^navigate\("([^"]*)"\);/.exec(b))) return { action: 'nav', route: m[1] };
-    if ((m = /^focus\("([^"]*)"\);/.exec(b))) return { action: 'focus', key: m[1] };
+     if ((m = /^navigate\("([^"]*)"\);/.exec(b))) return { action: 'nav', route: m[1] };
+     if ((m = /^focus\("([^"]*)"\);/.exec(b))) return { action: 'focus', key: m[1] };
+     if ((m = /^(\w+) := true;/.exec(b)) && allModals().some((x) => isBound(x.modal.root.props.open) && x.modal.root.props.open.slice(1) === m[1])) return { action: 'openModal', modal: m[1] };
+     if ((m = /^(\w+) := false;/.exec(b)) && allModals().some((x) => isBound(x.modal.root.props.open) && x.modal.root.props.open.slice(1) === m[1])) return { action: 'closeModal', modal: m[1] };
     if ((m = /^(\w+) := v;/.exec(b))) return { action: 'fromInput', varName: m[1] };
     if ((m = /^(\w+) := (.+);/.exec(b))) return { action: 'set', varName: m[1], value: m[2] };
     return { action: 'code' };
@@ -581,12 +624,20 @@
       const a = ACTIONS[st.action] || ACTIONS.none;
       if (a.needsVar) html += `<select data-role="var" style="max-width:120px">${varOpts || '<option>' + esc(t('(sem variáveis)')) + '</option>'}</select>`;
       if (a.needsRoute) html += `<select data-role="route" style="max-width:120px">${routeOpts}</select>`;
-      if (a.needsKey) {
+       if (a.needsKey) {
         const keys = focusKeys();
         const keyOpts = keys.length ? keys.map((k) => `<option ${k === st.key ? 'selected' : ''}>${esc(k)}</option>`).join('')
           : '<option value="">' + esc(t('(defina "Chave" nos componentes)')) + '</option>';
-        html += `<select data-role="key" style="max-width:140px">${keyOpts}</select>`;
-      }
+         html += `<select data-role="key" style="max-width:140px">${keyOpts}</select>`;
+       }
+       if (a.needsModal) {
+         const modals = allModals();
+         const modalOpts = modals.length ? modals.map((m) => {
+           const state = isBound(m.modal.root.props.open) ? m.modal.root.props.open.slice(1) : '';
+           return `<option value="${escAttr(m.modal.name)}" ${state === st.modal ? 'selected' : ''}>${esc(m.modal.name)}</option>`;
+         }).join('') : `<option value="">${esc(t('(crie um modal primeiro)'))}</option>`;
+         html += `<select data-role="modal" style="max-width:140px">${modalOpts}</select>`;
+       }
       html += `</div>`;
       if (a.needsValue) html += `<div class="evt-row" style="margin-top:6px"><input type="text" data-role="value" placeholder="${escAttr(t('valor (ex.: 10 ou "texto")'))}" value="${st.value ? escAttr(st.value) : ''}"></div>`;
       if (h) html += `<div class="code">${esc(previewHandler(h))}</div>`;
@@ -604,7 +655,7 @@
   function ensureHandler(node, ev) {
     let h = handlerOf(node, ev);
     if (h) return h;
-    const base = ev === 'onClick' ? 'aoClicar' : ev === 'onSubmit' ? 'aoEnviar' : 'aoMudar';
+     const base = ev === 'onClick' ? 'aoClicar' : ev === 'onSubmit' ? 'aoEnviar' : ev === 'onClose' ? 'aoFechar' : 'aoMudar';
     let name = base, i = 2;
     const taken = new Set((model.handlers || []).map((x) => x.name));
     while (taken.has(name)) name = base + (i++);
@@ -632,10 +683,14 @@
         const h = ensureHandler(node, ev);
         const vn = box.querySelector('[data-role=var]') ? box.querySelector('[data-role=var]').value : '';
         const route = box.querySelector('[data-role=route]') ? box.querySelector('[data-role=route]').value : '/';
-        const value = box.querySelector('[data-role=value]') ? box.querySelector('[data-role=value]').value : '';
-        const key = box.querySelector('[data-role=key]') ? box.querySelector('[data-role=key]').value : '';
-        h.params = a.param ? [a.param] : [];
-        h.body = a.body ? a.body(vn, value, route, key) : 'return true;';
+         const value = box.querySelector('[data-role=value]') ? box.querySelector('[data-role=value]').value : '';
+         const key = box.querySelector('[data-role=key]') ? box.querySelector('[data-role=key]').value : '';
+         const modalName = box.querySelector('[data-role=modal]') ? box.querySelector('[data-role=modal]').value : '';
+         const modal = allModals().find((m) => m.modal.name === modalName);
+         const modalVar = a.needsModal && modal ? modalState(modal) : '';
+         if (a.needsModal && !modalVar) return;
+         h.params = a.param ? [a.param] : [];
+         h.body = a.body ? a.body(vn, value, route, key, modalVar) : 'return true;';
         renderPropsTab(el('#ibody')); wireFields(el('#ibody'), node); renderCanvas(); push();
       };
       box.querySelectorAll('[data-role]').forEach((c) => { c.onchange = applyNocode; });
@@ -699,19 +754,45 @@
     model.target = target;
     W = TARGETS[target];
     // Widget sets differ between targets, so reset each screen to a fresh root.
-    model.screens.forEach((s) => { s.root = W.scaffoldRoot(); ensureIds(s.root); });
-    sel = null; render(); push();
+     model.screens.forEach((s) => {
+       s.root = W.scaffoldRoot(); ensureIds(s.root);
+       // Modal content uses target-specific widgets too, so discard it with the
+       // screen rather than leaving a tree the new target cannot render.
+       s.modals = [];
+     });
+     if (target === 'desktopink') {
+       model.screens = [{ route: '', name: 'screen', root: W.scaffoldRoot(), modals: [] }];
+       ensureIds(model.screens[0].root);
+       model.desktop = Object.assign({ centered: true, maximized: false, width: 900, height: 650, theme: 'light' }, model.desktop);
+     }
+     modalIdx = -1; sel = null; render(); push();
   }
-  function addScreen() {
+   function addScreen() {
+     if (model.target === 'desktopink') return;
     const term = model.target === 'terminalink';
     let name = term ? 'tela' : 'tela', i = 2; const taken = new Set(model.screens.map((s) => s.name));
     while (taken.has(name)) name = 'tela' + (i++);
     const route = term ? '' : '/' + name;
-    const sc = { route, name, root: W.scaffoldRoot() };
+     const sc = { route, name, root: W.scaffoldRoot(), modals: [] };
     ensureIds(sc.root);
     model.screens.push(sc);
-    screenIdx = model.screens.length - 1; sel = null; render(); push();
-  }
+     screenIdx = model.screens.length - 1; modalIdx = -1; sel = null; render(); push();
+   }
+   function addModal() {
+     const s = curScreen();
+     s.modals = s.modals || [];
+     let name = 'modal', i = 2; const taken = new Set(s.modals.map((m) => m.name));
+     while (taken.has(name)) name = 'modal' + (i++);
+     const def = W.def('Modal');
+     const root = { id: 'n' + (idSeq++), type: 'Modal', props: Object.assign({}, def.defaultProps), children: [] };
+     s.modals.push({ name, root });
+     modalIdx = s.modals.length - 1; sel = root.id; render(); push();
+   }
+   function deleteModal() {
+     const s = curScreen();
+     if (modalIdx < 0 || !s.modals || !s.modals[modalIdx]) return;
+     s.modals.splice(modalIdx, 1); modalIdx = -1; sel = null; render(); push();
+   }
 
   // ── custom themed dropdown ──────────────────────────────────────────────────
   // Native <select> popups can't be styled (the OS draws them), so we hide the
@@ -819,7 +900,10 @@
         model = normalize(parsed);
       } catch (err) { model = scaffold(); }
       W = TARGETS[model.target] || TARGETS.webink;
-      model.screens.forEach((s) => ensureIds(s.root));
+       model.screens.forEach((s) => {
+         ensureIds(s.root);
+         (s.modals || []).forEach((m) => ensureIds(m.root));
+       });
       if (screenIdx >= model.screens.length) screenIdx = 0;
       applyingRemote = false;
       render();
@@ -830,8 +914,16 @@
     m.target = m.target || 'webink';
     m.state = m.state || []; m.handlers = m.handlers || [];
     if (!Array.isArray(m.screens) || !m.screens.length) m.screens = scaffold().screens;
-    m.screens.forEach((s) => { s.root = s.root || { type: 'Page', props: {}, children: [] }; });
-    return m;
+      m.screens.forEach((s) => {
+       s.root = s.root || { type: 'Page', props: {}, children: [] };
+       s.modals = Array.isArray(s.modals) ? s.modals.filter((modal) => modal && modal.root) : [];
+      });
+     if (m.target === 'desktopink') {
+       m.screens = [m.screens[0]];
+       m.screens[0].name = 'screen'; m.screens[0].route = '';
+       m.desktop = Object.assign({ centered: true, maximized: false, width: 900, height: 650, theme: 'light' }, m.desktop);
+     }
+     return m;
   }
 
   selObserver.observe(document.body, { childList: true, subtree: true });

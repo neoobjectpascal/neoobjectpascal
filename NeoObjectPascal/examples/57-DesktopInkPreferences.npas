@@ -1,0 +1,58 @@
+// DesktopInk: tela nativa de preferencias com tema escuro.
+// Rode: java -jar target/neoobjectpascal-1.0-SNAPSHOT-jar-with-dependencies.jar examples/57-DesktopInkPreferences.npas
+
+uses desktopink;
+
+function principal(): Object
+begin
+    return Window(#{}, [
+        Row(#{ gap: 24 }, [
+            Sidebar(#{ width: 200 }, [
+                Heading(#{ level: 3 }, "NeoObjectPascal"),
+                Text(#{}, "Preferencias"),
+                Button(#{ text: "Conta", variant: "primary" }),
+                Button(#{ text: "Geral", variant: "secondary" }),
+                Button(#{ text: "Aparencia", variant: "secondary" }),
+                Button(#{ text: "Notificacoes", variant: "secondary" })
+            ]),
+            Container(#{ width: 700 }, [
+                Heading(#{ level: 1 }, "Conta"),
+                Divider(#{ }),
+                Section(#{ }, [
+                    Heading(#{ level: 3 }, "Perfil"),
+                    Text(#{ }, "Atualize os dados usados na sua conta."),
+                    Text(#{ }, "E-mail"),
+                    TextInput(#{ value: "john.doe@email.com", width: 360, autoFocus: true }),
+                    Text(#{ }, "Nome completo"),
+                    TextInput(#{ value: "John Doe", width: 360 })
+                ]),
+                Divider(#{ }),
+                Section(#{ }, [
+                    Heading(#{ level: 3 }, "Autenticacao em dois fatores"),
+                    Text(#{ }, "Escolha uma camada extra de seguranca para entrar."),
+                    Select(#{ options: ["SMS", "Aplicativo autenticador"], width: 260 }),
+                    Checkbox(#{ checked: true }, "Autenticacao biometrica")
+                ]),
+                Divider(#{ }),
+                Card(#{ }, [
+                    Heading(#{ level: 3 }, "Dispositivos recentes"),
+                    Table(#{
+                        columns: ["Dispositivo", "Local", "Status"],
+                        rows: [["MacBook Pro", "Rio de Janeiro", "Ativo"], ["iPhone", "Sao Paulo", "Ativo"]]
+                    })
+                ])
+            ])
+        ])
+    ]);
+end;
+
+begin
+    render(#{ principal: principal }, #{
+        title: "Preferencias",
+        width: 1100,
+        height: 720,
+        centered: true,
+        maximized: false,
+        theme: "dark"
+    });
+end.
