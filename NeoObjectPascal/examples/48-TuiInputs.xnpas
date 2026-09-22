@@ -1,0 +1,122 @@
+{
+  "xnpas": 1,
+  "target": "terminalink",
+  "state": [
+    { "name": "email", "type": "String" },
+    { "name": "senha", "type": "String" },
+    { "name": "resposta", "type": "String", "initial": "(pendente)" }
+  ],
+  "handlers": [
+    {
+      "name": "onEmail",
+      "params": ["v"],
+      "returns": "Boolean",
+      "body": "email := v;\n    return true;"
+    },
+    {
+      "name": "onSenha",
+      "params": ["v"],
+      "returns": "Boolean",
+      "body": "senha := v;\n    return true;"
+    },
+    {
+      "name": "aceitar",
+      "params": [],
+      "returns": "Boolean",
+      "body": "resposta := \"aceitou\";\n    return true;"
+    },
+    {
+      "name": "recusar",
+      "params": [],
+      "returns": "Boolean",
+      "body": "resposta := \"recusou\";\n    return true;"
+    }
+  ],
+  "screens": [
+    {
+      "name": "ui",
+      "root": {
+        "id": "n1",
+        "type": "VBox",
+        "props": {
+          "padding": 1,
+          "gap": 1,
+          "border": "round",
+          "borderColor": "green"
+        },
+        "children": [
+          {
+            "id": "n2",
+            "type": "Text",
+            "props": {
+              "bold": true,
+              "color": "green",
+              "text": "Cadastro"
+            }
+          },
+          {
+            "id": "n3",
+            "type": "Text",
+            "props": {
+              "text": "E-mail (digite e veja o dom\u00ednio ser sugerido):"
+            }
+          },
+          {
+            "id": "n4",
+            "type": "EmailInput",
+            "props": {
+              "placeholder": "voce@...",
+              "onChange": "@onEmail"
+            }
+          },
+          {
+            "id": "n5",
+            "type": "Text",
+            "props": {
+              "text": "Senha:"
+            }
+          },
+          {
+            "id": "n6",
+            "type": "PasswordInput",
+            "props": {
+              "placeholder": "secreta",
+              "onChange": "@onSenha"
+            }
+          },
+          {
+            "id": "n7",
+            "type": "Text",
+            "props": {
+              "text": "Aceita os termos?"
+            }
+          },
+          {
+            "id": "n8",
+            "type": "ConfirmInput",
+            "props": {
+              "defaultChoice": "confirm",
+              "onConfirm": "@aceitar",
+              "onCancel": "@recusar"
+            }
+          },
+          {
+            "id": "n9",
+            "type": "Text",
+            "props": {
+              "dim": true,
+              "text": "Tab alterna o foco \u00b7 Esc sai"
+            }
+          },
+          {
+            "id": "n10",
+            "type": "Text",
+            "props": {
+              "text": "Voc\u00ea "
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

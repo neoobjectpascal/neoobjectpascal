@@ -200,6 +200,26 @@ class InteractiveVariantsTest {
         assertEquals("(y/N)", InteractiveWidgets.expandConfirmInput(props("defaultChoice", "cancel")).textContent());
     }
 
+    // ---- Button -----------------------------------------------------------------
+
+    @Test
+    @DisplayName("Button Enter e Espaço disparam onClick")
+    void buttonActivatesOnEnterAndSpace() {
+        CapturingInterp interp = new CapturingInterp();
+        Map<String, Object> p = props("onClick", CALLBACK, "text", "Excluir");
+
+        assertTrue(InteractiveWidgets.handleButtonKey(p, interp, type(KeyType.Enter)));
+        assertTrue(InteractiveWidgets.handleButtonKey(p, interp, ch(' ')));
+        assertEquals(2, interp.calls);
+    }
+
+    @Test
+    @DisplayName("Button mostra um marcador de foco no rótulo")
+    void buttonShowsFocusMarker() {
+        assertEquals("[ Excluir ]", InteractiveWidgets.expandButton(props("text", "Excluir"), true).textContent());
+        assertEquals("  Excluir  ", InteractiveWidgets.expandButton(props("text", "Excluir"), false).textContent());
+    }
+
     // ---- MultiSelect ------------------------------------------------------------
 
     private static List<Map<String, Object>> options() {

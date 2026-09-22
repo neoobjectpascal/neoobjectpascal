@@ -1,0 +1,81 @@
+{
+  "xnpas": 1,
+  "target": "terminalink",
+  "state": [
+    { "name": "tema", "type": "Object" }
+  ],
+  "handlers": [],
+  "screens": [
+    {
+      "name": "ui",
+      "root": {
+        "id": "n1",
+        "type": "VBox",
+        "props": {
+          "padding": 1,
+          "gap": 1,
+          "border": "round",
+          "borderColor": "magenta"
+        },
+        "children": [
+          {
+            "id": "n2",
+            "type": "Text",
+            "props": {
+              "bold": true,
+              "color": "magenta",
+              "text": "Tema personalizado"
+            }
+          },
+          {
+            "id": "n3",
+            "type": "Spinner",
+            "props": {
+              "label": "Processando..."
+            }
+          },
+          {
+            "id": "n4",
+            "type": "HBox",
+            "props": { "gap": 1 },
+            "children": [
+              {
+                "id": "n5",
+                "type": "Badge",
+                "props": { "text": "novo" }
+              },
+              {
+                "id": "n6",
+                "type": "Badge",
+                "props": { "text": "pro" }
+              }
+            ]
+          },
+          {
+            "id": "n7",
+            "type": "Text",
+            "props": {
+              "dim": true,
+              "text": "Barra de progresso tematizada:"
+            }
+          },
+          {
+            "id": "n8",
+            "type": "ProgressBar",
+            "props": {
+              "value": 70
+            }
+          },
+          {
+            "id": "n9",
+            "type": "StatusMessage",
+            "props": {
+              "variant": "success",
+              "text": "Tema aplicado a Spinner, Badge e ProgressBar"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

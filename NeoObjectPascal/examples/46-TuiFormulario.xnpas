@@ -1,0 +1,79 @@
+{
+  "xnpas": 1,
+  "target": "terminalink",
+  "state": [
+    { "name": "nome", "type": "String" },
+    { "name": "enviado", "type": "Boolean", "initial": "false" }
+  ],
+  "handlers": [
+    {
+      "name": "onNome",
+      "params": ["v"],
+      "returns": "Boolean",
+      "body": "nome := v;\n    return true;"
+    },
+    {
+      "name": "enviar",
+      "params": ["v"],
+      "returns": "Boolean",
+      "body": "nome := v;\n    enviado := true;\n    return true;"
+    }
+  ],
+  "screens": [
+    {
+      "name": "ui",
+      "root": {
+        "id": "n1",
+        "type": "VBox",
+        "props": {
+          "padding": 1,
+          "gap": 1,
+          "border": "round",
+          "borderColor": "blue"
+        },
+        "children": [
+          {
+            "id": "n2",
+            "type": "Text",
+            "props": {
+              "bold": true,
+              "color": "blue",
+              "text": "Cadastro"
+            }
+          },
+          {
+            "id": "n3",
+            "type": "Text",
+            "props": {
+              "text": "Nome:"
+            }
+          },
+          {
+            "id": "n4",
+            "type": "TextInput",
+            "props": {
+              "placeholder": "Digite seu nome...",
+              "onChange": "@onNome",
+              "onSubmit": "@enviar"
+            }
+          },
+          {
+            "id": "n5",
+            "type": "Text",
+            "props": {
+              "text": "Ol\u00e1, "
+            }
+          },
+          {
+            "id": "n6",
+            "type": "StatusMessage",
+            "props": {
+              "variant": "=variante",
+              "text": "=msg"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

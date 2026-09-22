@@ -1,0 +1,88 @@
+{
+  "xnpas": 1,
+  "target": "desktopink",
+  "title": "DataGrid edit\u00e1vel",
+  "state": [
+    { "name": "dadosColetados", "type": "String" }
+  ],
+  "handlers": [
+    {
+      "name": "onCellChange",
+      "params": ["row", "col", "old", "valor"],
+      "returns": "Boolean",
+      "body": "WriteLn(\"Celula alterada: linha \" + row + \", coluna \" + col + \" = \" + valor);\n    return true;"
+    },
+    {
+      "name": "salvar",
+      "params": ["valor"],
+      "returns": "Boolean",
+      "body": "dadosColetados := valor;\n    WriteLn(\"Dados coletados:\");\n    WriteLn(valor);\n    return true;"
+    }
+  ],
+  "screens": [
+    {
+      "name": "screen",
+      "root": {
+        "id": "n1",
+        "type": "Window",
+        "props": {},
+        "children": [
+          {
+            "id": "n2",
+            "type": "Container",
+            "props": { "width": 980 },
+            "children": [
+              { "id": "n3", "type": "Heading", "props": { "level": 1, "text": "Equipe" } },
+              { "id": "n4", "type": "Text", "props": { "text": "Edite as celulas. As celulas alteradas ficarao destacadas em amarelo." } },
+              {
+                "id": "n5",
+                "type": "Card",
+                "props": {},
+                "children": [
+                  {
+                    "id": "n6",
+                    "type": "Table",
+                    "props": {
+                      "columns": ["Nome", "E-mail", "Papel", "Status"],
+                      "rows": [
+                        ["Ana Lima", "ana@empresa.com", "Admin", "Ativo"],
+                        ["Bruno Silva", "bruno@empresa.com", "Editor", "Ativo"],
+                        ["Carla Souza", "carla@empresa.com", "Leitor", "Pendente"]
+                      ],
+                      "editable": true,
+                      "onChange": "@onCellChange",
+                      "onSave": "@salvar",
+                      "editors": {
+                        "Papel": { "options": ["Admin", "Editor", "Leitor"] },
+                        "Status": { "options": ["Ativo", "Pendente", "Inativo"] }
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "n7",
+                "type": "Alert",
+                "props": {
+                  "variant": "success",
+                  "visible": "=dadosColetados <> \"\""
+                },
+                "children": [
+                  { "id": "n8", "type": "Text", "props": { "text": "Dados coletados apos Salvar:" } },
+                  { "id": "n9", "type": "Text", "props": { "text": "=dadosColetados" } }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "desktop": {
+    "title": "DataGrid edit\u00e1vel",
+    "width": 1080,
+    "height": 720,
+    "centered": true,
+    "theme": "dark"
+  }
+}

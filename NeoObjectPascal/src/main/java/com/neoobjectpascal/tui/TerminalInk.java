@@ -30,6 +30,7 @@ public final class TerminalInk {
 
         // Interactive components (stateful, keyboard-driven).
         interp.registerNative("TextInput", InteractiveWidgets.textInput());
+        interp.registerNative("Button", InteractiveWidgets.button());
         interp.registerNative("PasswordInput", InteractiveWidgets.passwordInput());
         interp.registerNative("EmailInput", InteractiveWidgets.emailInput());
         interp.registerNative("ConfirmInput", InteractiveWidgets.confirmInput());

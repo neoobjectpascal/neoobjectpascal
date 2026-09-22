@@ -1,0 +1,106 @@
+{
+  "xnpas": 1,
+  "target": "terminalink",
+  "state": [
+    { "name": "marcadas", "type": "Object", "initial": "(nenhuma)" }
+  ],
+  "handlers": [
+    {
+      "name": "onMarcar",
+      "params": ["vs"],
+      "returns": "Boolean",
+      "body": "marcadas := vs;\n    return true;"
+    }
+  ],
+  "screens": [
+    {
+      "name": "ui",
+      "root": {
+        "id": "n1",
+        "type": "VBox",
+        "props": {
+          "padding": 1,
+          "gap": 1,
+          "border": "round",
+          "borderColor": "cyan"
+        },
+        "children": [
+          {
+            "id": "n2",
+            "type": "Text",
+            "props": {
+              "bold": true,
+              "color": "cyan",
+              "text": "Prefer\u00eancias"
+            }
+          },
+          {
+            "id": "n3",
+            "type": "Text",
+            "props": {
+              "text": "Linguagens (Espa\u00e7o marca, Enter confirma):"
+            }
+          },
+          {
+            "id": "n4",
+            "type": "MultiSelect",
+            "props": {
+              "options": [
+                { "label": "TypeScript", "value": "ts" },
+                { "label": "Rust", "value": "rs" },
+                { "label": "Go", "value": "go" },
+                { "label": "Python", "value": "py" }
+              ],
+              "onChange": "@onMarcar"
+            }
+          },
+          {
+            "id": "n5",
+            "type": "Text",
+            "props": {
+              "text": "Marcadas: "
+            }
+          },
+          {
+            "id": "n6",
+            "type": "Text",
+            "props": {
+              "bold": true,
+              "text": "Passos de instala\u00e7\u00e3o:"
+            }
+          },
+          {
+            "id": "n7",
+            "type": "OrderedList",
+            "props": {
+              "items": [
+                "Instalar Java 11 ou superior",
+                "Compilar com Maven",
+                "Executar o exemplo"
+              ]
+            }
+          },
+          {
+            "id": "n8",
+            "type": "Text",
+            "props": {
+              "bold": true,
+              "text": "Recursos:"
+            }
+          },
+          {
+            "id": "n9",
+            "type": "UnorderedList",
+            "props": {
+              "items": [
+                "Layout flexbox",
+                "Estado reativo",
+                "Temas personaliz\u00e1veis"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 const { spawn } = require('child_process');
+const net = require('net');
 const path = require('path');
 const fs = require('fs');
 
@@ -8,6 +9,11 @@ const fs = require('fs');
 class NeoObjectPascalDebugAdapter {
     constructor() {
         this.debugProcess = null;
+        this.debuggerSocket = null;
+        this.dapSocketServer = null;
+        this.pendingDebuggerMessages = [];
+        this.pendingClientRequests = new Map();
+        this.didTerminate = false;
         this.sequence = 1;
         
         // Separate buffers for VS Code and Debugger
@@ -74,6 +80,15 @@ class NeoObjectPascalDebugAdapter {
 
     handleVSCodeMessage(message) {
         const { type, command } = message;
+
+        if (type === 'response') {
+            const pending = this.pendingClientRequests.get(message.request_seq);
+            if (!pending) return;
+            this.pendingClientRequests.delete(message.request_seq);
+            if (message.success === false) pending.reject(new Error(message.message || 'VS Code rejected the request'));
+            else pending.resolve(message.body || {});
+            return;
+        }
 
         if (type === 'request') {
             switch (command) {
@@ -147,7 +162,16 @@ class NeoObjectPascalDebugAdapter {
             return;
         }
 
-        // Start NeoObjectPascal in DAP mode
+        this.didTerminate = false;
+        this.sendResponse(message, {});
+
+        if (this.usesTerminalInk(program)) {
+            this.startTerminalDebug(fullJarPath, program);
+            this.sendToDebugger(message);
+            return;
+        }
+
+        // Start NeoObjectPascal in DAP mode.
         this.debugProcess = spawn('java', [
             '-jar', fullJarPath,
             '--dap',
@@ -168,7 +192,7 @@ class NeoObjectPascalDebugAdapter {
         });
 
         this.debugProcess.on('close', (code) => {
-            this.sendEvent('terminated', {});
+            this.sendTerminatedOnce();
         });
 
         this.debugProcess.on('error', (error) => {
@@ -178,11 +202,57 @@ class NeoObjectPascalDebugAdapter {
             });
         });
 
-        // Send launch response immediately
-        this.sendResponse(message, {});
-        
         // Forward launch request to debugger
         this.sendToDebugger(message);
+    }
+
+    usesTerminalInk(program) {
+        try {
+            return /\buses\s+terminalink\s*;/i.test(fs.readFileSync(program, 'utf8'));
+        } catch (error) {
+            return false;
+        }
+    }
+
+    startTerminalDebug(jarPath, program) {
+        this.dapSocketServer = net.createServer((socket) => {
+            if (this.debuggerSocket) {
+                socket.destroy();
+                return;
+            }
+            this.debuggerSocket = socket;
+            socket.on('data', (data) => this.handleDebuggerOutput(data));
+            socket.on('error', (error) => this.sendEvent('output', { category: 'stderr', output: `DAP socket error: ${error.message}\n` }));
+            socket.on('close', () => this.sendTerminatedOnce());
+            this.dapSocketServer.close();
+            this.dapSocketServer = null;
+            this.flushDebuggerMessages();
+        });
+        this.dapSocketServer.listen(0, '127.0.0.1', () => {
+            const port = this.dapSocketServer.address().port;
+            const args = ['-jar', jarPath, '--dap', '--dap-connect', String(port), '--dap-terminal', program];
+            this.requestRunInTerminal({
+                kind: 'integrated',
+                title: 'NeoObjectPascal TerminalInk Debug',
+                cwd: path.dirname(program),
+                args: ['java', ...args]
+            }).catch((error) => {
+                this.sendEvent('output', { category: 'stderr', output: `Could not start TerminalInk debug terminal: ${error.message}\n` });
+                this.sendTerminatedOnce();
+            });
+        });
+        this.dapSocketServer.on('error', (error) => {
+            this.sendEvent('output', { category: 'stderr', output: `Could not create DAP socket: ${error.message}\n` });
+            this.sendTerminatedOnce();
+        });
+    }
+
+    requestRunInTerminal(arguments_) {
+        return new Promise((resolve, reject) => {
+            const seq = this.sequence++;
+            this.pendingClientRequests.set(seq, { resolve, reject });
+            this.sendMessage({ seq, type: 'request', command: 'runInTerminal', arguments: arguments_ });
+        });
     }
 
     handleDebuggerOutput(data) {
@@ -214,6 +284,10 @@ class NeoObjectPascalDebugAdapter {
                         if (message.command !== 'launch' && message.command !== 'initialize') {
                             this.sendMessage(message);
                         }
+                        if (message.event === 'terminated') {
+                            this.didTerminate = true;
+                            if (this.debuggerSocket) this.debuggerSocket.end();
+                        }
                     } catch (error) {
                         console.error('Failed to parse debugger message:', error);
                     }
@@ -225,11 +299,22 @@ class NeoObjectPascalDebugAdapter {
     }
 
     sendToDebugger(message) {
-        if (this.debugProcess && this.debugProcess.stdin) {
-            const json = JSON.stringify(message);
-            const header = `Content-Length: ${Buffer.byteLength(json, 'utf8')}\r\n\r\n`;
-            this.debugProcess.stdin.write(header + json);
-        }
+        if (!this.writeToDebugger(message)) this.pendingDebuggerMessages.push(message);
+    }
+
+    flushDebuggerMessages() {
+        const queued = this.pendingDebuggerMessages;
+        this.pendingDebuggerMessages = [];
+        queued.forEach((message) => this.sendToDebugger(message));
+    }
+
+    writeToDebugger(message) {
+        const stream = this.debuggerSocket || (this.debugProcess && this.debugProcess.stdin);
+        if (!stream || stream.destroyed || !stream.writable) return false;
+        const json = JSON.stringify(message);
+        const header = `Content-Length: ${Buffer.byteLength(json, 'utf8')}\r\n\r\n`;
+        stream.write(header + json);
+        return true;
     }
 
     sendMessage(message) {
@@ -272,11 +357,19 @@ class NeoObjectPascalDebugAdapter {
         this.sendMessage(message);
     }
 
+    sendTerminatedOnce() {
+        if (this.didTerminate) return;
+        this.didTerminate = true;
+        this.sendEvent('terminated', {});
+    }
+
     shutdown() {
         if (this.debugProcess) {
             this.debugProcess.kill();
             this.debugProcess = null;
         }
+        if (this.debuggerSocket) this.debuggerSocket.destroy();
+        if (this.dapSocketServer) this.dapSocketServer.close();
     }
 }
 

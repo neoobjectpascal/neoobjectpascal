@@ -8,6 +8,7 @@ const fs = require('fs');
 const os = require('os');
 const { spawn } = require('child_process');
 const { generate } = require('../codegen');
+const extensionSrc = fs.readFileSync(path.join(__dirname, '..', 'extension.js'), 'utf8');
 
 let pass = 0, fail = 0;
 const gen = (m) => generate(m, 'teste');
@@ -21,6 +22,12 @@ function has(src, needle) {
 function hasnt(src, needle) {
   if (src.indexOf(needle) >= 0) throw new Error('não deveria conter: ' + JSON.stringify(needle));
 }
+
+t('Run/Debug prioriza o arquivo .npas ou .xnpas selecionado', () => {
+  has(extensionSrc, 'function resolveRunnableFile(filePath)');
+  has(extensionSrc, "const candidate = extension === '.xnpas'");
+  has(extensionSrc, 'const selected = getFilePath(uri);');
+});
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 const webink = {
@@ -326,6 +333,10 @@ require('../media/i18n'); // also attaches global.NpI18n
 require('../media/widgets-webink');
 require('../media/widgets-terminalink');
 require('../media/widgets-desktopink');
+t('DesktopInk Table pré-visualiza linhas vinculadas sem interromper o canvas', () => {
+  const html = global.DesktopInkWidgets.def('Table').preview({ props: { columns: ['Nome'], rows: '=membros' } }, '');
+  if (!html.includes('membros')) throw new Error('binding de linhas não foi exibido');
+});
 t('5 idiomas (pt/en/de/fr/it)', () => {
   if (NpI18n.langs.join(',') !== 'pt,en,de,fr,it') throw new Error('idiomas: ' + NpI18n.langs);
 });

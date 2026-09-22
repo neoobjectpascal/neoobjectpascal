@@ -81,10 +81,11 @@
       });
     });
 
-    // clickables (buttons)
+    // clickables (buttons, table rows)
     app.querySelectorAll("[data-webink-click]").forEach(function (el) {
       el.addEventListener("click", function () {
-        fireEvent(el.getAttribute("data-webink-click"), null);
+        var rowIndex = el.getAttribute("data-webink-row");
+        fireEvent(el.getAttribute("data-webink-click"), rowIndex !== null ? parseInt(rowIndex, 10) : null);
       });
     });
 

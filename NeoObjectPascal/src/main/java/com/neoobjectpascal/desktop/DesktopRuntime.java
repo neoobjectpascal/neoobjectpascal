@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 /** Owns native Swing windows and deliberately does nothing where a display is unavailable. */
 public final class DesktopRuntime {
@@ -32,6 +33,7 @@ public final class DesktopRuntime {
     private final Object screenSource;
     private final Map<String, Object> options;
     private final Interpreter interpreter;
+    private final CountDownLatch closed = new CountDownLatch(1);
     private JFrame frame;
 
     private DesktopRuntime(Object screenSource, Map<String, Object> options, Interpreter interpreter) {
@@ -56,6 +58,7 @@ public final class DesktopRuntime {
         DesktopRuntime runtime = new DesktopRuntime(screenSource, new LinkedHashMap<>(options), interpreter);
         active = runtime;
         SwingUtilities.invokeLater(runtime::show);
+        runtime.awaitClose();
         return true;
     }
 
@@ -65,15 +68,33 @@ public final class DesktopRuntime {
     }
 
     private void show() {
-        Theme theme = Theme.resolve(Props.getString(options, "theme", "light"));
-        frame = new JFrame(Props.getString(options, "title", "DesktopInk"));
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLayout(new BorderLayout());
-        frame.setSize(Props.getInt(options, "width", 960), Props.getInt(options, "height", 720));
-        if (Props.getBool(options, "maximized", false)) frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        else if (Props.getBool(options, "centered", true)) frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
-        rebuild();
+        try {
+            Theme theme = Theme.resolve(Props.getString(options, "theme", "light"));
+            frame = new JFrame(Props.getString(options, "title", "DesktopInk"));
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override public void windowClosed(java.awt.event.WindowEvent event) {
+                    closed.countDown();
+                }
+            });
+            frame.setLayout(new BorderLayout());
+            frame.setSize(Props.getInt(options, "width", 960), Props.getInt(options, "height", 720));
+            if (Props.getBool(options, "maximized", false)) frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            else if (Props.getBool(options, "centered", true)) frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+            rebuild();
+        } catch (RuntimeException exception) {
+            closed.countDown();
+            throw exception;
+        }
+    }
+
+    private void awaitClose() {
+        try {
+            closed.await();
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void rebuild() {

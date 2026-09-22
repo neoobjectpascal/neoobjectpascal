@@ -189,12 +189,12 @@
     "menus": {
       "explorer/context": [
         {
-          "when": "(resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || (explorerResourceIsFolder && neoobjectpascal:hasNpas)",
+          "when": "((resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || resourceExtname == .xnpas) || (explorerResourceIsFolder && neoobjectpascal:hasNpas)",
           "command": "neoobjectpascal.run",
           "group": "neoobjectpascal@1"
         },
         {
-          "when": "(resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || (explorerResourceIsFolder && neoobjectpascal:hasNpas)",
+          "when": "((resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || resourceExtname == .xnpas) || (explorerResourceIsFolder && neoobjectpascal:hasNpas)",
           "command": "neoobjectpascal.debug",
           "group": "neoobjectpascal@2"
         },
@@ -216,12 +216,12 @@
       ],
       "editor/context": [
         {
-          "when": "resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)",
+          "when": "(resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || resourceExtname == .xnpas",
           "command": "neoobjectpascal.run",
           "group": "neoobjectpascal@1"
         },
         {
-          "when": "resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)",
+          "when": "(resourceExtname == .npas && !(resourceFilename =~ /\\.test\\.npas$/)) || resourceExtname == .xnpas",
           "command": "neoobjectpascal.debug",
           "group": "neoobjectpascal@2"
         },
@@ -243,12 +243,12 @@
       ],
       "editor/title/run": [
         {
-          "when": "resourceExtname == .npas",
+          "when": "resourceExtname == .npas || resourceExtname == .xnpas",
           "command": "neoobjectpascal.run",
           "group": "navigation@1"
         },
         {
-          "when": "resourceExtname == .npas",
+          "when": "resourceExtname == .npas || resourceExtname == .xnpas",
           "command": "neoobjectpascal.debug",
           "group": "navigation@2"
         }

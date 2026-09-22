@@ -1,0 +1,98 @@
+{
+  "xnpas": 1,
+  "target": "desktopink",
+  "title": "Prefer\u00eancias",
+  "state": [],
+  "handlers": [],
+  "screens": [
+    {
+      "name": "screen",
+      "root": {
+        "id": "n1",
+        "type": "Window",
+        "props": {},
+        "children": [
+          {
+            "id": "n2",
+            "type": "Row",
+            "props": { "gap": 24 },
+            "children": [
+              {
+                "id": "n3",
+                "type": "Sidebar",
+                "props": { "width": 200 },
+                "children": [
+                  { "id": "n4", "type": "Heading", "props": { "level": 3, "text": "NeoObjectPascal" } },
+                  { "id": "n5", "type": "Text", "props": { "text": "Preferencias" } },
+                  { "id": "n6", "type": "Button", "props": { "text": "Conta", "variant": "primary" } },
+                  { "id": "n7", "type": "Button", "props": { "text": "Geral", "variant": "secondary" } },
+                  { "id": "n8", "type": "Button", "props": { "text": "Aparencia", "variant": "secondary" } },
+                  { "id": "n9", "type": "Button", "props": { "text": "Notificacoes", "variant": "secondary" } }
+                ]
+              },
+              {
+                "id": "n10",
+                "type": "Container",
+                "props": { "width": 700 },
+                "children": [
+                  { "id": "n11", "type": "Heading", "props": { "level": 1, "text": "Conta" } },
+                  { "id": "n12", "type": "Divider", "props": {} },
+                  {
+                    "id": "n13",
+                    "type": "Section",
+                    "props": {},
+                    "children": [
+                      { "id": "n14", "type": "Heading", "props": { "level": 3, "text": "Perfil" } },
+                      { "id": "n15", "type": "Text", "props": { "text": "Atualize os dados usados na sua conta." } },
+                      { "id": "n16", "type": "Text", "props": { "text": "E-mail" } },
+                      { "id": "n17", "type": "TextInput", "props": { "value": "john.doe@email.com", "width": 360, "autoFocus": true } },
+                      { "id": "n18", "type": "Text", "props": { "text": "Nome completo" } },
+                      { "id": "n19", "type": "TextInput", "props": { "value": "John Doe", "width": 360 } }
+                    ]
+                  },
+                  { "id": "n20", "type": "Divider", "props": {} },
+                  {
+                    "id": "n21",
+                    "type": "Section",
+                    "props": {},
+                    "children": [
+                      { "id": "n22", "type": "Heading", "props": { "level": 3, "text": "Autenticacao em dois fatores" } },
+                      { "id": "n23", "type": "Text", "props": { "text": "Escolha uma camada extra de seguranca para entrar." } },
+                      { "id": "n24", "type": "Select", "props": { "options": ["SMS", "Aplicativo autenticador"], "width": 260 } },
+                      { "id": "n25", "type": "Checkbox", "props": { "checked": true, "text": "Autenticacao biometrica" } }
+                    ]
+                  },
+                  { "id": "n26", "type": "Divider", "props": {} },
+                  {
+                    "id": "n27",
+                    "type": "Card",
+                    "props": {},
+                    "children": [
+                      { "id": "n28", "type": "Heading", "props": { "level": 3, "text": "Dispositivos recentes" } },
+                      {
+                        "id": "n29",
+                        "type": "Table",
+                        "props": {
+                          "columns": ["Dispositivo", "Local", "Status"],
+                          "rows": [["MacBook Pro", "Rio de Janeiro", "Ativo"], ["iPhone", "Sao Paulo", "Ativo"]]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "desktop": {
+    "title": "Prefer\u00eancias",
+    "width": 1100,
+    "height": 720,
+    "centered": true,
+    "maximized": false,
+    "theme": "dark"
+  }
+}

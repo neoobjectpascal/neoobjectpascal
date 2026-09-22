@@ -1,0 +1,111 @@
+{
+  "xnpas": 1,
+  "target": "webink",
+  "title": "Acme \u00b7 Painel",
+  "state": [
+    { "name": "cliques", "type": "Integer" }
+  ],
+  "handlers": [
+    {
+      "name": "registrar",
+      "params": [],
+      "returns": "Boolean",
+      "body": "cliques := cliques + 1;\n    return true;"
+    }
+  ],
+  "screens": [
+    {
+      "name": "home",
+      "route": "/",
+      "root": {
+        "id": "n1",
+        "type": "Page",
+        "props": {},
+        "children": [
+          {
+            "id": "n2",
+            "type": "Navbar",
+            "props": {},
+            "children": [
+              { "id": "n3", "type": "Heading", "props": { "level": 3, "text": "Acme Inc." } },
+              { "id": "n4", "type": "Link", "props": { "href": "/relatorio", "text": "Relat\u00f3rio" } }
+            ]
+          },
+          {
+            "id": "n5",
+            "type": "Container",
+            "props": { "className": "py-8 space-y-6" },
+            "children": [
+              { "id": "n6", "type": "Heading", "props": { "level": 1, "text": "Painel" } },
+              {
+                "id": "n7",
+                "type": "Grid",
+                "props": { "cols": 3 },
+                "children": [
+                  { "id": "n8", "type": "StatCard", "props": { "label": "Receita", "value": "R$ 128k", "delta": "+12%" } },
+                  { "id": "n9", "type": "StatCard", "props": { "label": "Usu\u00e1rios", "value": "3.420", "delta": "+5%" } },
+                  { "id": "n10", "type": "StatCard", "props": { "label": "Cliques", "value": "=cliques" } }
+                ]
+              },
+              {
+                "id": "n11",
+                "type": "Card",
+                "props": {},
+                "children": [
+                  { "id": "n12", "type": "Heading", "props": { "level": 4, "text": "Vendas por m\u00eas" } },
+                  {
+                    "id": "n13",
+                    "type": "Chart",
+                    "props": {
+                      "type": "line",
+                      "data": {
+                        "labels": ["Jan", "Fev", "Mar", "Abr"],
+                        "datasets": [{ "label": "R$ mil", "data": [30, 45, 38, 52] }]
+                      }
+                    }
+                  }
+                ]
+              },
+              { "id": "n14", "type": "Button", "props": { "onClick": "@registrar", "text": "Registrar clique" } }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "relatorio",
+      "route": "/relatorio",
+      "root": {
+        "id": "n15",
+        "type": "Page",
+        "props": {},
+        "children": [
+          {
+            "id": "n16",
+            "type": "Navbar",
+            "props": {},
+            "children": [
+              { "id": "n17", "type": "Heading", "props": { "level": 3, "text": "Relat\u00f3rio" } },
+              { "id": "n18", "type": "Link", "props": { "href": "/", "text": "In\u00edcio" } }
+            ]
+          },
+          {
+            "id": "n19",
+            "type": "Container",
+            "props": { "className": "py-8" },
+            "children": [
+              {
+                "id": "n20",
+                "type": "Table",
+                "props": {
+                  "columns": ["Produto", "Qtd", "Total"],
+                  "rows": [["Caf\u00e9", "120", "R$ 600"], ["Ch\u00e1", "80", "R$ 320"]]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

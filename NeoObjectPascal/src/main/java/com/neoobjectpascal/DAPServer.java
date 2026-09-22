@@ -23,6 +23,7 @@ public class DAPServer {
     private final PrintWriter output;
     private final ObjectMapper mapper;
     private final String filePath;
+    private final boolean preserveStandardOutput;
     private int sequenceNumber = 1;
     
     private Interpreter interpreter;
@@ -39,10 +40,15 @@ public class DAPServer {
     private int currentFrameId = 1;
     
     public DAPServer(InputStream in, OutputStream out, String filePath) {
+        this(in, out, filePath, false);
+    }
+
+    public DAPServer(InputStream in, OutputStream out, String filePath, boolean preserveStandardOutput) {
         this.input = new BufferedReader(new InputStreamReader(in));
         this.output = new PrintWriter(new OutputStreamWriter(out), true);
         this.mapper = new ObjectMapper();
         this.filePath = filePath;
+        this.preserveStandardOutput = preserveStandardOutput;
     }
     
     public void start() {
@@ -334,15 +340,19 @@ public class DAPServer {
 
             // Capture the program's stdout (WriteLn) and forward it as DAP 'output' events,
             // so it shows in the Debug Console instead of colliding with the DAP protocol on stdout.
-            PrintStream realOut = System.out;
-            // autoFlush=false so output is grouped per line (flushed on '\n'), not per print() call.
-            PrintStream captured = new PrintStream(new ProgramOutputStream(), false);
-            System.setOut(captured);
-            try {
+            if (preserveStandardOutput) {
                 interpreter.visit(tree);
-            } finally {
-                captured.flush();
-                System.setOut(realOut);
+            } else {
+                PrintStream realOut = System.out;
+                // autoFlush=false so output is grouped per line (flushed on '\n'), not per print() call.
+                PrintStream captured = new PrintStream(new ProgramOutputStream(), false);
+                System.setOut(captured);
+                try {
+                    interpreter.visit(tree);
+                } finally {
+                    captured.flush();
+                    System.setOut(realOut);
+                }
             }
 
             if (VERBOSE) System.err.println("[DAP] Program execution completed");

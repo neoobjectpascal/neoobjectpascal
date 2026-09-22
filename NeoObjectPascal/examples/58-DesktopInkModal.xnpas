@@ -1,0 +1,165 @@
+{
+  "xnpas": 1,
+  "target": "desktopink",
+  "title": "Projetos",
+  "state": [
+    { "name": "modalAberto", "type": "Boolean", "initial": "false" },
+    { "name": "projetos", "type": "Object" },
+    { "name": "totalProjetos", "type": "Integer", "initial": "2" },
+    { "name": "nomeProjeto", "type": "String", "initial": "Novo projeto" },
+    { "name": "responsavelProjeto", "type": "String", "initial": "Carla Souza" },
+    { "name": "descricaoProjeto", "type": "String" },
+    { "name": "linhaSelecionada", "type": "Integer" }
+  ],
+  "handlers": [
+    {
+      "name": "abrirModal",
+      "params": [],
+      "returns": "Boolean",
+      "body": "modalAberto := true;\n    return true;"
+    },
+    {
+      "name": "cancelar",
+      "params": [],
+      "returns": "Boolean",
+      "body": "modalAberto := false;\n    return true;"
+    },
+    {
+      "name": "criarProjeto",
+      "params": [],
+      "returns": "Boolean",
+      "body": "totalProjetos := totalProjetos + 1;\n    if totalProjetos = 1 then\n        projetos := [[nomeProjeto, responsavelProjeto, \"Em andamento\"]]\n    else if totalProjetos = 2 then\n        projetos := [projetos[0], [nomeProjeto, responsavelProjeto, \"Em andamento\"]]\n    else\n        projetos := [projetos[0], projetos[1], [nomeProjeto, responsavelProjeto, \"Em andamento\"]];\n    modalAberto := false;\n    return true;"
+    },
+    {
+      "name": "atualizarNome",
+      "params": ["valor"],
+      "returns": "Boolean",
+      "body": "nomeProjeto := valor;\n    return true;"
+    },
+    {
+      "name": "atualizarResponsavel",
+      "params": ["valor"],
+      "returns": "Boolean",
+      "body": "responsavelProjeto := valor;\n    return true;"
+    },
+    {
+      "name": "atualizarDescricao",
+      "params": ["valor"],
+      "returns": "Boolean",
+      "body": "descricaoProjeto := valor;\n    return true;"
+    },
+    {
+      "name": "selecionarProjeto",
+      "params": ["indice"],
+      "returns": "Boolean",
+      "body": "linhaSelecionada := indice;\n    return true;"
+    },
+    {
+      "name": "excluirProjeto",
+      "params": [],
+      "returns": "Boolean",
+      "body": "if totalProjetos = 1 then\n        projetos := []\n    else if totalProjetos = 2 then\n        if linhaSelecionada = 0 then projetos := [projetos[1]]\n        else projetos := [projetos[0]]\n    else\n        if linhaSelecionada = 0 then projetos := [projetos[1], projetos[2]]\n        else if linhaSelecionada = 1 then projetos := [projetos[0], projetos[2]]\n        else projetos := [projetos[0], projetos[1]];\n    if totalProjetos > 0 then totalProjetos := totalProjetos - 1;\n    if linhaSelecionada > 0 then linhaSelecionada := linhaSelecionada - 1;\n    return true;"
+    }
+  ],
+  "screens": [
+    {
+      "name": "screen",
+      "root": {
+        "id": "n1",
+        "type": "Window",
+        "props": {},
+        "children": [
+          {
+            "id": "n2",
+            "type": "Container",
+            "props": { "width": 920 },
+            "children": [
+              { "id": "n3", "type": "Heading", "props": { "level": 1, "text": "Projetos" } },
+              { "id": "n4", "type": "Text", "props": { "text": "Acompanhe e organize o trabalho da equipe." } },
+              {
+                "id": "n5",
+                "type": "Grid",
+                "props": { "cols": 3, "gap": 16 },
+                "children": [
+                  { "id": "n6", "type": "StatCard", "props": { "label": "Ativos", "value": "12", "delta": "+2 este mes" } },
+                  { "id": "n7", "type": "StatCard", "props": { "label": "Concluidos", "value": "48", "delta": "+14%" } },
+                  { "id": "n8", "type": "StatCard", "props": { "label": "Em risco", "value": "3", "delta": "Requer atencao" } }
+                ]
+              },
+              {
+                "id": "n9",
+                "type": "Row",
+                "props": { "gap": 12 },
+                "children": [
+                  { "id": "n10", "type": "Button", "props": { "text": "Adicionar projeto", "variant": "primary", "onClick": "@abrirModal" } },
+                  { "id": "n11", "type": "Button", "props": { "text": "Excluir projeto selecionado", "variant": "secondary", "onClick": "@excluirProjeto" } }
+                ]
+              },
+              {
+                "id": "n12",
+                "type": "Card",
+                "props": {},
+                "children": [
+                  { "id": "n13", "type": "Heading", "props": { "level": 3, "text": "Lista de projetos" } },
+                  {
+                    "id": "n14",
+                    "type": "Table",
+                    "props": {
+                      "columns": ["Projeto", "Responsavel", "Status"],
+                      "rows": "=projetos",
+                      "selectedRow": "=linhaSelecionada",
+                      "onRowClick": "@selecionarProjeto"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "modals": [
+        {
+          "name": "modal1",
+          "root": {
+            "id": "n15",
+            "type": "Modal",
+            "props": {
+              "name": "modal1",
+              "open": "=modalAberto",
+              "title": "Novo projeto",
+              "width": 560,
+              "height": 520,
+              "closeOnEscape": true,
+              "closeOnBackdrop": true
+            },
+            "children": [
+              { "id": "n16", "type": "Text", "props": { "text": "Preencha as informacoes iniciais para criar o projeto." } },
+              { "id": "n17", "type": "Text", "props": { "text": "Nome do projeto" } },
+              { "id": "n18", "type": "TextInput", "props": { "value": "=nomeProjeto", "placeholder": "Ex.: Portal de parceiros", "width": 480, "autoFocus": true, "onChange": "@atualizarNome" } },
+              { "id": "n19", "type": "Text", "props": { "text": "Responsavel" } },
+              { "id": "n20", "type": "Select", "props": { "value": "=responsavelProjeto", "options": ["Ana Lima", "Bruno Silva", "Carla Souza"], "width": 480, "onChange": "@atualizarResponsavel" } },
+              { "id": "n21", "type": "Text", "props": { "text": "Descricao" } },
+              { "id": "n22", "type": "TextArea", "props": { "value": "=descricaoProjeto", "rows": 4, "width": 480, "placeholder": "Contexto e objetivos do projeto", "onChange": "@atualizarDescricao" } },
+              {
+                "id": "n23",
+                "type": "Row",
+                "props": { "gap": 12 },
+                "children": [
+                  { "id": "n24", "type": "Button", "props": { "text": "Cancelar", "variant": "secondary", "onClick": "@cancelar" } },
+                  { "id": "n25", "type": "Button", "props": { "text": "Criar projeto", "variant": "primary", "onClick": "@criarProjeto" } }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "desktop": {
+    "title": "Projetos",
+    "width": 1080,
+    "height": 760,
+    "centered": true,
+    "theme": "dark"
+  }
+}

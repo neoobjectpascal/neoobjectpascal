@@ -1,0 +1,64 @@
+{
+  "xnpas": 1,
+  "target": "terminalink",
+  "state": [],
+  "handlers": [],
+  "screens": [
+    {
+      "name": "ui",
+      "root": {
+        "id": "n1",
+        "type": "VBox",
+        "props": {
+          "padding": 1,
+          "gap": 1,
+          "border": "round",
+          "borderColor": "cyan"
+        },
+        "children": [
+          {
+            "id": "n2",
+            "type": "Text",
+            "props": {
+              "bold": true,
+              "color": "cyan",
+              "text": "TerminalInk"
+            }
+          },
+          {
+            "id": "n3",
+            "type": "Text",
+            "props": {
+              "text": "Interfaces de terminal em NeoObjectPascal"
+            }
+          },
+          {
+            "id": "n4",
+            "type": "HBox",
+            "props": {
+              "gap": 2
+            },
+            "children": [
+              {
+                "id": "n5",
+                "type": "Badge",
+                "props": {
+                  "color": "green",
+                  "text": "OK"
+                }
+              },
+              {
+                "id": "n6",
+                "type": "Text",
+                "props": {
+                  "dim": true,
+                  "text": "pressione q para sair"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

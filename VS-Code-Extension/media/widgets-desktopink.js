@@ -5,6 +5,17 @@
   const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const p = (n, k, d) => (n.props && n.props[k] !== undefined ? n.props[k] : d);
   const show = (v) => typeof v === 'string' && v.startsWith('=') ? esc(v.slice(1)) : esc(v);
+  const tablePreview = (n) => {
+    const columns = p(n, 'columns', []) || [];
+    const rows = p(n, 'rows', []);
+    const body = typeof rows === 'string' && rows.startsWith('=')
+      ? `<tr><td colspan="${Math.max(1, columns.length)}" class="dk-fx">fx ${show(rows)}</td></tr>`
+      : (Array.isArray(rows) ? rows : []).map((row, index) =>
+        `<tr class="${index === 0 && p(n, 'selectedRow', null) !== undefined ? 'selected' : ''}">` +
+        `${(Array.isArray(row) ? row : []).map((cell) => `<td>${show(cell)}</td>`).join('')}</tr>`).join('');
+    return `<div class="dk-tablewrap"><table class="dk-table"><thead><tr>` +
+      `${columns.map((column) => `<th>${show(column)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></div>`;
+  };
   const F = { text: { key: 'text', label: 'Texto', kind: 'text' } };
   const event = { key: 'onClick', label: 'onClick', kind: 'event' };
   const W = {
@@ -31,7 +42,7 @@
     Select: { group: 'Formulários', label: 'Select', container: false, defaultProps: { options: ['Opção 1'] }, fields: [{ key: 'options', label: 'Opções (separadas por vírgula)', kind: 'csv', bindable: true }], preview: (n) => `<div class="wk-select">${show((p(n, 'options', [])[0]) || 'Selecione...')}</div>` },
     Checkbox: { group: 'Formulários', label: 'Checkbox', container: false, defaultProps: { label: 'Aceito', checked: false }, fields: [{ key: 'label', label: 'Rótulo', kind: 'text' }, { key: 'checked', label: 'Marcado', kind: 'bool' }, { key: 'onChange', label: 'onChange', kind: 'event' }], preview: (n) => `<label class="wk-checkbox"><span class="cbox"></span>${show(p(n, 'label', ''))}</label>` },
     Form: { group: 'Formulários', label: 'Form', container: true, defaultProps: {}, fields: [], preview: (n, i) => `<form class="wk-form">${i}</form>` },
-    Table: { group: 'Dados', label: 'Table', container: false, defaultProps: { columns: ['Coluna'], rows: [['valor']] }, fields: [{ key: 'columns', label: 'Colunas (vírgula)', kind: 'csv' }, { key: 'rows', label: 'Linhas (uma por linha; células por vírgula)', kind: 'rows' }], preview: (n) => `<div class="dk-tablewrap"><table class="dk-table"><thead><tr>${(p(n, 'columns', []) || []).map((x) => `<th>${show(x)}</th>`).join('')}</tr></thead><tbody>${(p(n, 'rows', []) || []).map((r, index) => `<tr class="${index === 0 && p(n, 'selectedRow', null) !== undefined ? 'selected' : ''}">${(Array.isArray(r) ? r : []).map((x) => `<td>${show(x)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` },
+    Table: { group: 'Dados', label: 'Table', container: false, defaultProps: { columns: ['Coluna'], rows: [['valor']] }, fields: [{ key: 'columns', label: 'Colunas (vírgula)', kind: 'csv' }, { key: 'rows', label: 'Linhas (uma por linha; células por vírgula)', kind: 'rows' }], preview: tablePreview },
     List: { group: 'Dados', label: 'List', container: false, defaultProps: { items: ['Item'] }, fields: [{ key: 'items', label: 'Itens (vírgula)', kind: 'csv' }], preview: (n) => `<ul class="wk-list">${(p(n, 'items', []) || []).map((x) => `<li>${show(x)}</li>`).join('')}</ul>` },
     ProgressBar: { group: 'Dados', label: 'ProgressBar', container: false, defaultProps: { value: 60 }, fields: [{ key: 'value', label: 'Valor (0–100)', kind: 'number', min: 0, max: 100, bindable: true }], preview: () => '<div class="wk-progress"><div class="fill" style="width:60%"></div></div>' },
     Spinner: { group: 'Dados', label: 'Spinner', container: false, defaultProps: { label: 'Carregando...' }, fields: [{ key: 'label', label: 'Rótulo', kind: 'text' }], preview: (n) => `<div class="wk-spinner">${show(p(n, 'label', ''))}</div>` },

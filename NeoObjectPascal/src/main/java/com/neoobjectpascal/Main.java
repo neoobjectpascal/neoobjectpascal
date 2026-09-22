@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.ConsoleErrorListener;
 import org.antlr.v4.runtime.BaseErrorListener;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,8 @@ public class Main {
         boolean testAllMode = argList.contains("--test-all") || argList.contains("-ta");
         boolean debugMode = argList.contains("--debug") || argList.contains("-d");
         boolean dapMode = argList.contains("--dap");
+        boolean dapTerminal = argList.contains("--dap-terminal");
+        Integer dapConnectPort = optionInt(args, "--dap-connect");
         boolean buildMode = argList.contains("--build");
         
         // Check for cloud execution
@@ -136,8 +139,13 @@ public class Main {
         if (dapMode) {
             try {
                 // Start DAP server (it will handle parsing and execution)
-                DAPServer dapServer = new DAPServer(System.in, System.out, filePath);
-                dapServer.start();
+                if (dapConnectPort != null) {
+                    try (Socket socket = new Socket("127.0.0.1", dapConnectPort)) {
+                        new DAPServer(socket.getInputStream(), socket.getOutputStream(), filePath, dapTerminal).start();
+                    }
+                } else {
+                    new DAPServer(System.in, System.out, filePath).start();
+                }
                 
                 return;
             } catch (Exception e) {
@@ -470,6 +478,18 @@ public class Main {
     }
 
     /** Parse {@code --build} options. Value flags consume their argument; the remaining bare arg is the program. */
+    private static Integer optionInt(String[] args, String option) {
+        for (int index = 0; index + 1 < args.length; index++) {
+            if (!option.equals(args[index])) continue;
+            try {
+                return Integer.valueOf(args[index + 1]);
+            } catch (NumberFormatException exception) {
+                throw new IllegalArgumentException(option + " requires an integer port");
+            }
+        }
+        return null;
+    }
+
     private static NativeBuilder.Options parseBuildOptions(String[] args) {
         NativeBuilder.Options o = new NativeBuilder.Options();
         for (int i = 0; i < args.length; i++) {
@@ -497,4 +517,3 @@ public class Main {
         return o;
     }
 }
-

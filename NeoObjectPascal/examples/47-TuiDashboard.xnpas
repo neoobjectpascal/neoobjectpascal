@@ -1,0 +1,113 @@
+{
+  "xnpas": 1,
+  "target": "terminalink",
+  "state": [
+    { "name": "progresso", "type": "Integer", "initial": "66" },
+    { "name": "cor", "type": "String", "initial": "(nenhuma)" }
+  ],
+  "handlers": [
+    {
+      "name": "escolher",
+      "params": ["v"],
+      "returns": "Boolean",
+      "body": "cor := v;\n    return true;"
+    }
+  ],
+  "screens": [
+    {
+      "name": "ui",
+      "root": {
+        "id": "n1",
+        "type": "VBox",
+        "props": {
+          "padding": 1,
+          "gap": 1,
+          "border": "round",
+          "borderColor": "magenta"
+        },
+        "children": [
+          {
+            "id": "n2",
+            "type": "HBox",
+            "props": { "gap": 1 },
+            "children": [
+              {
+                "id": "n3",
+                "type": "Text",
+                "props": {
+                  "bold": true,
+                  "color": "magenta",
+                  "text": "Dashboard"
+                }
+              },
+              {
+                "id": "n4",
+                "type": "Badge",
+                "props": {
+                  "color": "yellow",
+                  "text": "beta"
+                }
+              }
+            ]
+          },
+          {
+            "id": "n5",
+            "type": "Spinner",
+            "props": {
+              "label": "Carregando dados..."
+            }
+          },
+          {
+            "id": "n6",
+            "type": "Text",
+            "props": {
+              "dim": true,
+              "text": "Progresso:"
+            }
+          },
+          {
+            "id": "n7",
+            "type": "ProgressBar",
+            "props": {
+              "value": "=progresso"
+            }
+          },
+          {
+            "id": "n8",
+            "type": "StatusMessage",
+            "props": {
+              "variant": "success",
+              "text": "Conex\u00e3o estabelecida"
+            }
+          },
+          {
+            "id": "n9",
+            "type": "Text",
+            "props": {
+              "text": "Escolha uma cor:"
+            }
+          },
+          {
+            "id": "n10",
+            "type": "Select",
+            "props": {
+              "options": [
+                { "label": "Vermelho", "value": "red" },
+                { "label": "Verde", "value": "green" },
+                { "label": "Azul", "value": "blue" }
+              ],
+              "onChange": "@escolher"
+            }
+          },
+          {
+            "id": "n11",
+            "type": "Text",
+            "props": {
+              "text": "Cor escolhida: "
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

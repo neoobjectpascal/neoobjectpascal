@@ -47,7 +47,8 @@
     { key: 'justifyContent', label: 'Distribuir (eixo principal)', kind: 'enum', options: ['start', 'center', 'end', 'space-between'] },
   ];
   const evChange = { key: 'onChange', label: 'onChange', kind: 'event' };
-  const evSubmit = { key: 'onSubmit', label: 'onSubmit', kind: 'event' };
+   const evSubmit = { key: 'onSubmit', label: 'onSubmit', kind: 'event' };
+   const evClick = { key: 'onClick', label: 'onClick', kind: 'event' };
   const phField = { key: 'placeholder', label: 'Placeholder', kind: 'text' };
   const valField = { key: 'value', label: 'Valor inicial', kind: 'text', bindable: true };
   // Foco: `key` dá um identificador estável ao componente (usado por focus("chave")
@@ -84,6 +85,9 @@
       preview: (n) => `<span class="tk-badge" style="background:${col(p(n, 'color', 'magenta'))}">${esc(String(showVal(p(n, 'text', ''))).toUpperCase())}</span>` },
 
     // ── Entrada ───────────────────────────────────────────────────────────────
+    Button: { group: 'Entrada', label: 'Button', container: false, defaultProps: { text: 'Botão' },
+      fields: [{ key: 'text', label: 'Texto', kind: 'text' }, evClick],
+      preview: (n) => `<span class="tk-button">[ ${showVal(p(n, 'text', 'Botão'))} ]</span>` },
     TextInput: { group: 'Entrada', label: 'TextInput', container: false, defaultProps: { placeholder: 'Digite…' },
       fields: [phField, valField].concat(focusFields, [evChange, evSubmit]),
       preview: (n) => tkInput(p(n, 'value', p(n, 'defaultValue', '')), p(n, 'placeholder', '')) },

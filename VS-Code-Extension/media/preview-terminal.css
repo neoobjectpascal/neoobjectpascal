@@ -10,6 +10,7 @@
   padding: 2px 8px; min-width: 180px; background: #0f1626; }
 .tk-input .dim, .dim { opacity: .5; }
 .tk-cur { display: inline-block; width: 7px; height: 15px; background: #4ec9d4; margin-left: 3px; }
+.tk-button { display: inline-block; color: #0d1220; background: #4ec9d4; padding: 0 1ch; font-weight: 700; }
 .tk-select { display: flex; flex-direction: column; }
 .tk-opt { padding: 1px 0; }
 .tk-opt.on { color: #ffffff; }

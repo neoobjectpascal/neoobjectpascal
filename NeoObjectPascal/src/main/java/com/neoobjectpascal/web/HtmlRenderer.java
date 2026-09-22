@@ -207,15 +207,32 @@ final class HtmlRenderer {
             out.append("</tr></thead>");
         }
         Object rows = n.props.get("rows");
+        Object rowClick = n.props.get("onRowClick");
+        String rowHandler = rowClick != null && runtime.isCallable(rowClick) ? runtime.registerHandler(rowClick) : null;
         out.append("<tbody>");
         if (rows instanceof List) {
+            int i = 0;
             for (Object row : (List<?>) rows) {
-                out.append("<tr class=\"border-b border-slate-100 hover:bg-slate-50\">");
+                if (rowHandler != null) {
+                    out.append("<tr data-webink-row=\"").append(i).append("\"")
+                       .append(" data-webink-click=\"").append(rowHandler).append("\"")
+                       .append(" class=\"border-b border-slate-100 hover:bg-slate-50 cursor-pointer\">");
+                } else {
+                    out.append("<tr class=\"border-b border-slate-100 hover:bg-slate-50\">");
+                }
                 if (row instanceof List) {
-                    for (Object cell : (List<?>) row)
-                        out.append("<td class=\"px-4 py-2 text-slate-700\">").append(esc(WebNodes.fmt(cell))).append("</td>");
+                    for (Object cell : (List<?>) row) {
+                        if (cell instanceof WebNode) {
+                            out.append("<td class=\"px-4 py-2\">");
+                            node((WebNode) cell);
+                            out.append("</td>");
+                        } else {
+                            out.append("<td class=\"px-4 py-2 text-slate-700\">").append(esc(WebNodes.fmt(cell))).append("</td>");
+                        }
+                    }
                 }
                 out.append("</tr>");
+                i++;
             }
         }
         out.append("</tbody></table></div>");

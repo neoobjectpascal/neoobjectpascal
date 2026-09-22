@@ -131,6 +131,37 @@ public final class InteractiveWidgets {
         return Nodes.hbox(0, parts);
     }
 
+    // ======================================================================= Button
+
+    /** {@code Button(props?)}: focus with Tab, activate with Enter or Space. */
+    public static NativeFunction button() {
+        return (args, interp) -> {
+            Map<String, Object> props = NodeCoercion.extractProps(args);
+            TuiContext ctx = TuiContext.currentOrTransient();
+            String key = ctx.keyFor("Button", props);
+            int index = ctx.registerFocusable(key, k -> handleButtonKey(props, interp, k), props);
+            return focusableNode(expandButton(props, ctx.isFocused(index)), key);
+        };
+    }
+
+    /** Activates {@code onClick} on Enter or Space. */
+    public static boolean handleButtonKey(Map<String, Object> props, Interpreter interp, KeyStroke key) {
+        if (Props.getBool(props, "disabled", false)) return false;
+        if (key.getKeyType() == KeyType.Enter
+                || key.getKeyType() == KeyType.Character && Character.valueOf(' ').equals(key.getCharacter())) {
+            fireNoArg(interp, props, "onClick");
+            return true;
+        }
+        return false;
+    }
+
+    /** Renders focus using terminal-style brackets. */
+    static TuiNode expandButton(Map<String, Object> props, boolean focused) {
+        String text = Props.getString(props, "text", "Botão");
+        return Nodes.text(focused ? "[ " + text + " ]" : "  " + text + "  ",
+                "inverse", focused, "dim", Props.getBool(props, "disabled", false));
+    }
+
     // ======================================================================= Select
 
     /** Mutable per-widget state for a {@code Select}. */

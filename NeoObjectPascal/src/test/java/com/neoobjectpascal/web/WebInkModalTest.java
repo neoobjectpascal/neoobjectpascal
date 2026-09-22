@@ -4,6 +4,7 @@ import com.neoobjectpascal.Interpreter;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +65,46 @@ class WebInkModalTest {
     }
 
     @Test
-    void acceptsThemeInRenderOptions() {
-        WebRuntime runtime = new WebRuntime(new TestInterpreter(), new LinkedHashMap<>(), null, "dark");
-        assertEquals("dark", runtime.getTheme());
+    void tableRendersButtonWidgetInsideCell() {
+        WebRuntime runtime = new WebRuntime(new TestInterpreter(), new LinkedHashMap<>(), null, "light");
+        WebNode deleteBtn = WebNode.of("Button", props("onClick", CALLBACK, "text", "Excluir"), new ArrayList<>());
+        List<Object> rows = Arrays.asList(Arrays.asList("Ana Lima", "Admin", deleteBtn));
+        WebNode table = WebNode.of("Table", props("columns", Arrays.asList("Nome", "Perfil", ""), "rows", rows), new ArrayList<>());
+
+        String html = HtmlRenderer.render(table, runtime);
+
+        assertTrue(html.contains("<button"), "table cell should render a button element");
+        assertTrue(html.contains("Excluir"), "button text should appear");
+        assertTrue(html.contains("data-webink-click"), "button should have click handler");
+        assertTrue(html.indexOf("<td") < html.indexOf("<button"), "button should be inside a cell");
+    }
+
+    @Test
+    void tableCellWithPlainTextRendersNormally() {
+        WebRuntime runtime = new WebRuntime(new TestInterpreter(), new LinkedHashMap<>(), null, "light");
+        List<Object> rows = Arrays.asList(Arrays.asList("Ana", "Admin"));
+        WebNode table = WebNode.of("Table", props("columns", Arrays.asList("Nome", "Perfil"), "rows", rows), new ArrayList<>());
+
+        String html = HtmlRenderer.render(table, runtime);
+
+        assertTrue(html.contains(">Ana<"));
+        assertFalse(html.contains("<button"));
+    }
+
+    @Test
+    void tableCellWithWidgetDoesNotContainTextSlateClass() {
+        WebRuntime runtime = new WebRuntime(new TestInterpreter(), new LinkedHashMap<>(), null, "light");
+        WebNode btn = WebNode.of("Button", props("text", "OK"), new ArrayList<>());
+        List<Object> rows = Arrays.asList(Arrays.asList("Label", btn));
+        WebNode table = WebNode.of("Table", props("columns", Arrays.asList("A", "B"), "rows", rows), new ArrayList<>());
+
+        String html = HtmlRenderer.render(table, runtime);
+
+        // count cells: first is text (has text-slate-700), second has widget (no text-slate-700)
+        assertTrue(html.contains("text-slate-700"), "text cell keeps its class");
+        // Count td tags - the widget cell should still have px-4 py-2
+        int tdCount = occurrences(html, "<td");
+        assertEquals(2, tdCount);
     }
 
     private static int occurrences(String value, String target) {

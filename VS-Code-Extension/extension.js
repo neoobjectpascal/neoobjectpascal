@@ -112,6 +112,26 @@ function activate(context) {
         return /\bend\s*\.\s*$/i.test(content);
     }
 
+    // The Explorer URI is authoritative: only a runnable .npas (or the generated sibling of an
+    // .xnpas design) can bypass the project-wide main-file picker.
+    function resolveRunnableFile(filePath) {
+        if (!filePath) return null;
+        const extension = path.extname(filePath).toLowerCase();
+        const candidate = extension === '.xnpas'
+            ? filePath.slice(0, -'.xnpas'.length) + '.npas'
+            : filePath;
+        if (extension !== '.npas' && extension !== '.xnpas') return null;
+        if (/\.test\.npas$/i.test(candidate)) return null;
+        try {
+            return fs.existsSync(candidate) && fs.statSync(candidate).isFile()
+                    && isMainProgram(fs.readFileSync(candidate, 'utf8'))
+                ? candidate
+                : null;
+        } catch (error) {
+            return null;
+        }
+    }
+
     // Resolve the folder to operate on from a right-click uri (or the active editor):
     // a clicked folder → that folder; a clicked file → its workspace folder (else its directory);
     // nothing clicked → the first workspace folder.
@@ -150,6 +170,16 @@ function activate(context) {
     // 0 found → error (with a sensible fallback to the clicked file). 1 → use it. >1 → ask the user.
     // Returns null when there is nothing to run or the user cancels the picker.
     async function resolveMainFile(uri) {
+        const selected = getFilePath(uri);
+        if (selected && (!fs.existsSync(selected) || !fs.statSync(selected).isDirectory())) {
+            const runnable = resolveRunnableFile(selected);
+            if (runnable) return runnable;
+            vscode.window.showErrorMessage(
+                'Selected file is not runnable. Choose a .npas file ending with "end." or an .xnpas with a runnable .npas sibling.'
+            );
+            return null;
+        }
+
         const root = resolveRoot(uri);
         if (!root) {
             vscode.window.showErrorMessage('No NeoObjectPascal folder or workspace is open.');
@@ -158,10 +188,6 @@ function activate(context) {
         const mains = await findMainFiles(root);
 
         if (mains.length === 0) {
-            const clicked = uri && uri.fsPath ? uri.fsPath : getFilePath(null);
-            if (clicked && clicked.endsWith('.npas') && !clicked.endsWith('.test.npas')) {
-                return clicked; // fallback: run the clicked file even if `end.` wasn't detected
-            }
             vscode.window.showErrorMessage('No main program found — no .npas file ending with "end." under: ' + root);
             return null;
         }
