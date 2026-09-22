@@ -16,6 +16,10 @@
     'Nova tela': { en: 'New screen', de: 'Neuer Bildschirm', fr: 'Nouvel écran', it: 'Nuova schermata' },
     'Nova rota/tela': { en: 'New route/screen', de: 'Neue Route/Bildschirm', fr: 'Nouvelle route/écran', it: 'Nuova rotta/schermata' },
     'DesktopInk': { en: 'DesktopInk', de: 'DesktopInk', fr: 'DesktopInk', it: 'DesktopInk' },
+    'Tema': { en: 'Theme', de: 'Thema', fr: 'Thème', it: 'Tema' },
+    'Claro': { en: 'Light', de: 'Hell', fr: 'Clair', it: 'Chiaro' },
+    'Escuro': { en: 'Dark', de: 'Dunkel', fr: 'Sombre', it: 'Scuro' },
+    'Sistema': { en: 'System', de: 'System', fr: 'Système', it: 'Sistema' },
     'sincroniza com o .npas ao salvar': { en: 'syncs to the .npas on save', de: 'synchronisiert beim Speichern mit der .npas', fr: 'synchronise avec le .npas à l’enregistrement', it: 'sincronizza con il .npas al salvataggio' },
     'sincroniza com o .npas nos dois sentidos': {
       en: 'syncs both ways with the .npas',

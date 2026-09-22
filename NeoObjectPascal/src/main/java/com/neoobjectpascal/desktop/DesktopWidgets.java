@@ -10,7 +10,7 @@ import java.util.Map;
 
 /** Registers tolerant node builders for the DesktopInk component vocabulary. */
 final class DesktopWidgets {
-    private static final String[] TYPES = { "Window", "Container", "Section", "Grid", "Row", "Col",
+    private static final String[] TYPES = { "Window", "Container", "Sidebar", "Section", "Grid", "Row", "Col",
             "Card", "Divider", "Spacer", "Heading", "Text", "Badge", "StatCard", "Alert", "Button",
             "TextInput", "PasswordInput", "TextArea", "Select", "Checkbox", "Form", "Table", "List",
             "ProgressBar", "Spinner", "Modal" };

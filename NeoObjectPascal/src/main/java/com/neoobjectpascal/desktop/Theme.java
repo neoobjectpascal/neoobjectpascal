@@ -3,6 +3,7 @@ package com.neoobjectpascal.desktop;
 import java.awt.Color;
 import java.util.EnumMap;
 import java.util.Map;
+import javax.swing.UIManager;
 
 /** Semantic shadcn-inspired tokens shared by every Swing component. */
 public final class Theme {
@@ -20,7 +21,17 @@ public final class Theme {
     }
 
     public static Theme resolve(String value) {
-        return "dark".equalsIgnoreCase(value) ? dark() : light();
+        if ("dark".equalsIgnoreCase(value)) return dark();
+        if ("system".equalsIgnoreCase(value)) return system();
+        return light();
+    }
+
+    /** Uses the active Swing Look and Feel surface to select a semantic palette. */
+    public static Theme system() {
+        Color background = UIManager.getColor("Panel.background");
+        if (background == null) return light();
+        int luminance = (background.getRed() * 299 + background.getGreen() * 587 + background.getBlue() * 114) / 1000;
+        return luminance < 128 ? dark() : light();
     }
 
     public static Theme light() {

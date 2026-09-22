@@ -45,6 +45,12 @@ class DesktopInkTest {
     }
 
     @Test
+    void systemThemeResolvesUsingThePlatformLookAndFeel() {
+        assertEquals(Theme.system().color(Theme.Token.BACKGROUND),
+                Theme.resolve("system").color(Theme.Token.BACKGROUND));
+    }
+
+    @Test
     void rendererBuildsSwingComponentsWithoutAWindow() {
         DesktopNode tree = DesktopNode.of("Card", new LinkedHashMap<>(),
                 Arrays.asList(DesktopNode.of("Button", new LinkedHashMap<>(), Arrays.asList(DesktopNode.text("Save")))));

@@ -120,6 +120,7 @@
      }).join('');
     const term = model.target === 'terminalink';
     const desktop = model.target === 'desktopink';
+    const desktopTheme = desktop ? ((model.desktop || {}).theme || 'light') : '';
     const langOpts = NpI18n.langs.map((l) => `<option value="${l}" ${l === LANG ? 'selected' : ''}>${esc(LANG_NAMES[l] || l)}</option>`).join('');
     tb.innerHTML =
       `<div class="seg">
@@ -129,8 +130,9 @@
        </div>
         <div class="route">${icon('route')}<select id="routeSel">${screens}</select></div>
          <button class="tbtn icon" id="addScreen" ${desktop ? 'disabled' : ''} title="${esc(term ? t('Nova tela') : t('Nova rota/tela'))}">${icon('plus')}</button>
-        <button class="tbtn" id="addModal">${icon('plus', { s: 13 })} ${esc(t('Modal'))}</button>
-        ${modalIdx >= 0 ? `<button class="tbtn icon" id="delModal" title="${esc(t('Remover modal'))}">${icon('trash')}</button>` : ''}
+         <button class="tbtn" id="addModal">${icon('plus', { s: 13 })} ${esc(t('Modal'))}</button>
+         ${modalIdx >= 0 ? `<button class="tbtn icon" id="delModal" title="${esc(t('Remover modal'))}">${icon('trash')}</button>` : ''}
+        ${desktop ? `<div class="lang" title="${esc(t('Tema'))}"><select id="desktopTheme"><option value="light" ${desktopTheme === 'light' ? 'selected' : ''}>${esc(t('Claro'))}</option><option value="dark" ${desktopTheme === 'dark' ? 'selected' : ''}>${esc(t('Escuro'))}</option><option value="system" ${desktopTheme === 'system' ? 'selected' : ''}>${esc(t('Sistema'))}</option></select></div>` : ''}
        <div class="spring"></div>
        <div class="lang" title="${esc(t('Idioma'))}">${icon('globe', { s: 14 })}<select id="langSel">${langOpts}</select></div>
        <div class="sync">${icon('check', { s: 14 })} ${esc(t(SYNC === 'bidirectional' ? 'sincroniza com o .npas nos dois sentidos' : 'sincroniza com o .npas ao salvar'))}</div>
@@ -147,6 +149,11 @@
      el('#addScreen').onclick = addScreen;
      el('#addModal').onclick = addModal;
      if (el('#delModal')) el('#delModal').onclick = deleteModal;
+     if (el('#desktopTheme')) el('#desktopTheme').onchange = (e) => {
+       model.desktop = model.desktop || {};
+       model.desktop.theme = e.target.value;
+       renderCanvas(); push();
+     };
     el('#langSel').onchange = (e) => setLang(e.target.value);
     el('#undo').onclick = () => vscode.postMessage({ type: 'undo' });
     el('#redo').onclick = () => vscode.postMessage({ type: 'redo' });
@@ -262,9 +269,11 @@
     const stage = el('#stage');
      const rootNode = curRoot();
      const term = model.target === 'terminalink';
+     const desktop = model.target === 'desktopink';
      const empty = !(rootNode.children && rootNode.children.length);
-    const device = document.createElement('div'); device.className = 'device' + (term ? ' device-term' : '');
-    const root = document.createElement('div'); root.className = term ? 'tk-root' : 'wk-root';
+     const desktopTheme = desktop ? String((model.desktop || {}).theme || 'light').toLowerCase() : '';
+     const device = document.createElement('div'); device.className = 'device' + (term ? ' device-term' : '') + (desktop ? ' device-desktop desktop-' + desktopTheme : '');
+     const root = document.createElement('div'); root.className = term ? 'tk-root' : (desktop ? 'dk-root' : 'wk-root');
      root.appendChild(buildNode(rootNode, true));
     device.appendChild(root);
     if (empty) {
