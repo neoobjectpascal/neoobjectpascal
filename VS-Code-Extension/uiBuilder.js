@@ -56,6 +56,7 @@ class UiBuilderProvider {
         case 'undo': await vscode.commands.executeCommand('undo'); break;
         case 'redo': await vscode.commands.executeCommand('redo'); break;
         case 'run': await this.runLive(document); break;
+        case 'openHandler': await this.openHandler(document, msg.handler, msg.text); break;
         case 'setLang':
           await vscode.workspace.getConfiguration('neoobjectpascal')
             .update('uiBuilder.language', NpI18n.normalize(msg.lang), vscode.ConfigurationTarget.Global);
@@ -79,6 +80,32 @@ class UiBuilderProvider {
       try { await vscode.commands.executeCommand('neoobjectpascal.run', npasUri); }
       catch (e) { vscode.window.showErrorMessage(t('Não foi possível rodar: ') + e.message); }
     }
+  }
+
+  async openHandler(document, handlerName, text) {
+    if (!handlerName) return;
+    if (syncMode() === 'xnpasFirst') {
+      const choice = await vscode.window.showWarningMessage(
+        t('A edição do código do evento exige sincronização bidirecional.'),
+        t('Usar sincronização bidirecional')
+      );
+      if (choice !== t('Usar sincronização bidirecional')) return;
+      await vscode.workspace.getConfiguration('neoobjectpascal')
+        .update('uiBuilder.sync', 'bidirectional', vscode.ConfigurationTarget.Workspace);
+    }
+    if (text) await this.applyEdit(document, text);
+    await document.save();
+    const npasUri = await writeSibling(document);
+    if (!npasUri) return;
+    const source = await vscode.workspace.openTextDocument(npasUri);
+    const editor = await vscode.window.showTextDocument(source, { preview: false });
+    const marker = '// @ui-handler ' + handlerName;
+    const markerLine = source.getText().split(/\r?\n/).findIndex((line) => line.trim() === marker);
+    const start = markerLine >= 0 ? markerLine + 1 : 0;
+    const beginLine = source.getText().split(/\r?\n/).findIndex((line, index) => index >= start && /^\s*begin\s*$/i.test(line));
+    const position = new vscode.Position(beginLine >= 0 ? beginLine + 1 : start, 4);
+    editor.selection = new vscode.Selection(position, position);
+    editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
   }
 
   getHtml(webview) {

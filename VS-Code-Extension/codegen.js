@@ -84,6 +84,17 @@ function header(name) {
   ];
 }
 
+function handlerSrc(lines, handler) {
+  const params = (handler.params || []).join(', ');
+  lines.push('// @ui-handler ' + handler.name);
+  lines.push('function ' + handler.name + '(' + params + '): ' + (handler.returns || 'Boolean'));
+  lines.push('begin');
+  const body = (handler.body && handler.body.trim()) ? handler.body : 'return true;';
+  for (const line of body.split('\n')) lines.push(line ? '    ' + line : '');
+  lines.push('end;');
+  lines.push('');
+}
+
 function generateWeb(model, fileBase) {
   const L = header(fileBase);
   L.push('');
@@ -94,15 +105,7 @@ function generateWeb(model, fileBase) {
   for (const s of state) L.push('var ' + s.name + ': ' + s.type + ';   // estado compartilhado');
   if (state.length) L.push('');
 
-  for (const h of (model.handlers || [])) {
-    const params = (h.params || []).join(', ');
-    L.push('function ' + h.name + '(' + params + '): ' + (h.returns || 'Boolean'));
-    L.push('begin');
-    const body = (h.body && h.body.trim()) ? h.body : 'return true;';
-    for (const line of body.split('\n')) L.push(line ? '    ' + line : '');
-    L.push('end;');
-    L.push('');
-  }
+  for (const h of (model.handlers || [])) handlerSrc(L, h);
 
   const screens = model.screens || [];
   for (const sc of screens) {
@@ -165,15 +168,7 @@ function generateTerminal(model, fileBase) {
   const state = model.state || [];
   for (const s of state) L.push('var ' + s.name + ': ' + s.type + ';   // estado compartilhado');
   if (state.length) L.push('');
-  for (const h of (model.handlers || [])) {
-    const params = (h.params || []).join(', ');
-    L.push('function ' + h.name + '(' + params + '): ' + (h.returns || 'Boolean'));
-    L.push('begin');
-    const body = (h.body && h.body.trim()) ? h.body : 'return true;';
-    for (const line of body.split('\n')) L.push(line ? '    ' + line : '');
-    L.push('end;');
-    L.push('');
-  }
+  for (const h of (model.handlers || [])) handlerSrc(L, h);
   const screens = model.screens || [];
   for (const sc of screens) {
     L.push('function ' + sc.name + '(): Object');
@@ -202,15 +197,7 @@ function generateDesktop(model, fileBase) {
   const state = model.state || [];
   for (const s of state) L.push('var ' + s.name + ': ' + s.type + ';   // estado compartilhado');
   if (state.length) L.push('');
-  for (const h of (model.handlers || [])) {
-    const params = (h.params || []).join(', ');
-    L.push('function ' + h.name + '(' + params + '): ' + (h.returns || 'Boolean'));
-    L.push('begin');
-    const body = (h.body && h.body.trim()) ? h.body : 'return true;';
-    for (const line of body.split('\n')) L.push(line ? '    ' + line : '');
-    L.push('end;');
-    L.push('');
-  }
+  for (const h of (model.handlers || [])) handlerSrc(L, h);
   const screen = (model.screens || [])[0] || { root: { type: 'Window', props: {}, children: [] } };
   L.push('function screen(): Object');
   L.push('begin');

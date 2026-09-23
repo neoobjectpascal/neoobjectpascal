@@ -99,6 +99,7 @@ t('uses webink + header', () => { has(w, 'uses webink;'); has(w, 'GERADO por tes
 t('rotas em render', () => has(w, 'render(#{ "/": home, "/sobre": sobre }, #{ title: "Acme" });'));
 t('state var + init', () => { has(w, 'var cliques: Integer;'); has(w, 'cliques := 0;'); });
 t('handler function', () => has(w, 'function registrar(): Boolean'));
+t('handler gerado recebe marcador navegável', () => has(w, '// @ui-handler registrar'));
 t('evento = referência de função (sem aspas)', () => { has(w, 'onClick: registrar'); hasnt(w, 'onClick: "registrar"'); });
 t('=expr vira expressão bare', () => has(w, 'value: cliques'));
 t('Table colunas/linhas', () => has(w, 'columns: ["A", "B"], rows: [["1", "2"]]'));

@@ -81,7 +81,15 @@
     pending.add(text);
     vscode.postMessage({ type: 'update', text });
   }
-   const EVENT_PROPS = ['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel', 'onClose'];
+  const EVENT_PROPS = ['onClick', 'onChange', 'onSubmit', 'onConfirm', 'onCancel', 'onClose'];
+  const EVENT_META = {
+    onClick: { base: 'aoClicar', params: [] },
+    onChange: { base: 'aoMudar', params: ['v'] },
+    onSubmit: { base: 'aoEnviar', params: [] },
+    onConfirm: { base: 'aoConfirmar', params: [] },
+    onCancel: { base: 'aoCancelar', params: [] },
+    onClose: { base: 'aoFechar', params: [] },
+  };
   function pruneHandlers() {
     const used = new Set();
     const walk = (n) => {
@@ -359,7 +367,7 @@
     if (!r) { body.innerHTML = `<div class="hint">${esc(t('Selecione um componente no canvas para editar suas propriedades.'))}</div>`; return; }
     const node = r.node, def = W.def(node.type);
     let html = `<div class="icomp">${esc(t('Componente'))} <span class="tt">${node.type}</span><span class="id">#${node.id}</span></div>`;
-    for (const f of (def.fields || [])) html += fieldHtml(node, f);
+    for (const f of (def.fields || []).filter((f) => f.kind !== 'event')) html += fieldHtml(node, f);
     // `visible` applies to every component except the screen root (which always renders).
     if (r.parent) html += visibleFieldHtml(node);
     body.innerHTML = html;
@@ -661,14 +669,15 @@
     const params = (h.params || []).join(', ');
     return `function ${h.name}(${params}): ${h.returns || 'Boolean'}\n  ${(h.body || '').split('\n').join('\n  ')}`;
   }
-  function ensureHandler(node, ev) {
-    let h = handlerOf(node, ev);
-    if (h) return h;
-     const base = ev === 'onClick' ? 'aoClicar' : ev === 'onSubmit' ? 'aoEnviar' : ev === 'onClose' ? 'aoFechar' : 'aoMudar';
+   function ensureHandler(node, ev) {
+     let h = handlerOf(node, ev);
+     if (h) return h;
+      const meta = EVENT_META[ev] || { base: 'aoEvento', params: [] };
+      const base = meta.base;
     let name = base, i = 2;
     const taken = new Set((model.handlers || []).map((x) => x.name));
     while (taken.has(name)) name = base + (i++);
-    h = { name, returns: 'Boolean', params: [], body: 'return true;' };
+     h = { name, returns: 'Boolean', params: meta.params.slice(), body: 'return true;' };
     model.handlers = model.handlers || [];
     model.handlers.push(h);
     node.props[ev] = '@' + name;
@@ -741,13 +750,43 @@
   }
 
   function renderEventsTab(body) {
-    let html = `<div class="icomp">${esc(t('Eventos'))} <span class="tt">${esc(t('handlers'))}</span></div>`;
-    if (!(model.handlers || []).length) html += `<div class="hint">${t('Nenhum evento ainda. Selecione um componente (ex.: Button) e configure o <b>onClick</b> na aba Propriedades.')}</div>`;
-    (model.handlers || []).forEach((h) => {
-      html += `<div class="fld"><label>function ${esc(h.name)}(${(h.params || []).join(', ')}): ${h.returns || 'Boolean'}</label>` +
-        `<div class="code">${esc(h.body || '')}</div></div>`;
-    });
+    const r = selected();
+    if (!r) { body.innerHTML = `<div class="hint">${esc(t('Selecione um componente no canvas para editar seus eventos.'))}</div>`; return; }
+    const node = r.node;
+    const events = (W.def(node.type).fields || []).filter((f) => f.kind === 'event');
+    let html = `<div class="icomp">${esc(t('Eventos'))} <span class="tt">${esc(node.type)}</span></div>`;
+    if (!events.length) html += `<div class="hint">${esc(t('Este componente não possui eventos configuráveis.'))}</div>`;
+    for (const field of events) {
+      const handler = handlerOf(node, field.key);
+      const options = [`<option value="">${esc(t('(nenhum)'))}</option>`].concat((model.handlers || []).map((h) =>
+        `<option value="${escAttr(h.name)}" ${handler && h.name === handler.name ? 'selected' : ''}>${esc(h.name)}</option>`)).join('');
+      html += `<div class="event-row"><label>${esc(field.key)}</label><div class="event-controls">` +
+        `<select data-event-handler="${escAttr(field.key)}">${options}</select>` +
+        `<button class="iconbtn" data-create-handler="${escAttr(field.key)}" title="${esc(t('Criar método do evento'))}">${icon('plus', { s: 13 })}</button>` +
+        `<button class="linkbtn event-code" data-open-handler="${escAttr(handler ? handler.name : '')}" ${handler ? '' : 'disabled'}>${icon('code', { s: 13 })} ${esc(t('Código'))}</button>` +
+        `</div></div>`;
+    }
     body.innerHTML = html;
+    body.querySelectorAll('[data-event-handler]').forEach((select) => {
+      select.onchange = () => {
+        const eventName = select.dataset.eventHandler;
+        if (select.value) node.props[eventName] = '@' + select.value;
+        else delete node.props[eventName];
+        renderEventsTab(body); push();
+      };
+    });
+    body.querySelectorAll('[data-create-handler]').forEach((button) => {
+      button.onclick = () => {
+        const handler = ensureHandler(node, button.dataset.createHandler);
+        renderEventsTab(body);
+        vscode.postMessage({ type: 'openHandler', handler: handler.name, text: JSON.stringify(model, null, 2) + '\n' });
+      };
+    });
+    body.querySelectorAll('[data-open-handler]').forEach((button) => {
+      button.onclick = () => {
+        if (button.dataset.openHandler) vscode.postMessage({ type: 'openHandler', handler: button.dataset.openHandler });
+      };
+    });
   }
 
   // ── target + screens ───────────────────────────────────────────────────────
